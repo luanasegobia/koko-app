@@ -1,0 +1,81 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "conversation_id": {
+      "type": "string",
+      "description": "ID \u00fanico de la conversaci\u00f3n (ej: lostpet_{id} o urgentcase_{id})"
+    },
+    "context_type": {
+      "type": "string",
+      "enum": [
+        "lost_pet",
+        "urgent_case",
+        "adoption"
+      ],
+      "description": "Tipo de contexto de la conversaci\u00f3n"
+    },
+    "context_id": {
+      "type": "string",
+      "description": "ID del registro relacionado"
+    },
+    "context_title": {
+      "type": "string",
+      "description": "T\u00edtulo del contexto para mostrar"
+    },
+    "sender_id": {
+      "type": "string",
+      "description": "ID del usuario que envi\u00f3 el mensaje"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Nombre del remitente"
+    },
+    "text": {
+      "type": "string",
+      "description": "Contenido del mensaje"
+    },
+    "read_by": {
+      "type": "array",
+      "description": "IDs de usuarios que leyeron el mensaje",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "conversation_id",
+    "context_type",
+    "context_id",
+    "sender_id",
+    "text"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

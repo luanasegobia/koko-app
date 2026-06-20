@@ -1,0 +1,92 @@
+{
+  "name": "AbuseReport",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "urgente",
+        "regular",
+        "anonima"
+      ],
+      "description": "Tipo de denuncia"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n de la situaci\u00f3n"
+    },
+    "address": {
+      "type": "string",
+      "description": "Ubicaci\u00f3n del hecho"
+    },
+    "lat": {
+      "type": "number",
+      "description": "Latitud"
+    },
+    "lng": {
+      "type": "number",
+      "description": "Longitud"
+    },
+    "evidence_urls": {
+      "type": "array",
+      "description": "URLs de fotos/videos como evidencia",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reporter_name": {
+      "type": "string",
+      "description": "Nombre del denunciante (opcional)"
+    },
+    "reporter_phone": {
+      "type": "string",
+      "description": "Tel\u00e9fono del denunciante (opcional)"
+    },
+    "tracking_code": {
+      "type": "string",
+      "description": "C\u00f3digo de seguimiento"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendiente",
+        "en_revision",
+        "derivada",
+        "resuelta"
+      ],
+      "default": "pendiente"
+    }
+  },
+  "required": [
+    "type",
+    "description"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

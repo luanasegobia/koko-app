@@ -1,0 +1,101 @@
+{
+  "name": "UrgentCase",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo del caso"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n detallada"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Foto del animal"
+    },
+    "published_by": {
+      "type": "string",
+      "description": "Nombre de quien publica"
+    },
+    "goal_amount": {
+      "type": "number",
+      "description": "Meta de recaudaci\u00f3n en ARS"
+    },
+    "raised_amount": {
+      "type": "number",
+      "description": "Monto recaudado",
+      "default": 0
+    },
+    "contributors_count": {
+      "type": "number",
+      "description": "Cantidad de personas que colaboraron",
+      "default": 0
+    },
+    "donation_alias": {
+      "type": "string",
+      "description": "Alias para transferencia"
+    },
+    "needs": {
+      "type": "array",
+      "description": "Tipos de ayuda necesaria",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pendiente",
+              "parcial",
+              "cubierto"
+            ]
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "activo",
+        "en_curso",
+        "resuelto"
+      ],
+      "default": "activo"
+    }
+  },
+  "required": [
+    "title",
+    "description"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

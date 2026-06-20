@@ -1,0 +1,85 @@
+{
+  "name": "AlertSubscription",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario suscripto"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email del usuario"
+    },
+    "lat": {
+      "type": "number",
+      "description": "Latitud del centro del \u00e1rea de alerta"
+    },
+    "lng": {
+      "type": "number",
+      "description": "Longitud del centro del \u00e1rea de alerta"
+    },
+    "radius_km": {
+      "type": "number",
+      "description": "Radio en km",
+      "default": 5
+    },
+    "location_label": {
+      "type": "string",
+      "description": "Etiqueta del \u00e1rea (ej: Mi barrio)"
+    },
+    "notify_lost_pets": {
+      "type": "boolean",
+      "default": true,
+      "description": "Alertas de mascotas perdidas"
+    },
+    "notify_urgent_cases": {
+      "type": "boolean",
+      "default": true,
+      "description": "Alertas de casos urgentes"
+    }
+  },
+  "required": [
+    "user_id"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "name": "LostPet",
+  "type": "object",
+  "properties": {
+    "pet_name": {
+      "type": "string",
+      "description": "Nombre de la mascota"
+    },
+    "species": {
+      "type": "string",
+      "enum": [
+        "perro",
+        "gato",
+        "otro"
+      ],
+      "description": "Especie"
+    },
+    "breed": {
+      "type": "string",
+      "description": "Raza"
+    },
+    "age_years": {
+      "type": "number",
+      "description": "Edad en a\u00f1os"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "URL de la foto"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n y se\u00f1as particulares"
+    },
+    "last_seen_address": {
+      "type": "string",
+      "description": "Direcci\u00f3n donde fue vista por \u00faltima vez"
+    },
+    "last_seen_lat": {
+      "type": "number",
+      "description": "Latitud"
+    },
+    "last_seen_lng": {
+      "type": "number",
+      "description": "Longitud"
+    },
+    "contact_phone": {
+      "type": "string",
+      "description": "Tel\u00e9fono de contacto"
+    },
+    "contact_whatsapp": {
+      "type": "string",
+      "description": "WhatsApp de contacto"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "perdida",
+        "encontrada"
+      ],
+      "default": "perdida"
+    },
+    "sightings": {
+      "type": "array",
+      "description": "Avistamientos reportados",
+      "items": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number"
+          },
+          "lng": {
+            "type": "number"
+          },
+          "address": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "pet_name",
+    "species"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

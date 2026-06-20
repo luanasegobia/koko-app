@@ -1,0 +1,91 @@
+{
+  "name": "AppNotification",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario destinatario"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "lost_pet",
+        "urgent_case",
+        "sighting",
+        "abuse_report",
+        "chat_reply",
+        "case_update"
+      ],
+      "description": "Tipo de notificaci\u00f3n"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo"
+    },
+    "body": {
+      "type": "string",
+      "description": "Cuerpo del mensaje"
+    },
+    "ref_id": {
+      "type": "string",
+      "description": "ID del registro relacionado"
+    },
+    "link": {
+      "type": "string",
+      "description": "Ruta interna para navegar al hacer clic"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false
+    },
+    "distance_km": {
+      "type": "number",
+      "description": "Distancia al usuario en km"
+    }
+  },
+  "required": [
+    "user_id",
+    "type",
+    "title",
+    "body"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
