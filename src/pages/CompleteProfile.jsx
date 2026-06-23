@@ -1,7 +1,5 @@
-const db = globalThis.__B44_DB__ || { auth:{ isAuthenticated: async()=>false, me: async()=>null }, entities:new Proxy({}, { get:()=>({ filter:async()=>[], get:async()=>null, create:async()=>({}), update:async()=>({}), delete:async()=>({}) }) }), integrations:{ Core:{ UploadFile:async()=>({ file_url:'' }) } } };
-
 import React, { useState } from "react";
-
+import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,12 +40,12 @@ export default function CompleteProfile() {
     };
     if (role === "organizacion") data.organization_name = form.organization_name;
 
-    await db.auth.updateMe(data);
+    await base44.auth.updateMe(data);
 
     // Si es veterinario, crear registro en Veterinary pendiente de verificación
     if (role === "veterinario") {
-      const me = await db.auth.me();
-      await db.entities.Veterinary.create({
+      const me = await base44.auth.me();
+      await base44.entities.Veterinary.create({
         name: form.vet_clinic_name,
         address: form.vet_address,
         phone: form.vet_phone || form.phone,

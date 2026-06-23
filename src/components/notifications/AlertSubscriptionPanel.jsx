@@ -27,4 +27,10 @@ export default function AlertSubscriptionPanel() {
       const subs = await db.entities.AlertSubscription.filter({ user_id: u.id });
       if (subs.length > 0) {
         setSub(subs[0]);
-        setForm({
+        setForm({ ...subs[0] });
+      }
+    });
+  }, []);
+
+  return <div>AlertSubscriptionPanel</div>;
+}

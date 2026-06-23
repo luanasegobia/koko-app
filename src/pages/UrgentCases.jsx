@@ -1,7 +1,5 @@
-const db = globalThis.__B44_DB__ || { auth:{ isAuthenticated: async()=>false, me: async()=>null }, entities:new Proxy({}, { get:()=>({ filter:async()=>[], get:async()=>null, create:async()=>({}), update:async()=>({}), delete:async()=>({}) }) }), integrations:{ Core:{ UploadFile:async()=>({ file_url:'' }) } } };
-
 import React, { useState } from "react";
-
+import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -26,7 +24,7 @@ export default function UrgentCases() {
 
   const { data: cases = [], isLoading } = useQuery({
     queryKey: ["urgentCases"],
-    queryFn: () => db.entities.UrgentCase.list("-created_date", 50),
+    queryFn: () => base44.entities.UrgentCase.list("-created_date", 50),
   });
 
   const activeCases = cases.filter(c => c.status !== "resuelto");
@@ -43,7 +41,7 @@ export default function UrgentCases() {
             <Badge className="bg-destructive text-destructive-foreground">{activeCases.length} activos</Badge>
           )}
         </div>
-        <Button onClick={() => isAuthenticated ? setShowForm(true) : db.auth.redirectToLogin(window.location.href)}>
+        <Button onClick={() => isAuthenticated ? setShowForm(true) : base44.auth.redirectToLogin(window.location.href)}>
           <Plus className="w-4 h-4 mr-2" /> Publicar nuevo caso
         </Button>
       </div>

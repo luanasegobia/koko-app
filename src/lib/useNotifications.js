@@ -1,6 +1,5 @@
-const db = globalThis.__B44_DB__ || { auth:{ isAuthenticated: async()=>false, me: async()=>null }, entities:new Proxy({}, { get:()=>({ filter:async()=>[], get:async()=>null, create:async()=>({}), update:async()=>({}), delete:async()=>({}) }) }), integrations:{ Core:{ UploadFile:async()=>({ file_url:'' }) } } };
-
 import { useState, useEffect, useCallback, useRef } from "react";
+import { base44 } from "@/api/base44Client";
 
 function haversineKm([lat1, lng1], [lat2, lng2]) {
   const R = 6371;
@@ -24,15 +23,15 @@ export function useNotifications() {
 
   // Load current user
   useEffect(() => {
-    db.auth.me().then(setUser).catch(() => {});
+    base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
   // Load subscription and notifications
   const loadData = useCallback(async () => {
     if (!user) return;
     const [subs, notifs] = await Promise.all([
-      db.entities.AlertSubscription.filter({ user_id: user.id }),
-      db.entities.AppNotification.filter({ user_id: user.id }, "-created_date", 50),
+      base44.entities.AlertSubscription.filter({ user_id: user.id }),
+      base44.entities.AppNotification.filter({ user_id: user.id }, "-created_date", 50),
     ]);
     setSubscription(subs[0] || null);
     setNotifications(notifs);
@@ -52,7 +51,7 @@ export function useNotifications() {
   // Real-time subscription for new notifications
   useEffect(() => {
     if (!user) return;
-    const unsub = db.entities.AppNotification.subscribe((event) => {
+    const unsub = base44.entities.AppNotification.subscribe((event) => {
       if (event.type === "create" && event.data.user_id === user.id) {
         if (!seenIdsRef.current.has(event.id)) {
           seenIdsRef.current.add(event.id);
@@ -81,7 +80,7 @@ export function useNotifications() {
 
       // Check lost pets
       if (subscription.notify_lost_pets && subscription.lat && subscription.lng) {
-        const recent = await db.entities.LostPet.list("-created_date", 20);
+        const recent = await base44.entities.LostPet.list("-created_date", 20);
         for (const pet of recent) {
           if (!pet.created_date || new Date(pet.created_date) < new Date(Date.now() - POLL_MS * 1.5)) continue;
           if (seenIdsRef.current.has(`lp-${pet.id}`)) continue;
@@ -94,7 +93,7 @@ export function useNotifications() {
             distText = ` (a ${dist.toFixed(1)} km)`;
           }
 
-          await db.entities.AppNotification.create({
+          await base44.entities.AppNotification.create({
             user_id: user.id,
             type: "lost_pet",
             title: `🐾 Mascota perdida cerca${distText}`,
@@ -108,14 +107,14 @@ export function useNotifications() {
 
       // Check urgent cases
       if (subscription.notify_urgent_cases) {
-        const recent = await db.entities.UrgentCase.list("-updated_date", 10);
+        const recent = await base44.entities.UrgentCase.list("-updated_date", 10);
         for (const uc of recent) {
           if (!uc.updated_date || new Date(uc.updated_date) < new Date(Date.now() - POLL_MS * 1.5)) continue;
           const key = `uc-${uc.id}-${uc.updated_date}`;
           if (seenIdsRef.current.has(key)) continue;
           seenIdsRef.current.add(key);
 
-          await db.entities.AppNotification.create({
+          await base44.entities.AppNotification.create({
             user_id: user.id,
             type: "urgent_case",
             title: `🆘 Actualización: ${uc.title}`,
@@ -133,13 +132,13 @@ export function useNotifications() {
 
   const markAllRead = useCallback(async () => {
     const unread = notifications.filter(n => !n.read);
-    await Promise.all(unread.map(n => db.entities.AppNotification.update(n.id, { read: true })));
+    await Promise.all(unread.map(n => base44.entities.AppNotification.update(n.id, { read: true })));
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     setUnreadCount(0);
   }, [notifications]);
 
   const markRead = useCallback(async (id) => {
-    await db.entities.AppNotification.update(id, { read: true });
+    await base44.entities.AppNotification.update(id, { read: true });
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
     setUnreadCount(prev => Math.max(0, prev - 1));
   }, []);
@@ -148,17 +147,17 @@ export function useNotifications() {
     if (!user) return;
     const payload = { ...data, user_id: user.id, user_email: user.email };
     if (subscription) {
-      const updated = await db.entities.AlertSubscription.update(subscription.id, payload);
+      const updated = await base44.entities.AlertSubscription.update(subscription.id, payload);
       setSubscription({ ...subscription, ...payload });
     } else {
-      const created = await db.entities.AlertSubscription.create(payload);
+      const created = await base44.entities.AlertSubscription.create(payload);
       setSubscription(created);
     }
   }, [user, subscription]);
 
   const deleteSubscription = useCallback(async () => {
     if (!subscription) return;
-    await db.entities.AlertSubscription.delete(subscription.id);
+    await base44.entities.AlertSubscription.delete(subscription.id);
     setSubscription(null);
   }, [subscription]);
 

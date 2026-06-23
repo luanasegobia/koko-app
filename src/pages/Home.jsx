@@ -93,6 +93,7 @@ const modules = [
   tagColor: "bg-pink-500/10 text-pink-600 border-pink-500/20"
 }];
 
+
 const floatingPaws = [
 { x: "8%", y: "18%", size: 26, delay: 0, opacity: 0.08, rotate: -15 },
 { x: "78%", y: "8%", size: 34, delay: 0.6, opacity: 0.06, rotate: 20 },
@@ -100,6 +101,7 @@ const floatingPaws = [
 { x: "22%", y: "72%", size: 30, delay: 0.9, opacity: 0.06, rotate: 30 },
 { x: "88%", y: "45%", size: 18, delay: 0.4, opacity: 0.09, rotate: -25 },
 { x: "45%", y: "85%", size: 20, delay: 1.5, opacity: 0.05, rotate: 10 }];
+
 
 // Magnetic button hook
 function useMagnetic(strength = 0.3) {
@@ -273,6 +275,7 @@ const stats = [
 { icon: Heart, label: "Adopciones exitosas", value: "42", color: "text-pink-500" },
 { icon: MapPin, label: "Veterinarias activas", value: "18", color: "text-blue-500" },
 { icon: Zap, label: "Casos resueltos", value: "67", color: "text-amber-500" }];
+
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");

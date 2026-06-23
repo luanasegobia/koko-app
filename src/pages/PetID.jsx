@@ -1,7 +1,5 @@
-const db = globalThis.__B44_DB__ || { auth:{ isAuthenticated: async()=>false, me: async()=>null }, entities:new Proxy({}, { get:()=>({ filter:async()=>[], get:async()=>null, create:async()=>({}), update:async()=>({}), delete:async()=>({}) }) }), integrations:{ Core:{ UploadFile:async()=>({ file_url:'' }) } } };
-
 import React, { useState } from "react";
-
+import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,7 +15,7 @@ export default function PetID() {
 
   const { data: pets = [], isLoading } = useQuery({
     queryKey: ["myPets"],
-    queryFn: () => db.entities.Pet.list("-created_date", 50),
+    queryFn: () => base44.entities.Pet.list("-created_date", 50),
   });
 
   return (

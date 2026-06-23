@@ -1,7 +1,5 @@
-const db = globalThis.__B44_DB__ || { auth:{ isAuthenticated: async()=>false, me: async()=>null }, entities:new Proxy({}, { get:()=>({ filter:async()=>[], get:async()=>null, create:async()=>({}), update:async()=>({}), delete:async()=>({}) }) }), integrations:{ Core:{ UploadFile:async()=>({ file_url:'' }) } } };
-
 import React, { useState, useMemo } from "react";
-
+import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -44,7 +42,7 @@ export default function LostPets() {
 
   const { data: lostPets = [], isLoading } = useQuery({
     queryKey: ["lostPets"],
-    queryFn: () => db.entities.LostPet.list("-created_date", 100),
+    queryFn: () => base44.entities.LostPet.list("-created_date", 100),
   });
 
   const filtered = useMemo(() => {
@@ -109,7 +107,7 @@ export default function LostPets() {
           <p className="text-muted-foreground mt-1">Ayudá a encontrar mascotas perdidas en Orán</p>
         </div>
         <Button
-          onClick={() => isAuthenticated ? setShowForm(true) : db.auth.redirectToLogin(window.location.href)}
+          onClick={() => isAuthenticated ? setShowForm(true) : base44.auth.redirectToLogin(window.location.href)}
           className="bg-destructive hover:bg-destructive/90"
         >
           <Plus className="w-4 h-4 mr-2" /> Reportar mascota perdida

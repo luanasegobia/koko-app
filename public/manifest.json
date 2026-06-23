@@ -1,0 +1,7 @@
+{
+  "name": "Koko App",
+  "short_name": "Koko",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff"
+}

@@ -1,7 +1,5 @@
-const db = globalThis.__B44_DB__ || { auth:{ isAuthenticated: async()=>false, me: async()=>null }, entities:new Proxy({}, { get:()=>({ filter:async()=>[], get:async()=>null, create:async()=>({}), update:async()=>({}), delete:async()=>({}) }) }), integrations:{ Core:{ UploadFile:async()=>({ file_url:'' }) } } };
-
 import React, { useState } from "react";
-
+import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/AuthContext";
 import { Card } from "@/components/ui/card";
@@ -18,11 +16,11 @@ export default function AdminVeterinaries() {
 
   const { data: vets = [], isLoading } = useQuery({
     queryKey: ["admin-veterinaries"],
-    queryFn: () => db.entities.Veterinary.list(),
+    queryFn: () => base44.entities.Veterinary.list(),
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => db.entities.Veterinary.update(id, data),
+    mutationFn: ({ id, data }) => base44.entities.Veterinary.update(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-veterinaries"] }),
   });
 

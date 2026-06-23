@@ -26,3 +26,70 @@ import AdminDashboard from './pages/AdminDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, isAuthenticated, user } = useAuth();
+
+  if (isLoadingPublicSettings || isLoadingAuth) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // Redirect to onboarding if profile not completed (skip for public pages and onboarding itself)
+  const currentPath = window.location.pathname;
+  const publicPaths = ['/ficha/', '/completar-perfil', '/perdidas', '/casos-urgentes', '/veterinarias'];
+  const skipOnboarding = publicPaths.some(p => currentPath.startsWith(p));
+  if (isAuthenticated && user && !user.profile_completed && !skipOnboarding) {
+    return <CompleteProfile />;
+  }
+
+  return (
+    <Routes>
+      {/* Auth routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* Public route: pet profile via QR */}
+      <Route path="/ficha/:qrId" element={<PetPublicProfile />} />
+
+      {/* Public routes (no login required) inside layout */}
+      <Route element={<AppLayout />}>
+        <Route path="/perdidas" element={<LostPets />} />
+        <Route path="/casos-urgentes" element={<UrgentCases />} />
+        <Route path="/veterinarias" element={<Veterinaries />} />
+      </Route>
+
+      {/* Protected routes */}
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route path="/completar-perfil" element={<CompleteProfile />} />
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/adopcion" element={<Adoption />} />
+          <Route path="/identificacion" element={<PetID />} />
+          <Route path="/denuncias" element={<AbuseReports />} />
+          <Route path="/admin/veterinarias" element={<AdminVeterinaries />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Route>
+      </Route>
+
+      <Route path="*" element={<PageNotFound />} />
+    </Routes>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <QueryClientProvider client={queryClientInstance}>
+        <Router>
+          <AuthenticatedApp />
+        </Router>
+        <Toaster />
+      </QueryClientProvider>
+    </AuthProvider>
+  )
+}
+
+export default App
