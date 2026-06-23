@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/api/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +15,7 @@ export default function PetPublicProfile() {
 
   const { data: pets = [], isLoading } = useQuery({
     queryKey: ["publicPet", qrId],
-    queryFn: () => base44.entities.Pet.filter({ qr_id: qrId }),
+    queryFn: () => db.entities.Pet.filter({ qr_id: qrId }),
     enabled: !!qrId,
   });
 

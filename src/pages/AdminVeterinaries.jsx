@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/api/supabaseClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/AuthContext";
 import { Card } from "@/components/ui/card";
@@ -16,11 +16,11 @@ export default function AdminVeterinaries() {
 
   const { data: vets = [], isLoading } = useQuery({
     queryKey: ["admin-veterinaries"],
-    queryFn: () => base44.entities.Veterinary.list(),
+    queryFn: () => db.entities.Veterinary.list(),
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Veterinary.update(id, data),
+    mutationFn: ({ id, data }) => db.entities.Veterinary.update(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-veterinaries"] }),
   });
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/api/supabaseClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/AuthContext";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -15,37 +15,37 @@ export default function AdminDashboard() {
 
   const { data: vets = [], isLoading: loadingVets } = useQuery({
     queryKey: ["admin-vets"],
-    queryFn: () => base44.entities.Veterinary.list(),
+    queryFn: () => db.entities.Veterinary.list(),
   });
   const { data: lostPets = [], isLoading: loadingLost } = useQuery({
     queryKey: ["admin-lost"],
-    queryFn: () => base44.entities.LostPet.list(),
+    queryFn: () => db.entities.LostPet.list(),
   });
   const { data: urgentCases = [], isLoading: loadingUrgent } = useQuery({
     queryKey: ["admin-urgent"],
-    queryFn: () => base44.entities.UrgentCase.list(),
+    queryFn: () => db.entities.UrgentCase.list(),
   });
   const { data: adoptions = [], isLoading: loadingAdoptions } = useQuery({
     queryKey: ["admin-adoptions"],
-    queryFn: () => base44.entities.AdoptionPet.list(),
+    queryFn: () => db.entities.AdoptionPet.list(),
   });
   const { data: reports = [], isLoading: loadingReports } = useQuery({
     queryKey: ["admin-reports"],
-    queryFn: () => base44.entities.AbuseReport.list(),
+    queryFn: () => db.entities.AbuseReport.list(),
   });
 
   const vetMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Veterinary.update(id, data),
+    mutationFn: ({ id, data }) => db.entities.Veterinary.update(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-vets"] }),
   });
 
   const caseMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.UrgentCase.update(id, data),
+    mutationFn: ({ id, data }) => db.entities.UrgentCase.update(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-urgent"] }),
   });
 
   const lostMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.LostPet.update(id, data),
+    mutationFn: ({ id, data }) => db.entities.LostPet.update(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-lost"] }),
   });
 

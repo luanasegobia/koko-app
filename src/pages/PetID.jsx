@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/api/supabaseClient";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -15,7 +15,7 @@ export default function PetID() {
 
   const { data: pets = [], isLoading } = useQuery({
     queryKey: ["myPets"],
-    queryFn: () => base44.entities.Pet.list("-created_date", 50),
+    queryFn: () => db.entities.Pet.list("-created_date", 50),
   });
 
   return (

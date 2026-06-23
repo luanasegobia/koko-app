@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/api/supabaseClient";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,12 +40,12 @@ export default function CompleteProfile() {
     };
     if (role === "organizacion") data.organization_name = form.organization_name;
 
-    await base44.auth.updateMe(data);
+    await db.auth.updateMe(data);
 
     // Si es veterinario, crear registro en Veterinary pendiente de verificación
     if (role === "veterinario") {
-      const me = await base44.auth.me();
-      await base44.entities.Veterinary.create({
+      const me = await db.auth.me();
+      await db.entities.Veterinary.create({
         name: form.vet_clinic_name,
         address: form.vet_address,
         phone: form.vet_phone || form.phone,

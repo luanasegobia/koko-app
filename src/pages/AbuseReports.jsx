@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/api/supabaseClient";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -43,7 +43,7 @@ export default function AbuseReports() {
 
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ["abuseReports"],
-    queryFn: () => base44.entities.AbuseReport.list("-created_date", 100),
+    queryFn: () => db.entities.AbuseReport.list("-created_date", 100),
   });
 
   const filtered = useMemo(() => {

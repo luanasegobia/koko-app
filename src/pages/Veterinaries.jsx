@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
+import { db } from "@/api/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -110,7 +110,7 @@ export default function Veterinaries() {
 
   const { data: vets = [], isLoading } = useQuery({
     queryKey: ["veterinaries"],
-    queryFn: () => base44.entities.Veterinary.list(),
+    queryFn: () => db.entities.Veterinary.list(),
   });
 
   const verified = useMemo(() => vets.filter(v => v.is_verified), [vets]);
