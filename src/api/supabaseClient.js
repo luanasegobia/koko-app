@@ -18,8 +18,22 @@ export const db = {
     me: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
-      // Fetch extra user details from Users table if we had one, or just return user metadata
-      return { id: user.id, email: user.email, ...user.user_metadata };
+
+      const { data: perfil } = await supabase
+        .from('profiles')
+        .select('full_name, phone, avatar_url, role, profile_completed')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      return {
+        id: user.id,
+        email: user.email,
+        ...user.user_metadata,
+        ...(perfil || {}),
+        // El rol se lee siempre de profiles: user_metadata lo puede editar
+        // la propia persona usuaria, así que no sirve para permisos.
+        role: perfil?.role || 'user',
+      };
     },
     logout: async (redirectUrl) => {
       await supabase.auth.signOut();
@@ -70,9 +84,28 @@ export const db = {
       return true;
     },
     updateMe: async (data) => {
-      const { data: updated, error } = await supabase.auth.updateUser({ data });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No hay una sesión activa');
+
+      // El rol no se escribe nunca desde el cliente: lo administra la base de
+      // datos, que además revoca el permiso sobre esa columna.
+      const campos = { ...data };
+      delete campos.role;
+      delete campos.id;
+
+      const { data: perfil, error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          email: user.email,
+          ...campos,
+          updated_at: new Date().toISOString(),
+        })
+        .select('full_name, phone, avatar_url, role, profile_completed')
+        .single();
       if (error) throw error;
-      return updated.user;
+
+      return { id: user.id, email: user.email, ...perfil };
     }
   },
   
