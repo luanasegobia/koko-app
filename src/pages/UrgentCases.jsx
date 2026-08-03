@@ -154,7 +154,6 @@ function UrgentCaseCard({ caseData: c, index }) {
           contextType="urgent_case"
           contextId={c.id}
           contextTitle={c.title}
-          contextOwnerId={c.created_by_id}
         />
       </Card>
     </motion.div>

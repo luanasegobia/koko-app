@@ -61,7 +61,6 @@ export default function LostPetCard({ pet, onSighting }) {
         contextType="lost_pet"
         contextId={pet.id}
         contextTitle={pet.pet_name}
-        contextOwnerId={pet.created_by_id}
       />
     </Card>
   );

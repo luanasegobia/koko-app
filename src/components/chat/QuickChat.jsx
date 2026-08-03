@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const GUEST_NAME_KEY = "quick_chat_guest_name";
 
-export default function QuickChat({ contextType, contextId, contextTitle, contextOwnerId, accentClass = "" }) {
+export default function QuickChat({ contextType, contextId, contextTitle, accentClass = "" }) {
   const conversationId = `${contextType}_${contextId}`;
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -63,18 +63,9 @@ export default function QuickChat({ contextType, contextId, contextTitle, contex
       read_by: [],
     });
 
-    // Notify the owner of the report (contextOwnerId) if it's not the sender
-    if (contextOwnerId && contextOwnerId !== (currentUser?.id)) {
-      db.entities.AppNotification.create({
-        user_id: contextOwnerId,
-        type: "chat_reply",
-        title: `💬 Nueva respuesta en "${contextTitle}"`,
-        body: `${senderName}: ${msgText.trim().slice(0, 80)}`,
-        ref_id: contextId,
-        link: contextType === "lost_pet" ? "/perdidas" : "/casos-urgentes",
-        read: false,
-      }).catch(() => {});
-    }
+    // La notificación al dueño de la publicación la genera el trigger
+    // on_chat_message_created en la base de datos: desde el cliente ya no se
+    // pueden crear notificaciones para otra persona.
 
     setText("");
     setSending(false);
