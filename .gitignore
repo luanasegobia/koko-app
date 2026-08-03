@@ -19,6 +19,8 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+# Configuración personal de Claude Code: launch.json sí se versiona
+.claude/settings.local.json
 .idea
 .DS_Store
 *.suo
