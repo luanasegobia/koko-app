@@ -61,6 +61,7 @@ en minúsculas y separada por guiones:
 ## Checklist antes de abrir el Pull Request
 
 - [ ] `npm run lint` pasa sin errores.
+- [ ] `npm test` pasa sin fallos (y agregaste tests si sumaste lógica nueva).
 - [ ] `npm run build` compila correctamente.
 - [ ] Probaste el cambio a mano en `npm run dev`.
 - [ ] No subiste archivos con credenciales: `.env.local` y cualquier `.env*` están
