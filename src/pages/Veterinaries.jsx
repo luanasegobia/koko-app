@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import { db } from "@/api/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Stethoscope, Phone, MapPin, Clock, AlertCircle, Map, List, Zap } from "lucide-react";

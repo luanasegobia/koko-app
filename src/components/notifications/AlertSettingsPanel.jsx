@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Loader2, LocateFixed, Trash2, Save, Bell } from "lucide-react";
+import { Loader2, LocateFixed, Trash2, Save } from "lucide-react";
 
 export default function AlertSettingsPanel({ subscription, onSave, onDelete }) {
   const [form, setForm] = useState({

@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import UrgentCaseForm from "@/components/urgent/UrgentCaseForm";
 import AlertSubscriptionPanel from "@/components/notifications/AlertSubscriptionPanel";
 import QuickChat from "@/components/chat/QuickChat";
+import BotonDonarStripe from "@/components/urgent/BotonDonarStripe";
 
 const statusConfig = { activo: { label: "Urgente", color: "bg-destructive text-destructive-foreground" }, en_curso: { label: "En curso", color: "bg-accent text-accent-foreground" }, resuelto: { label: "Resuelto", color: "bg-primary text-primary-foreground" } };
 const needStatusIcon = { cubierto: "✓", parcial: "◑", pendiente: "✕" };
@@ -144,9 +145,7 @@ function UrgentCaseCard({ caseData: c, index }) {
         )}
 
         <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" className="flex-1">
-            <HandHeart className="w-4 h-4 mr-1" /> Ofrecer ayuda
-          </Button>
+          <BotonDonarStripe caseId={c.id} title={c.title} donationAlias={c.donation_alias} />
           <Button variant="outline" className="flex-1">
             <Bell className="w-4 h-4 mr-1" /> Seguir caso
           </Button>

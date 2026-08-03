@@ -24,7 +24,11 @@ Para ejecutar este proyecto en tu entorno local, asegúrate de tener instalado [
    ```env
    VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
    VITE_SUPABASE_ANON_KEY=tu-anon-key-publica
+   VITE_STRIPE_PUBLISHABLE_KEY=pk_test_tu-clave-publica
    ```
+
+   La clave secreta de Stripe no va acá: se configura como secret de la Edge Function
+   `create-checkout-session` con `supabase secrets set STRIPE_SECRET_KEY=sk_test_...`.
 
 4. **Ejecutar el servidor de desarrollo**:
    ```bash
@@ -34,4 +38,18 @@ Para ejecutar este proyecto en tu entorno local, asegúrate de tener instalado [
 
 ## Base de Datos (Supabase)
 
-Asegúrate de que tu proyecto en Supabase tenga las tablas requeridas. Puedes encontrar el script SQL completo para generar toda la base de datos en el archivo `schema.sql` (si no lo tienes en el repositorio, solicítalo al administrador). Simplemente pégalo en el SQL Editor de tu panel de Supabase para instanciar las tablas necesarias.
+Asegúrate de que tu proyecto en Supabase tenga las tablas requeridas. El script SQL completo (tablas, índices y políticas RLS) vive en `supabase/migrations/`. Podés aplicarlo de dos formas:
+
+- Pegando el contenido del archivo en el SQL Editor de tu panel de Supabase.
+- O, con la [CLI de Supabase](https://supabase.com/docs/guides/local-development) enlazada al proyecto:
+  ```bash
+  supabase db push
+  ```
+
+## Tests
+
+El proyecto usa [Vitest](https://vitest.dev/) con Testing Library sobre jsdom:
+
+```bash
+npm test
+```

@@ -2,7 +2,7 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { QrCode, Phone, MessageCircle, PawPrint, AlertTriangle, ExternalLink } from "lucide-react";
+import { QrCode, PawPrint, AlertTriangle, ExternalLink } from "lucide-react";
 
 export default function PetQRCard({ pet }) {
   const publicUrl = `${window.location.origin}/ficha/${pet.qr_id || pet.id}`;
