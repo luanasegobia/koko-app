@@ -26,11 +26,13 @@ export default function CompleteProfile() {
     vet_services: "",
   });
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const handleNext = () => setStep(2);
 
   const handleSave = async () => {
     setSaving(true);
+    setError("");
     const data = {
       role,
       profile_completed: true,
@@ -40,24 +42,31 @@ export default function CompleteProfile() {
     };
     if (role === "organizacion") data.organization_name = form.organization_name;
 
-    await db.auth.updateMe(data);
+    try {
+      await db.auth.updateMe(data);
 
-    // Si es veterinario, crear registro en Veterinary pendiente de verificación
-    if (role === "veterinario") {
-      const me = await db.auth.me();
-      await db.entities.Veterinary.create({
-        name: form.vet_clinic_name,
-        address: form.vet_address,
-        phone: form.vet_phone || form.phone,
-        is_verified: false,
-        registered_by_user_id: me.id,
-        services: form.vet_services,
-        bio: form.bio,
-      });
+      // Si es veterinario, crear registro en Veterinary pendiente de verificación
+      if (role === "veterinario") {
+        const me = await db.auth.me();
+        await db.entities.Veterinary.create({
+          name: form.vet_clinic_name,
+          address: form.vet_address,
+          phone: form.vet_phone || form.phone,
+          is_verified: false,
+          registered_by_user_id: me.id,
+          services: form.vet_services,
+          bio: form.bio,
+        });
+      }
+
+      await reloadUser?.();
+      window.location.href = "/";
+    } catch (err) {
+      // Sin este catch el botón quedaba girando para siempre y la persona
+      // volvía al onboarding en cada inicio de sesión.
+      setError(err?.message || "No pudimos guardar tu perfil. Intentá de nuevo.");
+      setSaving(false);
     }
-
-    await reloadUser?.();
-    window.location.href = "/";
   };
 
   const isVet = role === "veterinario";
@@ -152,6 +161,7 @@ export default function CompleteProfile() {
                     onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
                   />
                 </div>
+                {error && <p className="text-sm text-destructive">{error}</p>}
                 <div className="flex gap-2 pt-1">
                   <Button variant="outline" className="flex-1" onClick={() => setStep(1)}>Atrás</Button>
                   <Button
@@ -201,6 +211,7 @@ export default function CompleteProfile() {
                     onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
                   />
                 </div>
+                {error && <p className="text-sm text-destructive">{error}</p>}
                 <div className="flex gap-2 pt-1">
                   <Button variant="outline" className="flex-1" onClick={() => setStep(1)}>Atrás</Button>
                   <Button

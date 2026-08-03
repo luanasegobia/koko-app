@@ -87,10 +87,9 @@ export const db = {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No hay una sesión activa');
 
-      // El rol no se escribe nunca desde el cliente: lo administra la base de
-      // datos, que además revoca el permiso sobre esa columna.
+      // El rol lo elige cada persona en el onboarding, pero nadie puede
+      // asignarse 'admin': lo bloquea la política de la base de datos.
       const campos = { ...data };
-      delete campos.role;
       delete campos.id;
 
       const { data: perfil, error } = await supabase
