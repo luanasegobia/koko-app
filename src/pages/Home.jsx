@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Search, Heart, Stethoscope, QrCode, ShieldAlert, HandHeart,
-  ArrowRight, PawPrint, Megaphone, Eye, Sparkles, ChevronRight,
+  ArrowRight, PawPrint, Megaphone, Eye, Sparkles,
   MapPin, Bell, Zap } from
 "lucide-react";
-import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useMotionValue } from "framer-motion";
 
 const modules = [
 {

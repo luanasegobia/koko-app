@@ -1,6 +1,8 @@
-const db = globalThis.__B44_DB__ || { auth:{ isAuthenticated: async()=>false, me: async()=>null }, entities:new Proxy({}, { get:()=>({ filter:async()=>[], get:async()=>null, create:async()=>({}), update:async()=>({}), delete:async()=>({}) }) }), integrations:{ Core:{ UploadFile:async()=>({ file_url:'' }) } } };
-
 import React, { useState, useRef, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { mascotaPerdidaSchema } from "@/schemas";
+import { db } from "@/api/supabaseClient";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,10 +12,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, Loader2, Camera } from "lucide-react";
 
 export default function LostPetForm({ onSuccess, openCameraOnMount = false }) {
-  const [form, setForm] = useState({
-    pet_name: "", species: "perro", breed: "", age_years: "",
-    description: "", last_seen_address: "", contact_phone: "", contact_whatsapp: "",
+  const { register, handleSubmit, control, formState: { errors } } = useForm({
+    resolver: zodResolver(mascotaPerdidaSchema),
+    defaultValues: {
+      pet_name: "", species: "perro", breed: "", age_years: "",
+      description: "", last_seen_address: "", contact_phone: "", contact_whatsapp: "",
+    },
   });
+
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -25,8 +31,7 @@ export default function LostPetForm({ onSuccess, openCameraOnMount = false }) {
     }
   }, [openCameraOnMount]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setSaving(true);
     let photo_url = "";
     if (photo) {
@@ -34,8 +39,8 @@ export default function LostPetForm({ onSuccess, openCameraOnMount = false }) {
       photo_url = res.file_url;
     }
     await db.entities.LostPet.create({
-      ...form,
-      age_years: form.age_years ? Number(form.age_years) : undefined,
+      ...data,
+      age_years: data.age_years || undefined,
       photo_url,
       status: "perdida",
     });
@@ -44,50 +49,57 @@ export default function LostPetForm({ onSuccess, openCameraOnMount = false }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label>Nombre</Label>
-          <Input value={form.pet_name} onChange={e => setForm({ ...form, pet_name: e.target.value })} required placeholder="Ej: Max" />
+          <Input {...register("pet_name")} placeholder="Ej: Max" />
+          {errors.pet_name && <p className="text-xs text-destructive">{errors.pet_name.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label>Especie</Label>
-          <Select value={form.species} onValueChange={v => setForm({ ...form, species: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="perro">Perro</SelectItem>
-              <SelectItem value="gato">Gato</SelectItem>
-              <SelectItem value="otro">Otro</SelectItem>
-            </SelectContent>
-          </Select>
+          <Controller
+            name="species"
+            control={control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="perro">Perro</SelectItem>
+                  <SelectItem value="gato">Gato</SelectItem>
+                  <SelectItem value="otro">Otro</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label>Raza</Label>
-          <Input value={form.breed} onChange={e => setForm({ ...form, breed: e.target.value })} placeholder="Ej: Labrador" />
+          <Input {...register("breed")} placeholder="Ej: Labrador" />
         </div>
         <div className="space-y-1.5">
           <Label>Edad (años)</Label>
-          <Input type="number" value={form.age_years} onChange={e => setForm({ ...form, age_years: e.target.value })} placeholder="Ej: 2" />
+          <Input type="number" {...register("age_years")} placeholder="Ej: 2" />
         </div>
       </div>
       <div className="space-y-1.5">
         <Label>Descripción y señas particulares</Label>
-        <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Color, tamaño, collar..." rows={3} />
+        <Textarea {...register("description")} placeholder="Color, tamaño, collar..." rows={3} />
       </div>
       <div className="space-y-1.5">
         <Label>Última ubicación vista</Label>
-        <Input value={form.last_seen_address} onChange={e => setForm({ ...form, last_seen_address: e.target.value })} placeholder="Ej: Av. San Martín y Belgrano, Orán" />
+        <Input {...register("last_seen_address")} placeholder="Ej: Av. San Martín y Belgrano, Orán" />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label>Teléfono</Label>
-          <Input value={form.contact_phone} onChange={e => setForm({ ...form, contact_phone: e.target.value })} placeholder="3878-..." />
+          <Input {...register("contact_phone")} placeholder="3878-..." />
         </div>
         <div className="space-y-1.5">
           <Label>WhatsApp</Label>
-          <Input value={form.contact_whatsapp} onChange={e => setForm({ ...form, contact_whatsapp: e.target.value })} placeholder="3878-..." />
+          <Input {...register("contact_whatsapp")} placeholder="3878-..." />
         </div>
       </div>
       <div className="space-y-1.5">

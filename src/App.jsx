@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import ScrollToTop from '@/components/ScrollToTop';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 
@@ -21,6 +22,7 @@ import PetPublicProfile from './pages/PetPublicProfile';
 import AbuseReports from './pages/AbuseReports';
 import UrgentCases from './pages/UrgentCases';
 import CompleteProfile from './pages/CompleteProfile';
+import DonarExito from './pages/DonarExito';
 import AdminVeterinaries from './pages/AdminVeterinaries';
 import AdminDashboard from './pages/AdminDashboard';
 
@@ -37,7 +39,7 @@ const AuthenticatedApp = () => {
 
   // Redirect to onboarding if profile not completed (skip for public pages and onboarding itself)
   const currentPath = window.location.pathname;
-  const publicPaths = ['/ficha/', '/completar-perfil', '/perdidas', '/casos-urgentes', '/veterinarias'];
+  const publicPaths = ['/ficha/', '/completar-perfil', '/perdidas', '/casos-urgentes', '/veterinarias', '/donar/'];
   const skipOnboarding = publicPaths.some(p => currentPath.startsWith(p));
   if (isAuthenticated && user && !user.profile_completed && !skipOnboarding) {
     return <CompleteProfile />;
@@ -51,8 +53,9 @@ const AuthenticatedApp = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
-      {/* Public route: pet profile via QR */}
+      {/* Public routes: pet profile via QR + Stripe success */}
       <Route path="/ficha/:qrId" element={<PetPublicProfile />} />
+      <Route path="/donar/exito" element={<DonarExito />} />
 
       {/* Public routes (no login required) inside layout */}
       <Route element={<AppLayout />}>
@@ -84,6 +87,7 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
+          <ScrollToTop />
           <AuthenticatedApp />
         </Router>
         <Toaster />

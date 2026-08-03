@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, QrCode, PawPrint, ExternalLink } from "lucide-react";
+import { Plus, QrCode } from "lucide-react";
 import { motion } from "framer-motion";
 import PetForm from "@/components/petid/PetForm";
 import PetQRCard from "@/components/petid/PetQRCard";

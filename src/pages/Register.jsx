@@ -41,10 +41,7 @@ export default function Register() {
     setError("");
     setLoading(true);
     try {
-      const result = await db.auth.verifyOtp({ email, otpCode });
-      if (result?.access_token) {
-        db.auth.setToken(result.access_token);
-      }
+      await db.auth.verifyOtp({ email, otpCode });
       window.location.href = "/";
     } catch (err) {
       setError(err.message || "Invalid verification code");

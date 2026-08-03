@@ -155,7 +155,7 @@ export const db = {
     Core: {
       UploadFile: async (file) => {
         const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
         const filePath = `uploads/${fileName}`;
 
         const { error } = await supabase.storage.from('public-files').upload(filePath, file);

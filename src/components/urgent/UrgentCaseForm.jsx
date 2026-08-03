@@ -1,6 +1,8 @@
-const db = globalThis.__B44_DB__ || { auth:{ isAuthenticated: async()=>false, me: async()=>null }, entities:new Proxy({}, { get:()=>({ filter:async()=>[], get:async()=>null, create:async()=>({}), update:async()=>({}), delete:async()=>({}) }) }), integrations:{ Core:{ UploadFile:async()=>({ file_url:'' }) } } };
-
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { casoUrgenteSchema } from "@/schemas";
+import { db } from "@/api/supabaseClient";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,16 +11,19 @@ import { Label } from "@/components/ui/label";
 import { Upload, Loader2, Plus, X } from "lucide-react";
 
 export default function UrgentCaseForm({ onSuccess }) {
-  const [form, setForm] = useState({
-    title: "", description: "", published_by: "", goal_amount: "",
-    donation_alias: "",
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(casoUrgenteSchema),
+    defaultValues: {
+      title: "", description: "", published_by: "", goal_amount: "",
+      donation_alias: "",
+    },
   });
+
   const [needs, setNeeds] = useState([""]);
   const [photo, setPhoto] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setSaving(true);
     let photo_url = "";
     if (photo) {
@@ -26,8 +31,8 @@ export default function UrgentCaseForm({ onSuccess }) {
       photo_url = res.file_url;
     }
     await db.entities.UrgentCase.create({
-      ...form,
-      goal_amount: form.goal_amount ? Number(form.goal_amount) : 0,
+      ...data,
+      goal_amount: data.goal_amount || 0,
       photo_url,
       needs: needs.filter(n => n.trim()).map(n => ({ label: n, status: "pendiente" })),
       status: "activo",
@@ -38,17 +43,32 @@ export default function UrgentCaseForm({ onSuccess }) {
     onSuccess();
   };
 
-  const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-1.5"><Label>Título del caso</Label><Input value={form.title} onChange={e => update("title", e.target.value)} required placeholder="Ej: Perrita encontrada en ruta 50" /></div>
-      <div className="space-y-1.5"><Label>Descripción</Label><Textarea value={form.description} onChange={e => update("description", e.target.value)} required rows={3} placeholder="Detallá la situación, qué se necesita..." /></div>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5"><Label>Publicado por</Label><Input value={form.published_by} onChange={e => update("published_by", e.target.value)} placeholder="Nombre u organización" /></div>
-        <div className="space-y-1.5"><Label>Meta de recaudación ($)</Label><Input type="number" value={form.goal_amount} onChange={e => update("goal_amount", e.target.value)} placeholder="Ej: 45000" /></div>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="space-y-1.5">
+        <Label>Título del caso</Label>
+        <Input {...register("title")} placeholder="Ej: Perrita encontrada en ruta 50" />
+        {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
       </div>
-      <div className="space-y-1.5"><Label>Alias para donaciones</Label><Input value={form.donation_alias} onChange={e => update("donation_alias", e.target.value)} placeholder="Ej: rescatistas.oran" /></div>
+      <div className="space-y-1.5">
+        <Label>Descripción</Label>
+        <Textarea {...register("description")} rows={3} placeholder="Detallá la situación, qué se necesita..." />
+        {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <Label>Publicado por</Label>
+          <Input {...register("published_by")} placeholder="Nombre u organización" />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Meta de recaudación ($)</Label>
+          <Input type="number" {...register("goal_amount")} placeholder="Ej: 45000" />
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <Label>Alias para donaciones</Label>
+        <Input {...register("donation_alias")} placeholder="Ej: rescatistas.oran" />
+      </div>
 
       <div className="space-y-2">
         <Label>Tipo de ayuda necesaria</Label>
@@ -61,7 +81,10 @@ export default function UrgentCaseForm({ onSuccess }) {
         <Button type="button" variant="outline" size="sm" onClick={() => setNeeds([...needs, ""])}><Plus className="w-3 h-3 mr-1" /> Agregar</Button>
       </div>
 
-      <div className="space-y-1.5"><Label>Foto</Label><Input type="file" accept="image/*" onChange={e => setPhoto(e.target.files[0])} /></div>
+      <div className="space-y-1.5">
+        <Label>Foto</Label>
+        <Input type="file" accept="image/*" onChange={e => setPhoto(e.target.files[0])} />
+      </div>
       <Button type="submit" disabled={saving} className="w-full">
         {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
         Publicar caso
