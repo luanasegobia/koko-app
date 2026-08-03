@@ -205,6 +205,28 @@ ALTER TABLE public.chat_message ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.app_notification ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.alert_subscription ENABLE ROW LEVEL SECURITY;
 
+-- Limpieza de políticas previas: PostgreSQL no soporta CREATE POLICY IF NOT EXISTS,
+-- así que las borramos antes de recrearlas para que esta migración sea re-ejecutable.
+DO $$
+DECLARE
+  politica RECORD;
+BEGIN
+  FOR politica IN
+    SELECT schemaname, tablename, policyname
+    FROM pg_policies
+    WHERE (schemaname = 'public' AND tablename IN (
+            'profiles', 'pet', 'lost_pet', 'adoption_pet', 'veterinary',
+            'urgent_case', 'abuse_report', 'chat_message', 'app_notification',
+            'alert_subscription'))
+       OR (schemaname = 'storage' AND tablename = 'objects' AND policyname LIKE 'storage\_%')
+  LOOP
+    EXECUTE format(
+      'DROP POLICY IF EXISTS %I ON %I.%I',
+      politica.policyname, politica.schemaname, politica.tablename
+    );
+  END LOOP;
+END $$;
+
 -- Profiles: users can read/write own profile, admins can read all
 CREATE POLICY "profiles_select_own" ON public.profiles FOR SELECT USING (id = auth.uid() OR (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin');
 CREATE POLICY "profiles_insert_own" ON public.profiles FOR INSERT WITH CHECK (id = auth.uid());
