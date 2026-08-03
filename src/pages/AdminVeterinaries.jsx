@@ -25,7 +25,7 @@ export default function AdminVeterinaries() {
   });
 
   // Solo admins
-  if (user?.role !== "admin") {
+  if (!user?.es_admin) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center gap-4">
         <ShieldX className="w-16 h-16 text-destructive" />

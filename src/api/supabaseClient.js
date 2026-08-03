@@ -21,7 +21,7 @@ export const db = {
 
       const { data: perfil } = await supabase
         .from('profiles')
-        .select('full_name, phone, avatar_url, role, profile_completed')
+        .select('full_name, phone, avatar_url, tipo_cuenta, es_admin, profile_completed')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -30,9 +30,10 @@ export const db = {
         email: user.email,
         ...user.user_metadata,
         ...(perfil || {}),
-        // El rol se lee siempre de profiles: user_metadata lo puede editar
-        // la propia persona usuaria, así que no sirve para permisos.
-        role: perfil?.role || 'user',
+        // Ambos se leen siempre de profiles: user_metadata lo puede editar la
+        // propia persona usuaria, así que no sirve para decidir permisos.
+        tipo_cuenta: perfil?.tipo_cuenta || 'usuario',
+        es_admin: perfil?.es_admin === true,
       };
     },
     logout: async (redirectUrl) => {
@@ -87,10 +88,12 @@ export const db = {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No hay una sesión activa');
 
-      // El rol lo elige cada persona en el onboarding, pero nadie puede
-      // asignarse 'admin': lo bloquea la política de la base de datos.
+      // tipo_cuenta lo elige cada persona en el onboarding. es_admin no se
+      // escribe nunca desde el cliente: lo bloquean los permisos por columna
+      // y la política de la base de datos.
       const campos = { ...data };
       delete campos.id;
+      delete campos.es_admin;
 
       const { data: perfil, error } = await supabase
         .from('profiles')
@@ -100,7 +103,7 @@ export const db = {
           ...campos,
           updated_at: new Date().toISOString(),
         })
-        .select('full_name, phone, avatar_url, role, profile_completed')
+        .select('full_name, phone, avatar_url, tipo_cuenta, es_admin, profile_completed')
         .single();
       if (error) throw error;
 

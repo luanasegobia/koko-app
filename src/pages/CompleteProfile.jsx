@@ -13,7 +13,7 @@ import RoleSelector from "@/components/onboarding/RoleSelector";
 export default function CompleteProfile() {
   const { reloadUser } = useAuth();
   const [step, setStep] = useState(1);
-  const [role, setRole] = useState("usuario");
+  const [tipoCuenta, setTipoCuenta] = useState("usuario");
   const [form, setForm] = useState({
     organization_name: "",
     bio: "",
@@ -34,19 +34,19 @@ export default function CompleteProfile() {
     setSaving(true);
     setError("");
     const data = {
-      role,
+      tipo_cuenta: tipoCuenta,
       profile_completed: true,
       bio: form.bio,
       phone: form.phone,
       location: form.location,
     };
-    if (role === "organizacion") data.organization_name = form.organization_name;
+    if (tipoCuenta === "organizacion") data.organization_name = form.organization_name;
 
     try {
       await db.auth.updateMe(data);
 
       // Si es veterinario, crear registro en Veterinary pendiente de verificación
-      if (role === "veterinario") {
+      if (tipoCuenta === "veterinario") {
         const me = await db.auth.me();
         await db.entities.Veterinary.create({
           name: form.vet_clinic_name,
@@ -69,10 +69,10 @@ export default function CompleteProfile() {
     }
   };
 
-  const isVet = role === "veterinario";
+  const isVet = tipoCuenta === "veterinario";
 
   const canSubmit = () => {
-    if (role === "organizacion" && !form.organization_name) return false;
+    if (tipoCuenta === "organizacion" && !form.organization_name) return false;
     if (isVet && (!form.vet_clinic_name || !form.vet_address)) return false;
     return true;
   };
@@ -106,7 +106,7 @@ export default function CompleteProfile() {
           <CardContent className="space-y-5 pt-2">
             {step === 1 ? (
               <>
-                <RoleSelector selected={role} onSelect={setRole} />
+                <RoleSelector selected={tipoCuenta} onSelect={setTipoCuenta} />
                 <Button className="w-full" onClick={handleNext}>
                   Continuar <ArrowRight className="w-4 h-4 ml-1" />
                 </Button>
@@ -176,7 +176,7 @@ export default function CompleteProfile() {
               </>
             ) : (
               <>
-                {role === "organizacion" && (
+                {tipoCuenta === "organizacion" && (
                   <div className="space-y-1">
                     <Label>Nombre de la organización *</Label>
                     <Input

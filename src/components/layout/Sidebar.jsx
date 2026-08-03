@@ -104,7 +104,7 @@ export default function Sidebar() {
           </div>
 
           {/* Admin section */}
-          {user?.role === "admin" && (
+          {user?.es_admin && (
             <div className="pt-4 mt-4 border-t border-sidebar-border">
               <p className="text-xs text-sidebar-foreground/40 font-semibold uppercase tracking-wider px-3 mb-2">Administración</p>
               <Link
