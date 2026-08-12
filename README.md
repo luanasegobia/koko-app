@@ -57,6 +57,40 @@ exactamente qué falta y cómo resolverlo.
 
 ---
 
+## Configuración del panel de Supabase
+
+Estos ajustes **no viven en el repositorio**: se hacen una sola vez desde el panel del
+proyecto. `supabase/config.toml` tiene los mismos valores, pero ese archivo solo lo lee un
+stack local de Supabase; el proyecto en la nube lo ignora.
+
+### Enlaces de correo y vuelta al sitio
+
+Sin esto, el enlace de "olvidé mi contraseña" y el login con Google no saben a dónde volver.
+
+**Authentication → URL Configuration**
+
+| Campo | Valor |
+|---|---|
+| Site URL | `http://localhost:5173` |
+| Redirect URLs | `http://localhost:5173/**` |
+
+> ⚠️ El **Site URL** es el destino por defecto de los correos de autenticación. Mientras no
+> haya nada desplegado, `localhost` está bien. **El día que se publique la app hay que
+> cambiarlo por la URL real**, o los correos van a mandar a cada persona a su propia
+> máquina. La entrada de Redirect URLs con `localhost` puede quedarse: solo sirve para
+> desarrollo.
+
+### Login con Google (opcional)
+
+Todavía no está habilitado. Para activarlo: **Authentication → Providers → Google**, cargar
+el Client ID y el Client Secret de Google Cloud, y registrar allá la URL de retorno que el
+panel muestra (`https://<ref>.supabase.co/auth/v1/callback`).
+
+Mientras esté deshabilitado, el botón "Continuar con Google" va a dar error. El acceso con
+email y contraseña funciona igual.
+
+---
+
 ## Convertirse en administrador
 
 El panel de `/admin` (verificar veterinarias, moderar denuncias, cambiar estados) requiere
