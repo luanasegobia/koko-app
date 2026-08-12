@@ -1,8 +1,17 @@
+# Proyecto de Supabase compartido para desarrollo.
+# Para trabajar en la app NO hace falta la CLI: alcanza con el .env.local.
+# La CLI solo se necesita para aplicar migraciones (`supabase link` + `db push`).
+project_id = "knvocftylpunbzycoarx"
+
 [auth]
 enabled = true
+# Necesarias para que vuelvan bien el login con Google y el reseteo de contraseña.
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173", "http://localhost:5173/**"]
 
 [edge_functions]
 enabled = true
 
 [functions.create-checkout-session]
-verify_jwt = false
+# Sin esto la función queda invocable de forma anónima con cualquier monto.
+verify_jwt = true

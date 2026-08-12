@@ -65,7 +65,11 @@ en minúsculas y separada por guiones:
 - [ ] `npm run build` compila correctamente.
 - [ ] Probaste el cambio a mano en `npm run dev`.
 - [ ] No subiste archivos con credenciales: `.env.local` y cualquier `.env*` están
-      ignorados por git y **nunca** deben commitearse.
+      ignorados por git y **nunca** deben commitearse. (`.env.example` sí se versiona:
+      es la plantilla, y va vacía de valores.)
+- [ ] Si agregaste una variable de entorno, la sumaste a `.env.example` **y** avisaste
+      al equipo: sin eso, a los demás la app les deja de arrancar al hacer `git pull`.
+- [ ] Si tocaste `supabase/migrations/`, avisaste antes de mergear (ver abajo).
 - [ ] Los textos visibles por la persona usuaria están en español.
 - [ ] El Pull Request explica qué cambia y por qué.
 
@@ -75,6 +79,19 @@ Los cambios de esquema (tablas, índices, políticas RLS) van versionados como
 archivos SQL dentro de `supabase/migrations/`, nunca aplicados solo a mano desde el
 panel de Supabase. Así cualquier persona del equipo puede reproducir la base desde
 cero.
+
+Reglas para no pisarse:
+
+- **Un cambio de esquema = un archivo nuevo.** Nunca se edita una migración ya
+  aplicada: el resto del equipo ya la corrió y no se vuelve a ejecutar sola.
+- **La base de desarrollo es compartida entre las tres personas.** Una migración la
+  aplica **una sola persona** (`supabase db push`) y avisa al resto en cuanto termina.
+- Antes del primer `db push` hay que enlazar el repo con el proyecto, una única vez:
+  ```bash
+  supabase link --project-ref knvocftylpunbzycoarx
+  ```
+- Los cambios destructivos (borrar una columna o una tabla) se conversan **antes** de
+  escribirlos: no hay copia de respaldo de la base de desarrollo.
 
 ## Notas para agentes de IA
 

@@ -1,9 +1,40 @@
 import { createClient } from '@supabase/supabase-js';
+import { leerConfiguracion } from '@/api/entorno';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+/**
+ * El cliente se crea la PRIMERA VEZ que se lo usa, no al importar el módulo.
+ *
+ * Antes esto era `createClient(import.meta.env.VITE_SUPABASE_URL, ...)` suelto:
+ * sin .env.local, `createClient` tiraba mientras se evaluaba el módulo, cosa
+ * que ningún ErrorBoundary puede atrapar, y la app quedaba en blanco sin una
+ * sola pista. Diferirlo también es lo que permite que `vite build` funcione en
+ * CI, donde no hay credenciales.
+ */
+let clienteMemorizado = null;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export function obtenerCliente() {
+  if (!clienteMemorizado) {
+    const { url, anonKey } = leerConfiguracion();
+    clienteMemorizado = createClient(url, anonKey);
+  }
+  return clienteMemorizado;
+}
+
+/**
+ * Fachada perezosa: se usa igual que el cliente de siempre
+ * (`supabase.auth`, `supabase.from(...)`, `supabase.channel(...)`), pero no
+ * lo instancia hasta el primer acceso.
+ */
+export const supabase = new Proxy(
+  {},
+  {
+    get: (_objetivo, propiedad) => {
+      const cliente = obtenerCliente();
+      const valor = cliente[propiedad];
+      return typeof valor === 'function' ? valor.bind(cliente) : valor;
+    },
+  }
+);
 
 // Helper to map snake_case base44 entities to Supabase tables
 // Some mappings might be needed if table names are different

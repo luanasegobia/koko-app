@@ -1,6 +1,9 @@
 #env
 .env
 .env.*
+# .env.example sí se versiona: es la plantilla que copia cada persona del equipo.
+# La negación va DESPUÉS del patrón .env.* o git la ignora igual.
+!.env.example
 
 # Logs
 /logs
