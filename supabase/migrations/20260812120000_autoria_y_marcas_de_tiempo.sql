@@ -21,12 +21,16 @@
 -- veterinaria. Con DEFAULT ese código sigue funcionando, y si algún día
 -- mandara un valor ajeno la política de abajo lo rechaza en vez de taparlo.
 
-ALTER TABLE public.pet          ALTER COLUMN created_by_id         SET DEFAULT (SELECT auth.uid());
-ALTER TABLE public.lost_pet     ALTER COLUMN created_by_id         SET DEFAULT (SELECT auth.uid());
-ALTER TABLE public.adoption_pet ALTER COLUMN created_by_id         SET DEFAULT (SELECT auth.uid());
-ALTER TABLE public.urgent_case  ALTER COLUMN created_by_id         SET DEFAULT (SELECT auth.uid());
-ALTER TABLE public.abuse_report ALTER COLUMN created_by_id         SET DEFAULT (SELECT auth.uid());
-ALTER TABLE public.veterinary   ALTER COLUMN registered_by_user_id SET DEFAULT (SELECT auth.uid());
+-- Sin envolver en (SELECT ...): PostgreSQL no admite subconsultas en una
+-- expresión DEFAULT. Ese envoltorio sí se usa en las políticas de más abajo,
+-- donde evita reevaluar auth.uid() fila por fila, pero acá es un error de
+-- sintaxis (0A000).
+ALTER TABLE public.pet          ALTER COLUMN created_by_id         SET DEFAULT auth.uid();
+ALTER TABLE public.lost_pet     ALTER COLUMN created_by_id         SET DEFAULT auth.uid();
+ALTER TABLE public.adoption_pet ALTER COLUMN created_by_id         SET DEFAULT auth.uid();
+ALTER TABLE public.urgent_case  ALTER COLUMN created_by_id         SET DEFAULT auth.uid();
+ALTER TABLE public.abuse_report ALTER COLUMN created_by_id         SET DEFAULT auth.uid();
+ALTER TABLE public.veterinary   ALTER COLUMN registered_by_user_id SET DEFAULT auth.uid();
 
 -- Las políticas de dueño filtran por estas columnas en cada UPDATE y DELETE.
 CREATE INDEX IF NOT EXISTS idx_pet_created_by          ON public.pet (created_by_id);
