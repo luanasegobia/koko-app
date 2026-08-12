@@ -58,7 +58,11 @@ CREATE INDEX IF NOT EXISTS idx_veterinary_registrada_por ON public.veterinary (r
 -- La denuncia "anónima" del formulario oculta los datos de contacto, pero se
 -- publica con sesión iniciada.
 
+-- Se descartan tanto los nombres viejos como los nuevos, para que la migración
+-- se pueda volver a ejecutar sin chocar con "policy already exists". Es la misma
+-- convención que ya usa el esquema inicial.
 DROP POLICY IF EXISTS "pet_insert_auth" ON public.pet;
+DROP POLICY IF EXISTS "pet_insert_propio" ON public.pet;
 CREATE POLICY "pet_insert_propio" ON public.pet
   FOR INSERT WITH CHECK (
     (SELECT auth.uid()) IS NOT NULL
@@ -66,6 +70,7 @@ CREATE POLICY "pet_insert_propio" ON public.pet
   );
 
 DROP POLICY IF EXISTS "lost_pet_insert_all" ON public.lost_pet;
+DROP POLICY IF EXISTS "lost_pet_insert_propio" ON public.lost_pet;
 CREATE POLICY "lost_pet_insert_propio" ON public.lost_pet
   FOR INSERT WITH CHECK (
     (SELECT auth.uid()) IS NOT NULL
@@ -73,6 +78,7 @@ CREATE POLICY "lost_pet_insert_propio" ON public.lost_pet
   );
 
 DROP POLICY IF EXISTS "adoption_pet_insert_auth" ON public.adoption_pet;
+DROP POLICY IF EXISTS "adoption_pet_insert_propio" ON public.adoption_pet;
 CREATE POLICY "adoption_pet_insert_propio" ON public.adoption_pet
   FOR INSERT WITH CHECK (
     (SELECT auth.uid()) IS NOT NULL
@@ -80,6 +86,7 @@ CREATE POLICY "adoption_pet_insert_propio" ON public.adoption_pet
   );
 
 DROP POLICY IF EXISTS "urgent_case_insert_all" ON public.urgent_case;
+DROP POLICY IF EXISTS "urgent_case_insert_propio" ON public.urgent_case;
 CREATE POLICY "urgent_case_insert_propio" ON public.urgent_case
   FOR INSERT WITH CHECK (
     (SELECT auth.uid()) IS NOT NULL
@@ -87,6 +94,7 @@ CREATE POLICY "urgent_case_insert_propio" ON public.urgent_case
   );
 
 DROP POLICY IF EXISTS "abuse_report_insert_all" ON public.abuse_report;
+DROP POLICY IF EXISTS "abuse_report_insert_propio" ON public.abuse_report;
 CREATE POLICY "abuse_report_insert_propio" ON public.abuse_report
   FOR INSERT WITH CHECK (
     (SELECT auth.uid()) IS NOT NULL
@@ -96,6 +104,7 @@ CREATE POLICY "abuse_report_insert_propio" ON public.abuse_report
 -- La veterinaria además sigue naciendo sin verificar: la verifica administración.
 DROP POLICY IF EXISTS "veterinary_insert_all" ON public.veterinary;
 DROP POLICY IF EXISTS "veterinary_insert_sin_verificar" ON public.veterinary;
+DROP POLICY IF EXISTS "veterinary_insert_propia_sin_verificar" ON public.veterinary;
 CREATE POLICY "veterinary_insert_propia_sin_verificar" ON public.veterinary
   FOR INSERT WITH CHECK (
     (SELECT auth.uid()) IS NOT NULL
