@@ -1,0 +1,41 @@
+name: Verificación
+
+# Corre el mismo checklist que pide CONTRIBUTING, para que no dependa de que
+# cada persona se acuerde de hacerlo antes de abrir el Pull Request.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Estilo de código
+        run: npm run lint
+
+      - name: Tests
+        run: npm test
+
+      - name: Compilación
+        run: npm run build
+        env:
+          # Valores de mentira a propósito: la verificación NO se conecta a
+          # Supabase. Correr contra el proyecto compartido dejaría datos basura
+          # que verían las tres personas del equipo, y volvería el resultado no
+          # determinístico.
+          #
+          # Esto funciona porque la validación del entorno es perezosa: se
+          # ejecuta en el primer uso del cliente, no al importar el módulo. Si
+          # alguna vez se valida al importar, este paso se rompe.
+          VITE_SUPABASE_URL: https://ejemplo.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_valor_de_prueba

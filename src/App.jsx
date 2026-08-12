@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes, Outlet, useLocation } from 'rea
 import ScrollToTop from '@/components/ScrollToTop';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import { ThemeProvider } from '@/lib/ThemeContext';
 
 import { Navigate } from 'react-router-dom';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -23,7 +24,6 @@ import AbuseReports from './pages/AbuseReports';
 import UrgentCases from './pages/UrgentCases';
 import CompleteProfile from './pages/CompleteProfile';
 import DonarExito from './pages/DonarExito';
-import AdminVeterinaries from './pages/AdminVeterinaries';
 import AdminDashboard from './pages/AdminDashboard';
 
 /**
@@ -86,7 +86,9 @@ const AuthenticatedApp = () => {
             <Route path="/adopcion" element={<Adoption />} />
             <Route path="/identificacion" element={<PetID />} />
             <Route path="/denuncias" element={<AbuseReports />} />
-            <Route path="/admin/veterinarias" element={<AdminVeterinaries />} />
+            {/* Se eliminó /admin/veterinarias: duplicaba la pestaña del panel
+                con otra clave de caché, así que verificar en una dejaba la otra
+                desactualizada, y no estaba enlazada desde ningún lado. */}
             <Route path="/admin" element={<AdminDashboard />} />
           </Route>
         </Route>
@@ -99,15 +101,17 @@ const AuthenticatedApp = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <ScrollToTop />
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router>
+            <ScrollToTop />
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

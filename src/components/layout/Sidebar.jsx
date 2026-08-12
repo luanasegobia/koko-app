@@ -3,11 +3,12 @@ import { db } from "@/api/supabaseClient";
 import { Link, useLocation } from "react-router-dom";
 import {
   Search, Heart, Stethoscope, QrCode, ShieldAlert,
-  HandHeart, Home, Menu, X, PawPrint, ShieldCheck, LogIn, LogOut } from
+  HandHeart, Home, Menu, X, PawPrint, ShieldCheck, LogIn, LogOut, Sun, Moon } from
 "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import { useAuth } from "@/lib/AuthContext";
+import { useTheme } from "@/lib/ThemeContext";
 
 const navItems = [
 { path: "/", label: "Inicio", icon: Home },
@@ -22,6 +23,7 @@ export default function Sidebar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user } = useAuth();
+  const { tema, alternarTema } = useTheme();
 
   return (
     <>
@@ -78,6 +80,17 @@ export default function Sidebar() {
                 {item.label}
               </Link>);
           })}
+
+          {/* Tema */}
+          <div className="pt-4 mt-4 border-t border-sidebar-border">
+            <button
+              onClick={alternarTema}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200"
+            >
+              {tema === "oscuro" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {tema === "oscuro" ? "Modo claro" : "Modo oscuro"}
+            </button>
+          </div>
 
           {/* Login / logout */}
           <div className="pt-4 mt-4 border-t border-sidebar-border">

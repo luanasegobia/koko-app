@@ -19,7 +19,9 @@ const { mockUseAuth, mockUseNotifications } = vi.hoisted(() => ({
 }));
 
 vi.mock("@/lib/AuthContext", () => ({ useAuth: mockUseAuth }));
-vi.mock("@/lib/useNotifications", () => ({ useNotifications: mockUseNotifications }));
+vi.mock("@/lib/NotificationsContext", () => ({
+  useNotificationsCompartidas: mockUseNotifications,
+}));
 
 vi.mock("@/components/notifications/AlertSettingsPanel", () => ({
   default: function MockAlertSettingsPanel({ subscription }) {

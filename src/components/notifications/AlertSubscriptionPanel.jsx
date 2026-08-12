@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
-import { useNotifications } from "@/lib/useNotifications";
+import { useNotificationsCompartidas } from "@/lib/NotificationsContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import AlertSettingsPanel from "./AlertSettingsPanel";
@@ -19,7 +19,7 @@ import AlertSettingsPanel from "./AlertSettingsPanel";
  */
 export default function AlertSubscriptionPanel() {
   const { isAuthenticated } = useAuth();
-  const { subscription, saveSubscription, deleteSubscription } = useNotifications();
+  const { subscription, saveSubscription, deleteSubscription } = useNotificationsCompartidas();
 
   if (!isAuthenticated) {
     return (

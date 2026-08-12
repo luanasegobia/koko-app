@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useNotifications } from "@/lib/useNotifications";
+import { useNotificationsCompartidas } from "@/lib/NotificationsContext";
 import NotificationPanel from "./NotificationPanel";
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const notif = useNotifications();
+  // Compartido: el Sidebar monta esta campana dos veces y las dos quedan
+  // siempre en el DOM.
+  const notif = useNotificationsCompartidas();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
