@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import { db } from "@/api/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
@@ -6,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { PawPrint, Phone, MessageCircle, AlertTriangle, MapPin, Loader2, Check } from "lucide-react";
 
 export default function PetPublicProfile() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const pathParts = window.location.pathname.split("/");
-  const qrId = pathParts[pathParts.length - 1];
+  // La ruta es /ficha/:qrId, así que el parámetro lo da el router. Antes se
+  // partía window.location.pathname a mano.
+  const { qrId } = useParams();
   const [reporting, setReporting] = useState(false);
   const [reported, setReported] = useState(false);
 
@@ -20,13 +21,16 @@ export default function PetPublicProfile() {
 
   const pet = pets[0];
 
-  const handleFoundReport = async () => {
+  // Todavía no avisa a la persona dueña: el aviso automático necesita el módulo
+  // de notificaciones, que está fuera de alcance por ahora. Lo único honesto que
+  // se puede hacer es dejarlo marcado en pantalla e invitar a llamar, que es lo
+  // que de verdad resuelve el caso.
+  const handleFoundReport = () => {
     setReporting(true);
-    // In a real scenario, this would send a notification to the owner
     setTimeout(() => {
       setReporting(false);
       setReported(true);
-    }, 1000);
+    }, 400);
   };
 
   if (isLoading) {

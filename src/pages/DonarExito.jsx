@@ -1,29 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Heart, Loader2 } from "lucide-react";
-import { db } from "@/api/supabaseClient";
+import { CheckCircle, XCircle, Heart } from "lucide-react";
 
+/**
+ * Esta página solo confirma visualmente el resultado del pago.
+ *
+ * Antes incrementaba el contador de recaudación desde el navegador, sumando un
+ * hardcodeado +1 (un peso, no el monto donado) sobre una URL que cualquiera
+ * podía abrir a mano. Además la política de la tabla lo bloqueaba y el error se
+ * tragaba con un .catch(() => {}), así que en la práctica nunca hizo nada.
+ *
+ * El contador real lo tiene que escribir un webhook de Stripe con la clave de
+ * servicio, que es la única fuente que puede confirmar que el pago se acreditó.
+ * Queda pendiente para cuando se habiliten las donaciones con tarjeta.
+ */
 export default function DonarExito() {
   const [searchParams] = useSearchParams();
   const status = searchParams.get("status");
-  const caseId = searchParams.get("case_id");
-  const [actualizando, setActualizando] = useState(false);
-
-  useEffect(() => {
-    if (status === "exito" && caseId) {
-      setActualizando(true);
-      db.entities.UrgentCase.get(caseId).then((caso) => {
-        if (caso) {
-          return db.entities.UrgentCase.update(caseId, {
-            raised_amount: (caso.raised_amount || 0) + 1,
-            contributors_count: (caso.contributors_count || 0) + 1,
-          });
-        }
-      }).catch(() => {}).finally(() => setActualizando(false));
-    }
-  }, [status, caseId]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -35,11 +30,6 @@ export default function DonarExito() {
             <p className="text-muted-foreground">
               Tu colaboración ayuda a cambiar la vida de un animal que lo necesita.
             </p>
-            {actualizando && (
-              <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-                <Loader2 className="w-3 h-3 animate-spin" /> Actualizando contador...
-              </p>
-            )}
           </>
         ) : status === "cancelado" ? (
           <>

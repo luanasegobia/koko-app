@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Heart, Loader2 } from "lucide-react";
 import { redirigirAStripe } from "@/lib/stripe";
+import { hayStripeConfigurado } from "@/api/entorno";
+import { mensajeDeError } from "@/lib/mensajeDeError";
 
 export default function BotonDonarStripe({ caseId, title, donationAlias }) {
   const [open, setOpen] = useState(false);
@@ -24,10 +26,21 @@ export default function BotonDonarStripe({ caseId, title, donationAlias }) {
     try {
       await redirigirAStripe({ caseId, title, amount: cantidad, donationAlias });
     } catch (err) {
-      setError(err.message || "Error al procesar el pago");
+      setError(mensajeDeError(err));
       setLoading(false);
     }
   };
+
+  // Las donaciones con tarjeta están fuera de alcance por ahora. Sin la clave
+  // el botón queda deshabilitado en vez de abrir un flujo que va a fallar; la
+  // donación por alias bancario, que es el mecanismo real hoy, sigue intacta.
+  if (!hayStripeConfigurado()) {
+    return (
+      <Button variant="outline" className="flex-1" disabled title="Todavía no está habilitado el pago con tarjeta">
+        <Heart className="w-4 h-4 mr-1" /> Donar con tarjeta (próximamente)
+      </Button>
+    );
+  }
 
   return (
     <>

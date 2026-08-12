@@ -1,15 +1,7 @@
-import { loadStripe } from "@stripe/stripe-js";
 import { supabase } from "@/api/supabaseClient";
 
-const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-let stripePromise = null;
-
-function getStripe() {
-  if (!stripePromise && STRIPE_PUBLISHABLE_KEY) {
-    stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
-  }
-  return stripePromise;
-}
+// Se eliminó getStripe()/loadStripe: nadie los llamaba. El pago no se monta en
+// la página, se redirige al Checkout alojado por Stripe.
 
 export async function crearSesionDonacion({ caseId, title, amount, donationAlias }) {
   const baseUrl = window.location.origin;
