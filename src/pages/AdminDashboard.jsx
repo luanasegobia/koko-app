@@ -49,6 +49,11 @@ export default function AdminDashboard() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-lost"] }),
   });
 
+  const reportMutation = useMutation({
+    mutationFn: ({ id, data }) => db.entities.AbuseReport.update(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-reports"] }),
+  });
+
   if (!user?.es_admin) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center gap-4">
@@ -111,8 +116,10 @@ export default function AdminDashboard() {
             isLoading={loadingUrgent || loadingLost || loadingReports}
             onUpdateCase={(id, data) => caseMutation.mutate({ id, data })}
             onUpdateLost={(id, data) => lostMutation.mutate({ id, data })}
+            onUpdateReport={(id, data) => reportMutation.mutate({ id, data })}
             isCasePending={caseMutation.isPending}
             isLostPending={lostMutation.isPending}
+            isReportPending={reportMutation.isPending}
           />
         </TabsContent>
       </Tabs>

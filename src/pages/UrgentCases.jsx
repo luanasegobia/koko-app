@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Plus, HandHeart, Copy, Check, Bell } from "lucide-react";
 import { motion } from "framer-motion";
 import UrgentCaseForm from "@/components/urgent/UrgentCaseForm";
+import AccionesDeDuenio from "@/components/comun/AccionesDeDuenio";
 import AlertSubscriptionPanel from "@/components/notifications/AlertSubscriptionPanel";
 import QuickChat from "@/components/chat/QuickChat";
 import BotonDonarStripe from "@/components/urgent/BotonDonarStripe";
@@ -21,6 +22,7 @@ const needStatusColor = { cubierto: "text-primary", parcial: "text-accent", pend
 export default function UrgentCases() {
   const { isAuthenticated } = useAuth();
   const [showForm, setShowForm] = useState(false);
+  const [enEdicion, setEnEdicion] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: cases = [], isLoading } = useQuery({
@@ -62,24 +64,43 @@ export default function UrgentCases() {
       ) : (
         <div className="space-y-4">
           {cases.map((c, i) => (
-            <UrgentCaseCard key={c.id} caseData={c} index={i} />
+            <UrgentCaseCard
+              key={c.id}
+              caseData={c}
+              index={i}
+              onEditar={() => { setEnEdicion(c); setShowForm(true); }}
+              onEliminar={async () => {
+                await db.entities.UrgentCase.delete(c.id);
+                queryClient.invalidateQueries({ queryKey: ["urgentCases"] });
+              }}
+            />
           ))}
         </div>
       )}
 
-      <Dialog open={showForm} onOpenChange={setShowForm}>
+      <Dialog open={showForm} onOpenChange={(abierto) => { if (!abierto) { setShowForm(false); setEnEdicion(null); } }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-heading">Publicar caso urgente</DialogTitle>
+            <DialogTitle className="font-heading">
+              {enEdicion ? `Editar "${enEdicion.title}"` : "Publicar caso urgente"}
+            </DialogTitle>
           </DialogHeader>
-          <UrgentCaseForm onSuccess={() => { setShowForm(false); queryClient.invalidateQueries({ queryKey: ["urgentCases"] }); }} />
+          <UrgentCaseForm
+            key={enEdicion?.id || "nuevo"}
+            registroInicial={enEdicion}
+            onSuccess={() => {
+              setShowForm(false);
+              setEnEdicion(null);
+              queryClient.invalidateQueries({ queryKey: ["urgentCases"] });
+            }}
+          />
         </DialogContent>
       </Dialog>
     </div>
   );
 }
 
-function UrgentCaseCard({ caseData: c, index }) {
+function UrgentCaseCard({ caseData: c, index, onEditar, onEliminar }) {
   const [copied, setCopied] = useState(false);
   const sc = statusConfig[c.status] || statusConfig.activo;
   const progress = c.goal_amount > 0 ? Math.min((c.raised_amount / c.goal_amount) * 100, 100) : 0;
@@ -102,6 +123,12 @@ function UrgentCaseCard({ caseData: c, index }) {
             {c.published_by && <p className="text-xs text-muted-foreground">Publicado por <strong>{c.published_by}</strong></p>}
           </div>
           {c.photo_url && <img src={c.photo_url} alt="" className="w-12 h-12 rounded-lg object-cover" />}
+          <AccionesDeDuenio
+            registro={c}
+            etiqueta={`el caso "${c.title}"`}
+            onEditar={onEditar}
+            onEliminar={onEliminar}
+          />
         </div>
 
         <p className="text-sm text-foreground/80">{c.description}</p>

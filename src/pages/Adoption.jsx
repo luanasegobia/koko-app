@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Plus, Heart, Filter, PawPrint, Phone, Syringe, Scissors, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AdoptionForm from "@/components/adoption/AdoptionForm";
+import AccionesDeDuenio from "@/components/comun/AccionesDeDuenio";
 import { useChatManager } from "@/components/chat/ChatManager";
 
 const sizeLabels = { pequeño: "Pequeño", mediano: "Mediano", grande: "Grande" };
@@ -16,6 +17,7 @@ const statusColors = { disponible: "bg-primary/10 text-primary", en_proceso: "bg
 
 export default function Adoption() {
   const [showForm, setShowForm] = useState(false);
+  const [enEdicion, setEnEdicion] = useState(null);
   const { openChat } = useChatManager();
   const [speciesFilter, setSpeciesFilter] = useState("all");
   const [sizeFilter, setSizeFilter] = useState("all");
@@ -99,11 +101,22 @@ export default function Adoption() {
                     )}
                   </div>
                   <div className="p-4 space-y-3">
-                    <div>
-                      <h3 className="font-heading font-bold text-lg">{pet.name}</h3>
-                      <p className="text-muted-foreground text-sm">
-                        {pet.breed || pet.species} {pet.age_years ? `· ${pet.age_years} años` : ""} {pet.size ? `· ${sizeLabels[pet.size]}` : ""}
-                      </p>
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h3 className="font-heading font-bold text-lg">{pet.name}</h3>
+                        <p className="text-muted-foreground text-sm">
+                          {pet.breed || pet.species} {pet.age_years ? `· ${pet.age_years} años` : ""} {pet.size ? `· ${sizeLabels[pet.size]}` : ""}
+                        </p>
+                      </div>
+                      <AccionesDeDuenio
+                        registro={pet}
+                        etiqueta={`la publicación de ${pet.name}`}
+                        onEditar={() => { setEnEdicion(pet); setShowForm(true); }}
+                        onEliminar={async () => {
+                          await db.entities.AdoptionPet.delete(pet.id);
+                          queryClient.invalidateQueries({ queryKey: ["adoptionPets"] });
+                        }}
+                      />
                     </div>
                     <div className="flex gap-2 flex-wrap">
                       {pet.vaccinated && <Badge variant="secondary" className="text-xs"><Syringe className="w-3 h-3 mr-1" />Vacunado</Badge>}
@@ -133,12 +146,22 @@ export default function Adoption() {
         </div>
       )}
 
-      <Dialog open={showForm} onOpenChange={setShowForm}>
+      <Dialog open={showForm} onOpenChange={(abierto) => { if (!abierto) { setShowForm(false); setEnEdicion(null); } }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-heading">Publicar mascota en adopción</DialogTitle>
+            <DialogTitle className="font-heading">
+              {enEdicion ? `Editar la publicación de ${enEdicion.name}` : "Publicar mascota en adopción"}
+            </DialogTitle>
           </DialogHeader>
-          <AdoptionForm onSuccess={() => { setShowForm(false); queryClient.invalidateQueries({ queryKey: ["adoptionPets"] }); }} />
+          <AdoptionForm
+            key={enEdicion?.id || "nueva"}
+            registroInicial={enEdicion}
+            onSuccess={() => {
+              setShowForm(false);
+              setEnEdicion(null);
+              queryClient.invalidateQueries({ queryKey: ["adoptionPets"] });
+            }}
+          />
         </DialogContent>
       </Dialog>
     </div>

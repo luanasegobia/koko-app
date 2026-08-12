@@ -12,13 +12,22 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Loader2 } from "lucide-react";
 
-export default function PetForm({ onSuccess }) {
+export default function PetForm({ onSuccess, registroInicial = null }) {
+  const editando = Boolean(registroInicial);
+
   const { register, handleSubmit, control, formState: { errors } } = useForm({
     resolver: zodResolver(mascotaSchema),
     defaultValues: {
-      name: "", species: "perro", breed: "", age_years: "",
-      sex: "macho", description: "", allergies: "",
-      owner_name: "", owner_phone: "", owner_whatsapp: "",
+      name: registroInicial?.name ?? "",
+      species: registroInicial?.species ?? "perro",
+      breed: registroInicial?.breed ?? "",
+      age_years: registroInicial?.age_years ?? "",
+      sex: registroInicial?.sex ?? "macho",
+      description: registroInicial?.description ?? "",
+      allergies: registroInicial?.allergies ?? "",
+      owner_name: registroInicial?.owner_name ?? "",
+      owner_phone: registroInicial?.owner_phone ?? "",
+      owner_whatsapp: registroInicial?.owner_whatsapp ?? "",
     },
   });
 
@@ -30,23 +39,25 @@ export default function PetForm({ onSuccess }) {
     setSaving(true);
     setError(null);
     try {
-      let photo_url = "";
+      let photo_url = registroInicial?.photo_url || "";
       if (photo) {
         const res = await db.storage.subirArchivo(photo);
         photo_url = res.file_url;
       }
-      // crypto.randomUUID no existe fuera de contexto seguro, y la app se prueba
-      // desde el celular contra http://192.168.x.x.
-      const qr_id =
-        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-          ? crypto.randomUUID().split("-")[0]
-          : Math.random().toString(36).slice(2, 10);
-      await db.entities.Pet.create({
-        ...data,
-        age_years: data.age_years || undefined,
-        photo_url,
-        qr_id,
-      });
+      const campos = { ...data, age_years: data.age_years || undefined, photo_url };
+
+      if (editando) {
+        // El qr_id no se toca al editar: ya hay chapitas impresas con ese código.
+        await db.entities.Pet.update(registroInicial.id, campos);
+      } else {
+        // crypto.randomUUID no existe fuera de contexto seguro, y la app se
+        // prueba desde el celular contra http://192.168.x.x.
+        const qr_id =
+          typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+            ? crypto.randomUUID().split("-")[0]
+            : Math.random().toString(36).slice(2, 10);
+        await db.entities.Pet.create({ ...campos, qr_id });
+      }
       onSuccess();
     } catch (e) {
       setError(mensajeDeError(e));
@@ -138,7 +149,7 @@ export default function PetForm({ onSuccess }) {
       )}
       <Button type="submit" disabled={saving} className="w-full">
         {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
-        Registrar mascota
+        {editando ? "Guardar cambios" : "Registrar mascota"}
       </Button>
     </form>
   );

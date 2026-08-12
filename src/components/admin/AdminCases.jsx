@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { db } from "@/api/supabaseClient";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,7 +27,7 @@ const reportStatusColors = {
   resuelta: "bg-muted text-muted-foreground",
 };
 
-export default function AdminCases({ urgentCases, lostPets, reports, isLoading, onUpdateCase, onUpdateLost, isCasePending, isLostPending }) {
+export default function AdminCases({ urgentCases, lostPets, reports, isLoading, onUpdateCase, onUpdateLost, onUpdateReport, isCasePending, isLostPending, isReportPending }) {
   const [tab, setTab] = useState("urgentes");
 
   if (isLoading) {
@@ -159,9 +158,15 @@ export default function AdminCases({ urgentCases, lostPets, reports, isLoading, 
                   )}
                 </div>
                 <div className="shrink-0">
+                  {/* Antes esto escribía directo con db.entities, sin mutación y
+                      sin invalidar la caché: como el Select está controlado por
+                      r.status y la consulta nunca se refrescaba, el desplegable
+                      volvía solo al valor anterior. Las otras dos pestañas ya
+                      usaban el patrón correcto. */}
                   <Select
                     value={r.status}
-                    onValueChange={(val) => db.entities.AbuseReport.update(r.id, { status: val })}
+                    disabled={isReportPending}
+                    onValueChange={(val) => onUpdateReport(r.id, { status: val })}
                   >
                     <SelectTrigger className="w-36 text-sm">
                       <SelectValue />

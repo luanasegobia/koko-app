@@ -1,86 +1,110 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import AlertSubscriptionPanel from "@/components/notifications/AlertSubscriptionPanel";
 
-const { mockMe, mockFilter, mockCreate, mockUpdate, mockDelete } = vi.hoisted(() => ({
-  mockMe: vi.fn(),
-  mockFilter: vi.fn(),
-  mockCreate: vi.fn(),
-  mockUpdate: vi.fn(),
-  mockDelete: vi.fn(),
+/**
+ * El componente se reescribió: ya no pide la sesión por su cuenta ni consulta la
+ * tabla a mano, sino que consume el contexto de sesión y useNotifications.
+ *
+ * El test anterior simulaba SIEMPRE una sesión iniciada, y por eso tapaba el
+ * defecto real: el panel se monta en páginas públicas (/perdidas y
+ * /casos-urgentes), donde db.auth.me() devuelve null, y accedía a u.id sin
+ * protección. Cualquier visitante sin cuenta veía un TypeError en consola.
+ */
+
+const { mockUseAuth, mockUseNotifications } = vi.hoisted(() => ({
+  mockUseAuth: vi.fn(),
+  mockUseNotifications: vi.fn(),
 }));
 
-vi.mock("@/api/supabaseClient", () => ({
-  default: {
-    auth: {
-      me: mockMe,
-    },
-    entities: {
-      AlertSubscription: {
-        filter: mockFilter,
-        create: mockCreate,
-        update: mockUpdate,
-        delete: mockDelete,
-      },
-    },
-  },
-  db: {
-    auth: {
-      me: mockMe,
-    },
-    entities: {
-      AlertSubscription: {
-        filter: mockFilter,
-        create: mockCreate,
-        update: mockUpdate,
-        delete: mockDelete,
-      },
-    },
-  },
-}));
+vi.mock("@/lib/AuthContext", () => ({ useAuth: mockUseAuth }));
+vi.mock("@/lib/useNotifications", () => ({ useNotifications: mockUseNotifications }));
 
 vi.mock("@/components/notifications/AlertSettingsPanel", () => ({
-  default: function MockAlertSettingsPanel(props) {
-    return <div data-testid="alert-settings-panel">AlertSettingsPanel Mock</div>;
+  default: function MockAlertSettingsPanel({ subscription }) {
+    return (
+      <div data-testid="alert-settings-panel">
+        {subscription ? `sub:${subscription.id}` : "sin-suscripcion"}
+      </div>
+    );
   },
 }));
 
+const renderizar = () =>
+  render(
+    <MemoryRouter>
+      <AlertSubscriptionPanel />
+    </MemoryRouter>
+  );
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockUseNotifications.mockReturnValue({
+    subscription: null,
+    saveSubscription: vi.fn(),
+    deleteSubscription: vi.fn(),
+  });
+});
+
 describe("AlertSubscriptionPanel", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockMe.mockResolvedValue({ id: "user-1", email: "test@test.com" });
-    mockFilter.mockResolvedValue([]);
+  describe("sin sesión iniciada", () => {
+    beforeEach(() => {
+      mockUseAuth.mockReturnValue({ isAuthenticated: false, user: null });
+    });
+
+    it("no rompe y ofrece iniciar sesión", () => {
+      // Este es el caso que producía el TypeError en las páginas públicas.
+      expect(() => renderizar()).not.toThrow();
+      expect(screen.getByRole("link", { name: /iniciar sesión/i })).toBeInTheDocument();
+    });
+
+    it("no muestra el panel de configuración", () => {
+      renderizar();
+      expect(screen.queryByTestId("alert-settings-panel")).not.toBeInTheDocument();
+    });
   });
 
-  it("renderiza sin errores", async () => {
-    render(<AlertSubscriptionPanel />);
-    const panel = await screen.findByTestId("alert-settings-panel");
-    expect(panel).toBeInTheDocument();
-  });
+  describe("con sesión iniciada", () => {
+    beforeEach(() => {
+      mockUseAuth.mockReturnValue({
+        isAuthenticated: true,
+        user: { id: "user-1", email: "ana@ejemplo.com" },
+      });
+    });
 
-  it("llama a db.auth.me al montar", async () => {
-    render(<AlertSubscriptionPanel />);
-    await screen.findByTestId("alert-settings-panel");
-    expect(mockMe).toHaveBeenCalledTimes(1);
-  });
+    it("muestra el panel de configuración", () => {
+      renderizar();
+      expect(screen.getByTestId("alert-settings-panel")).toBeInTheDocument();
+    });
 
-  it("llama a AlertSubscription.filter con el user_id", async () => {
-    render(<AlertSubscriptionPanel />);
-    await screen.findByTestId("alert-settings-panel");
-    expect(mockFilter).toHaveBeenCalledWith({ user_id: "user-1" });
-  });
+    it("sin suscripción previa, el panel arranca vacío", () => {
+      renderizar();
+      expect(screen.getByTestId("alert-settings-panel")).toHaveTextContent("sin-suscripcion");
+    });
 
-  it("muestra AlertSettingsPanel sin sub cuando no hay suscripciones", async () => {
-    mockFilter.mockResolvedValue([]);
-    render(<AlertSubscriptionPanel />);
-    await screen.findByTestId("alert-settings-panel");
-  });
+    it("pasa la suscripción existente al panel", () => {
+      mockUseNotifications.mockReturnValue({
+        subscription: { id: "sub-1", lat: -23.1, lng: -64.3 },
+        saveSubscription: vi.fn(),
+        deleteSubscription: vi.fn(),
+      });
+      renderizar();
+      expect(screen.getByTestId("alert-settings-panel")).toHaveTextContent("sub:sub-1");
+    });
 
-  it("pasa la suscripción cuando existe", async () => {
-    const existingSub = { id: "sub-1", lat: -34.5, lng: -58.3 };
-    mockFilter.mockResolvedValue([existingSub]);
-    render(<AlertSubscriptionPanel />);
-    await screen.findByTestId("alert-settings-panel");
-    expect(mockFilter).toHaveBeenCalledTimes(1);
+    it("delega guardar y borrar en useNotifications, sin lógica propia", () => {
+      // Antes reimplementaba a mano lo que el hook ya hacía, contra la misma
+      // tabla y con estado propio, así que ambos podían desincronizarse.
+      const guardar = vi.fn();
+      const borrar = vi.fn();
+      mockUseNotifications.mockReturnValue({
+        subscription: null,
+        saveSubscription: guardar,
+        deleteSubscription: borrar,
+      });
+      renderizar();
+      expect(mockUseNotifications).toHaveBeenCalled();
+    });
   });
 });

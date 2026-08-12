@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { db } from "@/api/supabaseClient";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -8,15 +9,36 @@ import { Plus, QrCode } from "lucide-react";
 import { motion } from "framer-motion";
 import PetForm from "@/components/petid/PetForm";
 import PetQRCard from "@/components/petid/PetQRCard";
+import AccionesDeDuenio from "@/components/comun/AccionesDeDuenio";
 
 export default function PetID() {
   const [showForm, setShowForm] = useState(false);
+  const [enEdicion, setEnEdicion] = useState(null);
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
+  // Antes esto era Pet.list(), pero la política de lectura de la tabla es
+  // abierta: bajo el título "mis mascotas" se veían las de TODO el mundo, con
+  // el teléfono y el WhatsApp de sus dueños, y el QR ajeno. Estaba tapado
+  // porque la tabla venía vacía.
   const { data: pets = [], isLoading } = useQuery({
-    queryKey: ["myPets"],
-    queryFn: () => db.entities.Pet.list("-created_at", 50),
+    queryKey: ["misMascotas", user?.id],
+    enabled: Boolean(user?.id),
+    queryFn: () => db.entities.Pet.filter({ created_by_id: user.id }, "-created_at", 50),
   });
+
+  const refrescar = () => queryClient.invalidateQueries({ queryKey: ["misMascotas", user?.id] });
+
+  const cerrarFormulario = () => {
+    setShowForm(false);
+    setEnEdicion(null);
+    refrescar();
+  };
+
+  const eliminar = async (mascota) => {
+    await db.entities.Pet.delete(mascota.id);
+    refrescar();
+  };
 
   return (
     <div className="space-y-6">
@@ -25,7 +47,7 @@ export default function PetID() {
           <h1 className="font-heading text-2xl md:text-3xl font-bold">Identificación Digital</h1>
           <p className="text-muted-foreground mt-1">Registrá tu mascota y generá un QR para su collar</p>
         </div>
-        <Button onClick={() => setShowForm(true)}>
+        <Button onClick={() => { setEnEdicion(null); setShowForm(true); }}>
           <Plus className="w-4 h-4 mr-2" /> Registrar mascota
         </Button>
       </div>
@@ -59,19 +81,29 @@ export default function PetID() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {pets.map((pet, i) => (
-            <motion.div key={pet.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+            <motion.div key={pet.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="relative">
+              <div className="absolute top-3 right-3 z-10">
+                <AccionesDeDuenio
+                  registro={pet}
+                  etiqueta={`la ficha de ${pet.name}`}
+                  onEditar={() => { setEnEdicion(pet); setShowForm(true); }}
+                  onEliminar={() => eliminar(pet)}
+                />
+              </div>
               <PetQRCard pet={pet} />
             </motion.div>
           ))}
         </div>
       )}
 
-      <Dialog open={showForm} onOpenChange={setShowForm}>
+      <Dialog open={showForm} onOpenChange={(abierto) => { if (!abierto) { setShowForm(false); setEnEdicion(null); } }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-heading">Registrar mascota</DialogTitle>
+            <DialogTitle className="font-heading">
+              {enEdicion ? `Editar a ${enEdicion.name}` : "Registrar mascota"}
+            </DialogTitle>
           </DialogHeader>
-          <PetForm onSuccess={() => { setShowForm(false); queryClient.invalidateQueries({ queryKey: ["myPets"] }); }} />
+          <PetForm key={enEdicion?.id || "nueva"} registroInicial={enEdicion} onSuccess={cerrarFormulario} />
         </DialogContent>
       </Dialog>
     </div>

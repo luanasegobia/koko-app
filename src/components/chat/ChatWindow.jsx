@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db } from "@/api/supabaseClient";
+import { useAuth } from "@/lib/AuthContext";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,12 +14,9 @@ export default function ChatWindow({ conversationId, contextType, contextId, con
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
   const bottomRef = useRef(null);
-
-  useEffect(() => {
-    db.auth.me().then(setCurrentUser).catch(() => {});
-  }, []);
+  // Sale del contexto de sesión en vez de pedirlo otra vez por su cuenta.
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
     if (!conversationId) return;
@@ -40,7 +38,7 @@ export default function ChatWindow({ conversationId, contextType, contextId, con
   const send = async () => {
     if (!text.trim() || !currentUser) return;
     setSending(true);
-    await db.entities.ChatMessage.create({
+    const nuevo = await db.entities.ChatMessage.create({
       conversation_id: conversationId,
       context_type: contextType,
       context_id: contextId,
@@ -50,6 +48,9 @@ export default function ChatWindow({ conversationId, contextType, contextId, con
       text: text.trim(),
       read_by: [currentUser.id],
     });
+    // El mensaje propio se agrega en el acto: el tiempo real todavía está
+    // apagado, así que sin esto no aparecía hasta recargar.
+    setMessages((prev) => (prev.some((m) => m.id === nuevo.id) ? prev : [...prev, nuevo]));
     setText("");
     setSending(false);
   };

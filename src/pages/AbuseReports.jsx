@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import AbuseReportForm from "@/components/abuse/AbuseReportForm";
+import AccionesDeDuenio from "@/components/comun/AccionesDeDuenio";
 import TrackingLookup from "@/components/abuse/TrackingLookup";
 import PetMap, { ICONS } from "@/components/map/PetMap";
 import ProximityFilter from "@/components/map/ProximityFilter";
@@ -201,6 +202,17 @@ export default function AbuseReports() {
                         {report.created_at && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{format(new Date(report.created_at), "d MMM yyyy", { locale: es })}</span>}
                       </div>
                     </div>
+                    {/* Eliminar queda solo para administración por decisión de
+                        diseño: que quien denuncia no pueda borrar la evidencia. */}
+                    <AccionesDeDuenio
+                      registro={report}
+                      etiqueta="esta denuncia"
+                      soloAdminPuedeEliminar
+                      onEliminar={async () => {
+                        await db.entities.AbuseReport.delete(report.id);
+                        queryClient.invalidateQueries({ queryKey: ["abuseReports"] });
+                      }}
+                    />
                   </div>
                 </Card>
               </motion.div>

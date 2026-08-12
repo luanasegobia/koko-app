@@ -1,6 +1,10 @@
 import React, { useState, useMemo } from "react";
 import { db } from "@/api/supabaseClient";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/lib/AuthContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import AccionesDeDuenio from "@/components/comun/AccionesDeDuenio";
+import VeterinariaForm from "@/components/vet/VeterinariaForm";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -106,6 +110,9 @@ function StatusDot({ status }) {
 
 export default function Veterinaries() {
   const [view, setView] = useState("lista");
+  const [enEdicion, setEnEdicion] = useState(null);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: vets = [], isLoading } = useQuery({
     queryKey: ["veterinaries"],
@@ -252,6 +259,26 @@ export default function Veterinaries() {
                       {vet.is_verified && (
                         <span className="text-xs text-muted-foreground bg-muted rounded-full px-2 py-0.5">✓ Verificada</span>
                       )}
+                      {!vet.is_verified && vet.registered_by_user_id === user?.id && (
+                        <span className="text-xs text-amber-700 bg-amber-100 rounded-full px-2 py-0.5">
+                          Pendiente de verificación
+                        </span>
+                      )}
+                      <div className="ml-auto">
+                        {/* La ficha la edita quien la registró; darla de baja
+                            queda para administración, igual que la verificación. */}
+                        <AccionesDeDuenio
+                          registro={vet}
+                          columnaAutor="registered_by_user_id"
+                          etiqueta={`la ficha de ${vet.name}`}
+                          soloAdminPuedeEliminar
+                          onEditar={() => setEnEdicion(vet)}
+                          onEliminar={async () => {
+                            await db.entities.Veterinary.delete(vet.id);
+                            queryClient.invalidateQueries({ queryKey: ["veterinaries"] });
+                          }}
+                        />
+                      </div>
                     </div>
 
                     {/* Info row */}
@@ -311,6 +338,24 @@ export default function Veterinaries() {
           })}
         </div>
       )}
+
+      <Dialog open={Boolean(enEdicion)} onOpenChange={(abierto) => { if (!abierto) setEnEdicion(null); }}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-heading">Editar {enEdicion?.name}</DialogTitle>
+          </DialogHeader>
+          {enEdicion && (
+            <VeterinariaForm
+              key={enEdicion.id}
+              registroInicial={enEdicion}
+              onSuccess={() => {
+                setEnEdicion(null);
+                queryClient.invalidateQueries({ queryKey: ["veterinaries"] });
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

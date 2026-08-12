@@ -6,8 +6,9 @@ import { MapPin, Phone, Eye, PawPrint } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import QuickChat from "@/components/chat/QuickChat";
+import AccionesDeDuenio from "@/components/comun/AccionesDeDuenio";
 
-export default function LostPetCard({ pet, onSighting }) {
+export default function LostPetCard({ pet, onSighting, onEditar, onEliminar }) {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-destructive/20">
       <div className="relative h-48 bg-muted">
@@ -21,6 +22,14 @@ export default function LostPetCard({ pet, onSighting }) {
         <Badge className="absolute top-3 left-3 bg-destructive text-destructive-foreground">
           {pet.status === "encontrada" ? "Encontrada" : "Perdida"}
         </Badge>
+        <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full">
+          <AccionesDeDuenio
+            registro={pet}
+            etiqueta={`el reporte de ${pet.pet_name}`}
+            onEditar={onEditar}
+            onEliminar={onEliminar}
+          />
+        </div>
       </div>
       <div className="p-4 space-y-3">
         <div>

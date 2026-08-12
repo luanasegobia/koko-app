@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { denunciaSchema } from "@/schemas";
 import { db } from "@/api/supabaseClient";
 import { mensajeDeError } from "@/lib/mensajeDeError";
+import BotonUbicacion from "@/components/comun/BotonUbicacion";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,7 @@ export default function AbuseReportForm({ onSuccess }) {
   });
 
   const [files, setFiles] = useState([]);
+  const [ubicacion, setUbicacion] = useState({ lat: undefined, lng: undefined });
   const [saving, setSaving] = useState(false);
   const [trackingCode, setTrackingCode] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -49,6 +51,8 @@ export default function AbuseReportForm({ onSuccess }) {
       const denuncia = await db.entities.AbuseReport.create({
         ...data,
         evidence_urls,
+        lat: ubicacion.lat,
+        lng: ubicacion.lng,
         status: "pendiente",
         reporter_name: data.type === "anonima" ? undefined : data.reporter_name,
         reporter_phone: data.type === "anonima" ? undefined : data.reporter_phone,
@@ -118,6 +122,7 @@ export default function AbuseReportForm({ onSuccess }) {
       <div className="space-y-1.5">
         <Label>Ubicación</Label>
         <Input {...register("address")} placeholder="Ej: Av. San Martín, Orán" />
+        <BotonUbicacion valor={ubicacion} onCambio={setUbicacion} />
       </div>
 
       {formType !== "anonima" && (

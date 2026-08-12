@@ -14,6 +14,14 @@ export const mascotaSchema = z.object({
   owner_whatsapp: z.string().optional().default(""),
 });
 
+// Las coordenadas son opcionales pero tienen que existir en el esquema: sin
+// ellas el formulario nunca las enviaba y la pestaña "Mapa" quedaba
+// permanentemente vacía, además de dejar sin base a las alertas por cercanía.
+const coordenada = {
+  lat: z.coerce.number().min(-90).max(90).optional(),
+  lng: z.coerce.number().min(-180).max(180).optional(),
+};
+
 export const mascotaPerdidaSchema = z.object({
   pet_name: z.string().min(1, "El nombre es obligatorio"),
   species: z.enum(["perro", "gato", "otro"]),
@@ -22,6 +30,8 @@ export const mascotaPerdidaSchema = z.object({
   photo_url: z.string().optional().default(""),
   description: z.string().optional().default(""),
   last_seen_address: z.string().optional().default(""),
+  last_seen_lat: coordenada.lat,
+  last_seen_lng: coordenada.lng,
   contact_phone: z.string().optional().default(""),
   contact_whatsapp: z.string().optional().default(""),
 });
@@ -66,6 +76,8 @@ export const denunciaSchema = z.object({
   type: z.enum(["urgente", "regular", "anonima"]),
   description: z.string().min(1, "La descripción es obligatoria"),
   address: z.string().optional().default(""),
+  lat: coordenada.lat,
+  lng: coordenada.lng,
   reporter_name: z.string().optional().default(""),
   reporter_phone: z.string().optional().default(""),
 });

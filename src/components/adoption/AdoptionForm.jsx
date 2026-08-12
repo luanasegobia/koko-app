@@ -13,14 +13,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Upload, Loader2 } from "lucide-react";
 
-export default function AdoptionForm({ onSuccess }) {
+export default function AdoptionForm({ onSuccess, registroInicial = null }) {
+  const editando = Boolean(registroInicial);
+
   const { register, handleSubmit, control, formState: { errors } } = useForm({
     resolver: zodResolver(mascotaAdopcionSchema),
     defaultValues: {
-      name: "", species: "perro", breed: "", age_years: "",
-      sex: "macho", size: "mediano", description: "",
-      vaccinated: false, sterilized: false,
-      contact_name: "", contact_phone: "", location: "",
+      name: registroInicial?.name ?? "",
+      species: registroInicial?.species ?? "perro",
+      breed: registroInicial?.breed ?? "",
+      age_years: registroInicial?.age_years ?? "",
+      sex: registroInicial?.sex ?? "macho",
+      size: registroInicial?.size ?? "mediano",
+      description: registroInicial?.description ?? "",
+      vaccinated: registroInicial?.vaccinated ?? false,
+      sterilized: registroInicial?.sterilized ?? false,
+      contact_name: registroInicial?.contact_name ?? "",
+      contact_phone: registroInicial?.contact_phone ?? "",
+      location: registroInicial?.location ?? "",
     },
   });
 
@@ -32,17 +42,18 @@ export default function AdoptionForm({ onSuccess }) {
     setSaving(true);
     setError(null);
     try {
-      let photo_url = "";
+      let photo_url = registroInicial?.photo_url || "";
       if (photo) {
         const res = await db.storage.subirArchivo(photo);
         photo_url = res.file_url;
       }
-      await db.entities.AdoptionPet.create({
-        ...data,
-        age_years: data.age_years || undefined,
-        photo_url,
-        status: "disponible",
-      });
+      const campos = { ...data, age_years: data.age_years || undefined, photo_url };
+
+      if (editando) {
+        await db.entities.AdoptionPet.update(registroInicial.id, campos);
+      } else {
+        await db.entities.AdoptionPet.create({ ...campos, status: "disponible" });
+      }
       onSuccess();
     } catch (e) {
       setError(mensajeDeError(e));
@@ -169,7 +180,7 @@ export default function AdoptionForm({ onSuccess }) {
       )}
       <Button type="submit" disabled={saving} className="w-full">
         {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
-        Publicar
+        {editando ? "Guardar cambios" : "Publicar"}
       </Button>
     </form>
   );

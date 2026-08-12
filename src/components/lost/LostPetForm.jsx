@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { mascotaPerdidaSchema } from "@/schemas";
 import { db } from "@/api/supabaseClient";
 import { mensajeDeError } from "@/lib/mensajeDeError";
+import BotonUbicacion from "@/components/comun/BotonUbicacion";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,17 +13,30 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Loader2, Camera } from "lucide-react";
 
-export default function LostPetForm({ onSuccess, openCameraOnMount = false }) {
+// registroInicial llega cuando se está editando una publicación existente.
+export default function LostPetForm({ onSuccess, openCameraOnMount = false, registroInicial = null }) {
+  const editando = Boolean(registroInicial);
+
   const { register, handleSubmit, control, formState: { errors } } = useForm({
     resolver: zodResolver(mascotaPerdidaSchema),
     defaultValues: {
-      pet_name: "", species: "perro", breed: "", age_years: "",
-      description: "", last_seen_address: "", contact_phone: "", contact_whatsapp: "",
+      pet_name: registroInicial?.pet_name ?? "",
+      species: registroInicial?.species ?? "perro",
+      breed: registroInicial?.breed ?? "",
+      age_years: registroInicial?.age_years ?? "",
+      description: registroInicial?.description ?? "",
+      last_seen_address: registroInicial?.last_seen_address ?? "",
+      contact_phone: registroInicial?.contact_phone ?? "",
+      contact_whatsapp: registroInicial?.contact_whatsapp ?? "",
     },
   });
 
   const [photo, setPhoto] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(registroInicial?.photo_url || null);
+  const [ubicacion, setUbicacion] = useState({
+    lat: registroInicial?.last_seen_lat ?? undefined,
+    lng: registroInicial?.last_seen_lng ?? undefined,
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const cameraInputRef = useRef(null);
@@ -37,17 +51,25 @@ export default function LostPetForm({ onSuccess, openCameraOnMount = false }) {
     setSaving(true);
     setError(null);
     try {
-      let photo_url = "";
+      // Al editar sin cambiar la imagen, se conserva la que ya estaba.
+      let photo_url = registroInicial?.photo_url || "";
       if (photo) {
         const res = await db.storage.subirArchivo(photo);
         photo_url = res.file_url;
       }
-      await db.entities.LostPet.create({
+      const campos = {
         ...data,
         age_years: data.age_years || undefined,
+        last_seen_lat: ubicacion.lat,
+        last_seen_lng: ubicacion.lng,
         photo_url,
-        status: "perdida",
-      });
+      };
+
+      if (editando) {
+        await db.entities.LostPet.update(registroInicial.id, campos);
+      } else {
+        await db.entities.LostPet.create({ ...campos, status: "perdida" });
+      }
       onSuccess();
     } catch (e) {
       setError(mensajeDeError(e));
@@ -101,6 +123,7 @@ export default function LostPetForm({ onSuccess, openCameraOnMount = false }) {
       <div className="space-y-1.5">
         <Label>Última ubicación vista</Label>
         <Input {...register("last_seen_address")} placeholder="Ej: Av. San Martín y Belgrano, Orán" />
+        <BotonUbicacion valor={ubicacion} onCambio={setUbicacion} />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
@@ -150,7 +173,7 @@ export default function LostPetForm({ onSuccess, openCameraOnMount = false }) {
       )}
       <Button type="submit" disabled={saving} className="w-full bg-destructive hover:bg-destructive/90">
         {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
-        Publicar reporte
+        {editando ? "Guardar cambios" : "Publicar reporte"}
       </Button>
     </form>
   );

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { db } from "@/api/supabaseClient";
+import { mensajeDeError } from "@/lib/mensajeDeError";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -14,24 +15,32 @@ export default function SightingDialog({ pet, open, onClose }) {
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState(null);
   const queryClient = useQueryClient();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    const sighting = {
-      address,
-      note,
-      date: new Date().toISOString(),
-    };
-    const existing = pet.sightings || [];
-    await db.entities.LostPet.update(pet.id, {
-      sightings: [...existing, sighting],
-    });
-    queryClient.invalidateQueries({ queryKey: ["lostPets"] });
-    setSaving(false);
-    setDone(true);
-    setTimeout(() => { setDone(false); onClose(); }, 1500);
+    setError(null);
+    try {
+      // Antes esto era LostPet.update(), pero esa tabla solo deja actualizar a
+      // quien publicó. O sea que la única persona habilitada a avisar que vio a
+      // la mascota era su propia dueña, justo al revés de para qué existe la
+      // función. Y como no había try/catch, el diálogo mostraba el tilde de
+      // éxito mientras la operación fallaba en silencio.
+      await db.rpc("agregar_avistamiento", {
+        id_mascota: pet.id,
+        direccion: address,
+        nota: note || null,
+      });
+      queryClient.invalidateQueries({ queryKey: ["lostPets"] });
+      setDone(true);
+      setTimeout(() => { setDone(false); onClose(); }, 1500);
+    } catch (e) {
+      setError(mensajeDeError(e));
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -55,6 +64,9 @@ export default function SightingDialog({ pet, open, onClose }) {
               <Label>Nota adicional (opcional)</Label>
               <Textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Ej: Estaba cerca de la plaza..." rows={2} />
             </div>
+            {error && (
+              <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">{error}</p>
+            )}
             <Button type="submit" disabled={saving} className="w-full">
               {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <MapPin className="w-4 h-4 mr-2" />}
               Enviar avistamiento

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db } from "@/api/supabaseClient";
+import { useAuth } from "@/lib/AuthContext";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,16 +18,15 @@ export default function QuickChat({ contextType, contextId, contextTitle, accent
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
   const [guestName, setGuestName] = useState(() => localStorage.getItem(GUEST_NAME_KEY) || "");
   const [askName, setAskName] = useState(false);
   const [pendingText, setPendingText] = useState("");
   const bottomRef = useRef(null);
 
-  // Try to get logged-in user
-  useEffect(() => {
-    db.auth.me().then(setCurrentUser).catch(() => {});
-  }, []);
+  // Del contexto de sesión: es null para visitantes sin cuenta, que es un caso
+  // válido acá (el chat rápido admite invitados). Antes cada tarjeta de la lista
+  // disparaba su propio db.auth.me().
+  const { user: currentUser } = useAuth();
 
   // Load messages + subscribe when open
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function QuickChat({ contextType, contextId, contextTitle, accent
     const senderName = currentUser ? (currentUser.full_name || "Usuario") : (name || "Anónimo");
     const senderId = currentUser ? currentUser.id : `guest_${name}_${Date.now()}`;
 
-    await db.entities.ChatMessage.create({
+    const nuevo = await db.entities.ChatMessage.create({
       conversation_id: conversationId,
       context_type: contextType,
       context_id: contextId,
@@ -62,6 +62,8 @@ export default function QuickChat({ contextType, contextId, contextTitle, accent
       text: msgText.trim(),
       read_by: [],
     });
+    // Se agrega en el acto porque el tiempo real todavía está apagado.
+    setMessages((prev) => (prev.some((m) => m.id === nuevo.id) ? prev : [...prev, nuevo]));
 
     // La notificación al dueño de la publicación la genera el trigger
     // on_chat_message_created en la base de datos: desde el cliente ya no se

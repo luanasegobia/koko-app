@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { db } from "@/api/supabaseClient";
+import { useAuth } from "@/lib/AuthContext";
 
 function haversineKm([lat1, lng1], [lat2, lng2]) {
   const R = 6371;
@@ -17,14 +18,14 @@ export function useNotifications() {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [subscription, setSubscription] = useState(null);
-  const [user, setUser] = useState(null);
   const seenIdsRef = useRef(new Set());
   const isFirstLoad = useRef(true);
 
-  // Load current user
-  useEffect(() => {
-    db.auth.me().then(setUser).catch(() => {});
-  }, []);
+  // El usuario sale del contexto de sesión. Antes cada componente que usaba este
+  // hook disparaba su propio db.auth.me(), o sea un pedido a /auth/v1/user más
+  // un SELECT a profiles por cada uno: /perdidas con una docena de tarjetas
+  // hacía más de diez pares idénticos.
+  const { user } = useAuth();
 
   // Load subscription and notifications
   const loadData = useCallback(async () => {

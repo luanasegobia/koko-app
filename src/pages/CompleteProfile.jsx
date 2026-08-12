@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { db } from "@/api/supabaseClient";
 import { useAuth } from "@/lib/AuthContext";
 import { mensajeDeError } from "@/lib/mensajeDeError";
+import { veterinariaSchema } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,16 +52,18 @@ export default function CompleteProfile() {
 
       // Si es veterinario, crear registro en Veterinary pendiente de verificación
       if (tipoCuenta === "veterinario") {
-        const me = await db.auth.me();
-        await db.entities.Veterinary.create({
+        // Se valida con el mismo esquema que usa la edición de la ficha. Antes
+        // este insert se armaba a mano y sin validar, aunque veterinariaSchema
+        // ya existía sin que nadie lo importara.
+        const datosVeterinaria = veterinariaSchema.parse({
           name: form.vet_clinic_name,
           address: form.vet_address,
           phone: form.vet_phone || form.phone,
-          is_verified: false,
-          registered_by_user_id: me.id,
           services: form.vet_services,
           bio: form.bio,
         });
+        // registered_by_user_id lo pone el servidor con auth.uid().
+        await db.entities.Veterinary.create({ ...datosVeterinaria, is_verified: false });
       }
 
       await reloadUser?.();

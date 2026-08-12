@@ -33,6 +33,7 @@ export default function LostPets() {
   const [speciesFilter, setSpeciesFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("perdida");
   const [sightingPet, setSightingPet] = useState(null);
+  const [enEdicion, setEnEdicion] = useState(null);
   const [view, setView] = useState("lista");
   const [userLocation, setUserLocation] = useState(null);
   const [radiusKm, setRadiusKm] = useState(5);
@@ -188,7 +189,15 @@ export default function LostPets() {
           <AnimatePresence>
             {filtered.map((pet, i) => (
               <motion.div key={pet.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                <LostPetCard pet={pet} onSighting={() => setSightingPet(pet)} />
+                <LostPetCard
+                  pet={pet}
+                  onSighting={() => setSightingPet(pet)}
+                  onEditar={() => { setEnEdicion(pet); setShowForm(true); }}
+                  onEliminar={async () => {
+                    await db.entities.LostPet.delete(pet.id);
+                    queryClient.invalidateQueries({ queryKey: ["lostPets"] });
+                  }}
+                />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -196,14 +205,23 @@ export default function LostPets() {
       )}
 
       {/* Report Form Dialog */}
-      <Dialog open={showForm} onOpenChange={setShowForm}>
+      <Dialog open={showForm} onOpenChange={(abierto) => { if (!abierto) { setShowForm(false); setEnEdicion(null); } }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-heading">Reportar mascota perdida</DialogTitle>
+            <DialogTitle className="font-heading">
+              {enEdicion ? `Editar el reporte de ${enEdicion.pet_name}` : "Reportar mascota perdida"}
+            </DialogTitle>
           </DialogHeader>
           <LostPetForm
-            openCameraOnMount={openCamera}
-            onSuccess={() => { setShowForm(false); setOpenCamera(false); queryClient.invalidateQueries({ queryKey: ["lostPets"] }); }}
+            key={enEdicion?.id || "nuevo"}
+            registroInicial={enEdicion}
+            openCameraOnMount={openCamera && !enEdicion}
+            onSuccess={() => {
+              setShowForm(false);
+              setOpenCamera(false);
+              setEnEdicion(null);
+              queryClient.invalidateQueries({ queryKey: ["lostPets"] });
+            }}
           />
         </DialogContent>
       </Dialog>

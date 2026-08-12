@@ -11,16 +11,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Upload, Loader2, Plus, X } from "lucide-react";
 
-export default function UrgentCaseForm({ onSuccess }) {
+export default function UrgentCaseForm({ onSuccess, registroInicial = null }) {
+  const editando = Boolean(registroInicial);
+
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(casoUrgenteSchema),
     defaultValues: {
-      title: "", description: "", published_by: "", goal_amount: "",
-      donation_alias: "",
+      title: registroInicial?.title ?? "",
+      description: registroInicial?.description ?? "",
+      published_by: registroInicial?.published_by ?? "",
+      goal_amount: registroInicial?.goal_amount ?? "",
+      donation_alias: registroInicial?.donation_alias ?? "",
     },
   });
 
-  const [needs, setNeeds] = useState([""]);
+  const [needs, setNeeds] = useState(
+    registroInicial?.needs?.length ? registroInicial.needs.map((n) => n.label ?? "") : [""]
+  );
   const [photo, setPhoto] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -29,20 +36,36 @@ export default function UrgentCaseForm({ onSuccess }) {
     setSaving(true);
     setError(null);
     try {
-      let photo_url = "";
+      let photo_url = registroInicial?.photo_url || "";
       if (photo) {
         const res = await db.storage.subirArchivo(photo);
         photo_url = res.file_url;
       }
-      await db.entities.UrgentCase.create({
+      // Al editar se conserva el estado de cada necesidad ya cargada.
+      const estadoPrevio = new Map(
+        (registroInicial?.needs || []).map((n) => [n.label, n.status])
+      );
+      const campos = {
         ...data,
         goal_amount: data.goal_amount || 0,
         photo_url,
-        needs: needs.filter(n => n.trim()).map(n => ({ label: n, status: "pendiente" })),
-        status: "activo",
-        raised_amount: 0,
-        contributors_count: 0,
-      });
+        needs: needs
+          .filter((n) => n.trim())
+          .map((n) => ({ label: n, status: estadoPrevio.get(n) || "pendiente" })),
+      };
+
+      if (editando) {
+        // raised_amount y contributors_count no se tocan: los lleva la cuenta
+        // de donaciones, no este formulario.
+        await db.entities.UrgentCase.update(registroInicial.id, campos);
+      } else {
+        await db.entities.UrgentCase.create({
+          ...campos,
+          status: "activo",
+          raised_amount: 0,
+          contributors_count: 0,
+        });
+      }
       onSuccess();
     } catch (e) {
       setError(mensajeDeError(e));
@@ -98,7 +121,7 @@ export default function UrgentCaseForm({ onSuccess }) {
       )}
       <Button type="submit" disabled={saving} className="w-full">
         {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
-        Publicar caso
+        {editando ? "Guardar cambios" : "Publicar caso"}
       </Button>
     </form>
   );
