@@ -3,6 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { mascotaAdopcionSchema } from "@/schemas";
 import { db } from "@/api/supabaseClient";
+import { mensajeDeError } from "@/lib/mensajeDeError";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,22 +26,29 @@ export default function AdoptionForm({ onSuccess }) {
 
   const [photo, setPhoto] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   const onSubmit = async (data) => {
     setSaving(true);
-    let photo_url = "";
-    if (photo) {
-      const res = await db.integrations.Core.UploadFile({ file: photo });
-      photo_url = res.file_url;
+    setError(null);
+    try {
+      let photo_url = "";
+      if (photo) {
+        const res = await db.storage.subirArchivo(photo);
+        photo_url = res.file_url;
+      }
+      await db.entities.AdoptionPet.create({
+        ...data,
+        age_years: data.age_years || undefined,
+        photo_url,
+        status: "disponible",
+      });
+      onSuccess();
+    } catch (e) {
+      setError(mensajeDeError(e));
+    } finally {
+      setSaving(false);
     }
-    await db.entities.AdoptionPet.create({
-      ...data,
-      age_years: data.age_years || undefined,
-      photo_url,
-      status: "disponible",
-    });
-    setSaving(false);
-    onSuccess();
   };
 
   return (
@@ -156,6 +164,9 @@ export default function AdoptionForm({ onSuccess }) {
         <Label>Foto</Label>
         <Input type="file" accept="image/*" onChange={e => setPhoto(e.target.files[0])} />
       </div>
+      {error && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">{error}</p>
+      )}
       <Button type="submit" disabled={saving} className="w-full">
         {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
         Publicar

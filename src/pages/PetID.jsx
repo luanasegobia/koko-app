@@ -15,7 +15,7 @@ export default function PetID() {
 
   const { data: pets = [], isLoading } = useQuery({
     queryKey: ["myPets"],
-    queryFn: () => db.entities.Pet.list("-created_date", 50),
+    queryFn: () => db.entities.Pet.list("-created_at", 50),
   });
 
   return (

@@ -32,7 +32,7 @@ export default function QuickChat({ contextType, contextId, contextTitle, accent
   useEffect(() => {
     if (!open) return;
     db.entities.ChatMessage
-      .filter({ conversation_id: conversationId }, "created_date", 100)
+      .filter({ conversation_id: conversationId }, "created_at", 100)
       .then(setMessages);
 
     const unsub = db.entities.ChatMessage.subscribe((event) => {
@@ -146,8 +146,8 @@ export default function QuickChat({ contextType, contextId, contextTitle, accent
                         {msg.text}
                       </div>
                       <span className="text-[10px] text-muted-foreground mt-0.5 px-1">
-                        {msg.created_date
-                          ? formatDistanceToNow(new Date(msg.created_date), { addSuffix: true, locale: es })
+                        {msg.created_at
+                          ? formatDistanceToNow(new Date(msg.created_at), { addSuffix: true, locale: es })
                           : ""}
                       </span>
                     </div>

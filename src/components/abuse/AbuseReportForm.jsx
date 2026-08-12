@@ -3,6 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { denunciaSchema } from "@/schemas";
 import { db } from "@/api/supabaseClient";
+import { mensajeDeError } from "@/lib/mensajeDeError";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,28 +26,41 @@ export default function AbuseReportForm({ onSuccess }) {
   const [saving, setSaving] = useState(false);
   const [trackingCode, setTrackingCode] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState(null);
   const { toast } = useToast();
 
   const formType = watch("type");
 
   const onSubmit = async (data) => {
     setSaving(true);
-    let evidence_urls = [];
-    for (const file of files) {
-      const res = await db.integrations.Core.UploadFile({ file });
-      evidence_urls.push(res.file_url);
+    setError(null);
+    try {
+      const evidence_urls = [];
+      for (const file of files) {
+        const res = await db.storage.subirArchivo(file, {
+          tiposPermitidos: ["image/", "video/"],
+          tamanioMaximoMb: 25,
+        });
+        evidence_urls.push(res.file_url);
+      }
+      // El código lo genera la base de datos y es único. Antes salía de
+      // Math.random() con 6 caracteres y sin restricción de unicidad: ante una
+      // colisión, la búsqueda por código devolvía la denuncia de otra persona.
+      const denuncia = await db.entities.AbuseReport.create({
+        ...data,
+        evidence_urls,
+        status: "pendiente",
+        reporter_name: data.type === "anonima" ? undefined : data.reporter_name,
+        reporter_phone: data.type === "anonima" ? undefined : data.reporter_phone,
+      });
+      setTrackingCode(denuncia.tracking_code);
+    } catch (e) {
+      const mensaje = mensajeDeError(e);
+      setError(mensaje);
+      toast({ title: "No se pudo enviar la denuncia", description: mensaje, variant: "destructive" });
+    } finally {
+      setSaving(false);
     }
-    const tracking_code = Math.random().toString(36).substring(2, 8).toUpperCase();
-    await db.entities.AbuseReport.create({
-      ...data,
-      evidence_urls,
-      tracking_code,
-      status: "pendiente",
-      reporter_name: data.type === "anonima" ? undefined : data.reporter_name,
-      reporter_phone: data.type === "anonima" ? undefined : data.reporter_phone,
-    });
-    setSaving(false);
-    setTrackingCode(tracking_code);
   };
 
   const copyCode = () => {
@@ -124,6 +138,9 @@ export default function AbuseReportForm({ onSuccess }) {
         <Input type="file" accept="image/*,video/*" multiple onChange={e => setFiles(Array.from(e.target.files))} />
       </div>
 
+      {error && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">{error}</p>
+      )}
       <Button type="submit" disabled={saving} className="w-full bg-destructive hover:bg-destructive/90">
         {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
         Enviar denuncia {formType === "urgente" ? "urgente" : ""}

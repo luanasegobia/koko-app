@@ -43,7 +43,7 @@ export default function AbuseReports() {
 
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ["abuseReports"],
-    queryFn: () => db.entities.AbuseReport.list("-created_date", 100),
+    queryFn: () => db.entities.AbuseReport.list("-created_at", 100),
   });
 
   const filtered = useMemo(() => {
@@ -74,8 +74,8 @@ export default function AbuseReports() {
           </div>
           <p className="text-xs line-clamp-3">{r.description}</p>
           {r.address && <p className="text-xs text-gray-500">📍 {r.address}</p>}
-          {r.created_date && (
-            <p className="text-xs text-gray-400">{format(new Date(r.created_date), "d MMM yyyy", { locale: es })}</p>
+          {r.created_at && (
+            <p className="text-xs text-gray-400">{format(new Date(r.created_at), "d MMM yyyy", { locale: es })}</p>
           )}
           {r.tracking_code && <p className="text-xs font-mono text-gray-400">#{r.tracking_code}</p>}
         </div>
@@ -198,7 +198,7 @@ export default function AbuseReports() {
                       <p className="text-sm text-foreground/80 line-clamp-2">{report.description}</p>
                       <div className="flex gap-4 text-xs text-muted-foreground flex-wrap">
                         {report.address && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{report.address}</span>}
-                        {report.created_date && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{format(new Date(report.created_date), "d MMM yyyy", { locale: es })}</span>}
+                        {report.created_at && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{format(new Date(report.created_at), "d MMM yyyy", { locale: es })}</span>}
                       </div>
                     </div>
                   </div>

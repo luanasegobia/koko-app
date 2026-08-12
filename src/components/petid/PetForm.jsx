@@ -3,6 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { mascotaSchema } from "@/schemas";
 import { db } from "@/api/supabaseClient";
+import { mensajeDeError } from "@/lib/mensajeDeError";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,23 +24,35 @@ export default function PetForm({ onSuccess }) {
 
   const [photo, setPhoto] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   const onSubmit = async (data) => {
     setSaving(true);
-    let photo_url = "";
-    if (photo) {
-      const res = await db.integrations.Core.UploadFile({ file: photo });
-      photo_url = res.file_url;
+    setError(null);
+    try {
+      let photo_url = "";
+      if (photo) {
+        const res = await db.storage.subirArchivo(photo);
+        photo_url = res.file_url;
+      }
+      // crypto.randomUUID no existe fuera de contexto seguro, y la app se prueba
+      // desde el celular contra http://192.168.x.x.
+      const qr_id =
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID().split("-")[0]
+          : Math.random().toString(36).slice(2, 10);
+      await db.entities.Pet.create({
+        ...data,
+        age_years: data.age_years || undefined,
+        photo_url,
+        qr_id,
+      });
+      onSuccess();
+    } catch (e) {
+      setError(mensajeDeError(e));
+    } finally {
+      setSaving(false);
     }
-    const qr_id = crypto.randomUUID().split("-")[0];
-    await db.entities.Pet.create({
-      ...data,
-      age_years: data.age_years || undefined,
-      photo_url,
-      qr_id,
-    });
-    setSaving(false);
-    onSuccess();
   };
 
   return (
@@ -120,6 +133,9 @@ export default function PetForm({ onSuccess }) {
         <Label>Foto</Label>
         <Input type="file" accept="image/*" onChange={e => setPhoto(e.target.files[0])} />
       </div>
+      {error && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">{error}</p>
+      )}
       <Button type="submit" disabled={saving} className="w-full">
         {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
         Registrar mascota

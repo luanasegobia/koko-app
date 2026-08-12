@@ -78,9 +78,9 @@ export default function NotificationPanel({
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm leading-snug ${!n.read ? "font-semibold" : "font-normal"}`}>{n.title}</p>
                   <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{n.body}</p>
-                  {n.created_date && (
+                  {n.created_at && (
                     <p className="text-xs text-muted-foreground/60 mt-1">
-                      {formatDistanceToNow(new Date(n.created_date), { addSuffix: true, locale: es })}
+                      {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: es })}
                     </p>
                   )}
                 </div>

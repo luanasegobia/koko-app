@@ -77,7 +77,7 @@ export default function AdminCases({ urgentCases, lostPets, reports, isLoading, 
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">{c.description}</p>
                   {c.published_by && <p className="text-xs text-muted-foreground flex items-center gap-1"><User className="w-3 h-3" />{c.published_by}</p>}
-                  {c.created_date && <p className="text-xs text-muted-foreground">{format(new Date(c.created_date), "d MMM yyyy", { locale: es })}</p>}
+                  {c.created_at && <p className="text-xs text-muted-foreground">{format(new Date(c.created_at), "d MMM yyyy", { locale: es })}</p>}
                 </div>
                 <div className="shrink-0">
                   <Select value={c.status} onValueChange={(val) => onUpdateCase(c.id, { status: val })} disabled={isCasePending}>
@@ -112,7 +112,7 @@ export default function AdminCases({ urgentCases, lostPets, reports, isLoading, 
                     <Badge variant="outline" className="text-xs">{p.species}</Badge>
                   </div>
                   {p.last_seen_address && <p className="text-sm text-muted-foreground flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{p.last_seen_address}</p>}
-                  {p.created_date && <p className="text-xs text-muted-foreground">{format(new Date(p.created_date), "d MMM yyyy", { locale: es })}</p>}
+                  {p.created_at && <p className="text-xs text-muted-foreground">{format(new Date(p.created_at), "d MMM yyyy", { locale: es })}</p>}
                 </div>
                 <div className="shrink-0">
                   <Select value={p.status} onValueChange={(val) => onUpdateLost(p.id, { status: val })} disabled={isLostPending}>
@@ -147,7 +147,7 @@ export default function AdminCases({ urgentCases, lostPets, reports, isLoading, 
                   <p className="text-sm text-foreground/80 line-clamp-3">{r.description}</p>
                   {r.address && <p className="text-sm text-muted-foreground flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{r.address}</p>}
                   {r.reporter_name && <p className="text-xs text-muted-foreground flex items-center gap-1"><User className="w-3 h-3" />{r.reporter_name} {r.reporter_phone && `· ${r.reporter_phone}`}</p>}
-                  {r.created_date && <p className="text-xs text-muted-foreground">{format(new Date(r.created_date), "d MMM yyyy", { locale: es })}</p>}
+                  {r.created_at && <p className="text-xs text-muted-foreground">{format(new Date(r.created_at), "d MMM yyyy", { locale: es })}</p>}
                   {r.evidence_urls?.length > 0 && (
                     <div className="flex gap-2 mt-1 flex-wrap">
                       {r.evidence_urls.slice(0, 3).map((url, j) => (

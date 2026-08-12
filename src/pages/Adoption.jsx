@@ -23,7 +23,7 @@ export default function Adoption() {
 
   const { data: pets = [], isLoading } = useQuery({
     queryKey: ["adoptionPets"],
-    queryFn: () => db.entities.AdoptionPet.list("-created_date", 50),
+    queryFn: () => db.entities.AdoptionPet.list("-created_at", 50),
   });
 
   const filtered = pets.filter(p => {

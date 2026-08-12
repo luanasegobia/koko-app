@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { casoUrgenteSchema } from "@/schemas";
 import { db } from "@/api/supabaseClient";
+import { mensajeDeError } from "@/lib/mensajeDeError";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,25 +23,32 @@ export default function UrgentCaseForm({ onSuccess }) {
   const [needs, setNeeds] = useState([""]);
   const [photo, setPhoto] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   const onSubmit = async (data) => {
     setSaving(true);
-    let photo_url = "";
-    if (photo) {
-      const res = await db.integrations.Core.UploadFile({ file: photo });
-      photo_url = res.file_url;
+    setError(null);
+    try {
+      let photo_url = "";
+      if (photo) {
+        const res = await db.storage.subirArchivo(photo);
+        photo_url = res.file_url;
+      }
+      await db.entities.UrgentCase.create({
+        ...data,
+        goal_amount: data.goal_amount || 0,
+        photo_url,
+        needs: needs.filter(n => n.trim()).map(n => ({ label: n, status: "pendiente" })),
+        status: "activo",
+        raised_amount: 0,
+        contributors_count: 0,
+      });
+      onSuccess();
+    } catch (e) {
+      setError(mensajeDeError(e));
+    } finally {
+      setSaving(false);
     }
-    await db.entities.UrgentCase.create({
-      ...data,
-      goal_amount: data.goal_amount || 0,
-      photo_url,
-      needs: needs.filter(n => n.trim()).map(n => ({ label: n, status: "pendiente" })),
-      status: "activo",
-      raised_amount: 0,
-      contributors_count: 0,
-    });
-    setSaving(false);
-    onSuccess();
   };
 
   return (
@@ -85,6 +93,9 @@ export default function UrgentCaseForm({ onSuccess }) {
         <Label>Foto</Label>
         <Input type="file" accept="image/*" onChange={e => setPhoto(e.target.files[0])} />
       </div>
+      {error && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded-xl px-3 py-2">{error}</p>
+      )}
       <Button type="submit" disabled={saving} className="w-full">
         {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
         Publicar caso

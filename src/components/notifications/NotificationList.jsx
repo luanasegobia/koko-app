@@ -67,9 +67,9 @@ export default function NotificationList({ notifications, onMarkAllRead, onMarkR
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.body || n.message}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    {n.created_date && (
+                    {n.created_at && (
                       <span className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(n.created_date), { addSuffix: true, locale: es })}
+                        {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: es })}
                       </span>
                     )}
                     {n.link && (

@@ -69,9 +69,9 @@ export default function AdminVets({ vets, isLoading, onVerify, onRevoke, isPendi
                   </div>
                   {vet.bio && <p className="text-sm text-foreground/70">{vet.bio}</p>}
                   {vet.services && <p className="text-xs text-muted-foreground">Servicios: {vet.services}</p>}
-                  {vet.created_date && (
+                  {vet.created_at && (
                     <p className="text-xs text-muted-foreground">
-                      Registrada el {new Date(vet.created_date).toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" })}
+                      Registrada el {new Date(vet.created_at).toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" })}
                     </p>
                   )}
                 </div>

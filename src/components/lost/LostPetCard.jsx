@@ -51,9 +51,9 @@ export default function LostPetCard({ pet, onSighting }) {
           </Button>
 
         </div>
-        {pet.created_date && (
+        {pet.created_at && (
           <p className="text-xs text-muted-foreground text-center">
-            Reportada {format(new Date(pet.created_date), "d 'de' MMM, yyyy", { locale: es })}
+            Reportada {format(new Date(pet.created_at), "d 'de' MMM, yyyy", { locale: es })}
           </p>
         )}
       </div>

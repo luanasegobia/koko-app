@@ -41,7 +41,7 @@ export default function LostPets() {
 
   const { data: lostPets = [], isLoading } = useQuery({
     queryKey: ["lostPets"],
-    queryFn: () => db.entities.LostPet.list("-created_date", 100),
+    queryFn: () => db.entities.LostPet.list("-created_at", 100),
   });
 
   const filtered = useMemo(() => {

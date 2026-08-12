@@ -109,8 +109,8 @@ export default function AdminVeterinaries() {
                   {vet.registered_by_user_id && (
                     <p className="text-xs text-muted-foreground">ID de usuario registrante: {vet.registered_by_user_id}</p>
                   )}
-                  {vet.created_date && (
-                    <p className="text-xs text-muted-foreground">Registrada el {new Date(vet.created_date).toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" })}</p>
+                  {vet.created_at && (
+                    <p className="text-xs text-muted-foreground">Registrada el {new Date(vet.created_at).toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" })}</p>
                   )}
                 </div>
                 <div className="flex gap-2 shrink-0">

@@ -23,7 +23,7 @@ export default function ChatWindow({ conversationId, contextType, contextId, con
   useEffect(() => {
     if (!conversationId) return;
     const load = () =>
-      db.entities.ChatMessage.filter({ conversation_id: conversationId }, "created_date", 100)
+      db.entities.ChatMessage.filter({ conversation_id: conversationId }, "created_at", 100)
         .then(setMessages);
     load();
     const unsub = db.entities.ChatMessage.subscribe((event) => {
@@ -106,7 +106,7 @@ export default function ChatWindow({ conversationId, contextType, contextId, con
                   {msg.text}
                 </div>
                 <span className="text-[10px] text-muted-foreground mt-0.5 px-1">
-                  {msg.created_date ? formatDistanceToNow(new Date(msg.created_date), { addSuffix: true, locale: es }) : ""}
+                  {msg.created_at ? formatDistanceToNow(new Date(msg.created_at), { addSuffix: true, locale: es }) : ""}
                 </span>
               </div>
             );

@@ -29,18 +29,24 @@ export function useNotifications() {
   // Load subscription and notifications
   const loadData = useCallback(async () => {
     if (!user) return;
-    const [subs, notifs] = await Promise.all([
-      db.entities.AlertSubscription.filter({ user_id: user.id }),
-      db.entities.AppNotification.filter({ user_id: user.id }, "-created_date", 50),
-    ]);
-    setSubscription(subs[0] || null);
-    setNotifications(notifs);
-    setUnreadCount(notifs.filter(n => !n.read).length);
+    try {
+      const [subs, notifs] = await Promise.all([
+        db.entities.AlertSubscription.filter({ user_id: user.id }),
+        db.entities.AppNotification.filter({ user_id: user.id }, "-created_at", 50),
+      ]);
+      setSubscription(subs[0] || null);
+      setNotifications(notifs);
+      setUnreadCount(notifs.filter(n => !n.read).length);
 
-    // Seed seen IDs on first load to avoid false "new" notifications
-    if (isFirstLoad.current) {
-      notifs.forEach(n => seenIdsRef.current.add(n.id));
-      isFirstLoad.current = false;
+      // Seed seen IDs on first load to avoid false "new" notifications
+      if (isFirstLoad.current) {
+        notifs.forEach(n => seenIdsRef.current.add(n.id));
+        isFirstLoad.current = false;
+      }
+    } catch (e) {
+      // La campana de notificaciones es accesoria: si falla, no puede tumbar la
+      // pantalla que la contiene.
+      console.error("No se pudieron cargar las notificaciones:", e);
     }
   }, [user]);
 
@@ -58,7 +64,7 @@ export function useNotifications() {
           setNotifications(prev => [event.data, ...prev]);
           setUnreadCount(prev => prev + 1);
           // Browser notification if permitted
-          if (Notification.permission === "granted") {
+          if (typeof Notification !== "undefined" && Notification.permission === "granted") {
             new Notification(event.data.title, { body: event.data.body, icon: "/favicon.ico" });
           }
         }
@@ -73,6 +79,10 @@ export function useNotifications() {
   // Poll for new LostPets and UrgentCases and create notifications
   useEffect(() => {
     if (!user || !subscription) return;
+    // Apagado por defecto: este sondeo escribe notificaciones en la base cada 30
+    // segundos por cada pestaña abierta. Se enciende cuando el módulo de alertas
+    // esté validado de punta a punta.
+    if (import.meta.env.VITE_HABILITAR_ALERTAS !== "true") return;
     const POLL_MS = 30000;
 
     const check = async () => {
@@ -80,9 +90,9 @@ export function useNotifications() {
 
       // Check lost pets
       if (subscription.notify_lost_pets && subscription.lat && subscription.lng) {
-        const recent = await db.entities.LostPet.list("-created_date", 20);
+        const recent = await db.entities.LostPet.list("-created_at", 20);
         for (const pet of recent) {
-          if (!pet.created_date || new Date(pet.created_date) < new Date(Date.now() - POLL_MS * 1.5)) continue;
+          if (!pet.created_at || new Date(pet.created_at) < new Date(Date.now() - POLL_MS * 1.5)) continue;
           if (seenIdsRef.current.has(`lp-${pet.id}`)) continue;
           seenIdsRef.current.add(`lp-${pet.id}`);
 
@@ -107,10 +117,10 @@ export function useNotifications() {
 
       // Check urgent cases
       if (subscription.notify_urgent_cases) {
-        const recent = await db.entities.UrgentCase.list("-updated_date", 10);
+        const recent = await db.entities.UrgentCase.list("-updated_at", 10);
         for (const uc of recent) {
-          if (!uc.updated_date || new Date(uc.updated_date) < new Date(Date.now() - POLL_MS * 1.5)) continue;
-          const key = `uc-${uc.id}-${uc.updated_date}`;
+          if (!uc.updated_at || new Date(uc.updated_at) < new Date(Date.now() - POLL_MS * 1.5)) continue;
+          const key = `uc-${uc.id}-${uc.updated_at}`;
           if (seenIdsRef.current.has(key)) continue;
           seenIdsRef.current.add(key);
 
@@ -126,7 +136,12 @@ export function useNotifications() {
       }
     };
 
-    const interval = setInterval(check, POLL_MS);
+    // check() es asíncrona y setInterval no espera su promesa: sin este
+    // envoltorio, cualquier rechazo quedaba sin atrapar y aparecía como un
+    // error suelto en consola cada 30 segundos.
+    const interval = setInterval(() => {
+      check().catch((e) => console.error("Falló la revisión de alertas:", e));
+    }, POLL_MS);
     return () => clearInterval(interval);
   }, [user, subscription]);
 
@@ -147,7 +162,7 @@ export function useNotifications() {
     if (!user) return;
     const payload = { ...data, user_id: user.id, user_email: user.email };
     if (subscription) {
-      const updated = await db.entities.AlertSubscription.update(subscription.id, payload);
+      await db.entities.AlertSubscription.update(subscription.id, payload);
       setSubscription({ ...subscription, ...payload });
     } else {
       const created = await db.entities.AlertSubscription.create(payload);

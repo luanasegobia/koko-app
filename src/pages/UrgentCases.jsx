@@ -25,7 +25,7 @@ export default function UrgentCases() {
 
   const { data: cases = [], isLoading } = useQuery({
     queryKey: ["urgentCases"],
-    queryFn: () => db.entities.UrgentCase.list("-created_date", 50),
+    queryFn: () => db.entities.UrgentCase.list("-created_at", 50),
   });
 
   const activeCases = cases.filter(c => c.status !== "resuelto");

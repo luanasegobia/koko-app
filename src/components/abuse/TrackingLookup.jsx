@@ -54,7 +54,7 @@ export default function TrackingLookup() {
           <p className="text-sm">{result.description}</p>
           <div className="flex gap-3 text-xs text-muted-foreground">
             {result.address && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{result.address}</span>}
-            {result.created_date && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{format(new Date(result.created_date), "d MMM yyyy", { locale: es })}</span>}
+            {result.created_at && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{format(new Date(result.created_at), "d MMM yyyy", { locale: es })}</span>}
           </div>
         </Card>
       )}
