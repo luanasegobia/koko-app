@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { db } from "@/api/supabaseClient";
 import { useAuth } from "@/lib/AuthContext";
+import { mensajeDeError } from "@/lib/mensajeDeError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +14,8 @@ import RoleSelector from "@/components/onboarding/RoleSelector";
 
 export default function CompleteProfile() {
   const { reloadUser } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [step, setStep] = useState(1);
   const [tipoCuenta, setTipoCuenta] = useState("usuario");
   const [form, setForm] = useState({
@@ -60,11 +64,13 @@ export default function CompleteProfile() {
       }
 
       await reloadUser?.();
-      window.location.href = "/";
+      // Vuelve a donde la persona quería ir, que es lo que dejó anotado el gate
+      // de perfil incompleto al desviarla hasta acá.
+      navigate(location.state?.volverA || "/", { replace: true });
     } catch (err) {
       // Sin este catch el botón quedaba girando para siempre y la persona
       // volvía al onboarding en cada inicio de sesión.
-      setError(err?.message || "No pudimos guardar tu perfil. Intentá de nuevo.");
+      setError(mensajeDeError(err));
       setSaving(false);
     }
   };

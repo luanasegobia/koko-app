@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Outlet, useLocation } from 'react-router-dom';
 import ScrollToTop from '@/components/ScrollToTop';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
@@ -26,23 +26,35 @@ import DonarExito from './pages/DonarExito';
 import AdminVeterinaries from './pages/AdminVeterinaries';
 import AdminDashboard from './pages/AdminDashboard';
 
-const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, isAuthenticated, user } = useAuth();
+/**
+ * Manda a completar el perfil antes de dejar entrar a las pantallas privadas.
+ *
+ * Antes esto vivía fuera del router y leía window.location.pathname a mano, con
+ * una lista de rutas públicas mantenida a mano que ya estaba desincronizada del
+ * mapa de rutas real. Al no pasar por el router, tampoco se recalculaba al
+ * navegar del lado del cliente. Ahora envuelve solo a las rutas privadas, así
+ * que la pregunta "¿esta ruta necesita perfil?" la responde el propio árbol de
+ * rutas y no una lista aparte.
+ */
+const RutaConPerfilCompleto = () => {
+  const { user } = useAuth();
+  const location = useLocation();
 
-  if (isLoadingPublicSettings || isLoadingAuth) {
+  if (user && !user.profile_completed) {
+    return <Navigate to="/completar-perfil" replace state={{ volverA: location.pathname }} />;
+  }
+  return <Outlet />;
+};
+
+const AuthenticatedApp = () => {
+  const { isLoadingAuth } = useAuth();
+
+  if (isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
       </div>
     );
-  }
-
-  // Redirect to onboarding if profile not completed (skip for public pages and onboarding itself)
-  const currentPath = window.location.pathname;
-  const publicPaths = ['/ficha/', '/completar-perfil', '/perdidas', '/casos-urgentes', '/veterinarias', '/donar/'];
-  const skipOnboarding = publicPaths.some(p => currentPath.startsWith(p));
-  if (isAuthenticated && user && !user.profile_completed && !skipOnboarding) {
-    return <CompleteProfile />;
   }
 
   return (
@@ -66,14 +78,17 @@ const AuthenticatedApp = () => {
 
       {/* Protected routes */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        {/* Fuera del gate: es justamente la pantalla que hay que completar. */}
         <Route path="/completar-perfil" element={<CompleteProfile />} />
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/adopcion" element={<Adoption />} />
-          <Route path="/identificacion" element={<PetID />} />
-          <Route path="/denuncias" element={<AbuseReports />} />
-          <Route path="/admin/veterinarias" element={<AdminVeterinaries />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+        <Route element={<RutaConPerfilCompleto />}>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/adopcion" element={<Adoption />} />
+            <Route path="/identificacion" element={<PetID />} />
+            <Route path="/denuncias" element={<AbuseReports />} />
+            <Route path="/admin/veterinarias" element={<AdminVeterinaries />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Route>
         </Route>
       </Route>
 

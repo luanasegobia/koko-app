@@ -31,7 +31,10 @@ export default function Login() {
   };
 
   const handleGoogle = () => {
-    db.auth.loginWithProvider("google", "/");
+    // Sin argumento: loginWithProvider arma la URL absoluta que exige Supabase.
+    // Antes se pasaba "/", que por ser truthy salteaba el respaldo y llegaba
+    // como redirectTo relativo, que Supabase rechaza.
+    db.auth.loginWithProvider("google");
   };
 
   return (

@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
-import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
 const DefaultFallback = () => (
   <div className="fixed inset-0 flex items-center justify-center">
@@ -9,17 +8,14 @@ const DefaultFallback = () => (
 );
 
 export default function ProtectedRoute({ fallback = <DefaultFallback />, unauthenticatedElement }) {
-  const { isAuthenticated, isLoadingAuth, authError } = useAuth();
+  const { isAuthenticated, isLoadingAuth } = useAuth();
 
+  // Se eliminó la rama de authError con el caso 'user_not_registered': era un
+  // tipo de error de Base44 que nunca se llegaba a asignar. En este modelo
+  // cualquiera se registra por su cuenta, así que "usuario no registrado" no es
+  // un estado posible.
   if (isLoadingAuth) {
     return fallback;
-  }
-
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    }
-    return unauthenticatedElement;
   }
 
   if (!isAuthenticated) {
