@@ -9,10 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { MapPin, Loader2, Check } from "lucide-react";
+import BotonUbicacion from "@/components/comun/BotonUbicacion";
 
 export default function SightingDialog({ pet, open, onClose }) {
   const [address, setAddress] = useState("");
   const [note, setNote] = useState("");
+  const [ubicacion, setUbicacion] = useState({ lat: undefined, lng: undefined });
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState(null);
@@ -32,6 +34,10 @@ export default function SightingDialog({ pet, open, onClose }) {
         id_mascota: pet.id,
         direccion: address,
         nota: note || null,
+        // Sin coordenadas el avistamiento igual se guarda y se ve en la
+        // tarjeta; lo que no puede es aparecer en el mapa.
+        lat: ubicacion.lat ?? null,
+        lng: ubicacion.lng ?? null,
       });
       queryClient.invalidateQueries({ queryKey: ["lostPets"] });
       setDone(true);
@@ -59,6 +65,7 @@ export default function SightingDialog({ pet, open, onClose }) {
             <div className="space-y-1.5">
               <Label>¿Dónde la viste?</Label>
               <Input value={address} onChange={e => setAddress(e.target.value)} required placeholder="Calle y barrio..." />
+              <BotonUbicacion valor={ubicacion} onCambio={setUbicacion} />
             </div>
             <div className="space-y-1.5">
               <Label>Nota adicional (opcional)</Label>
