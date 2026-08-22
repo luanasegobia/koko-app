@@ -7,6 +7,12 @@ export default defineConfig({
   plugins: [
     react(),
   ],
+  server: {
+    // 5173 lo ocupa otro proyecto, y el puerto tiene que ser fijo porque los
+    // mails de recuperación de Supabase apuntan a window.location.origin.
+    port: Number(process.env.PORT) || 5175,
+    strictPort: true,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
