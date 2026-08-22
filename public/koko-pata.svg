@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" role="img" aria-labelledby="koko-pata-title">
+  <title id="koko-pata-title">Koko — pata</title>
+  <!-- Ícono mínimo, grilla de 24. Reemplaza a PawPrint de lucide-react.
+       Hereda el color con currentColor. -->
+  <circle cx="4.4" cy="7.4" r="2.4"/>
+  <circle cx="9.4" cy="5.0" r="2.4"/>
+  <circle cx="14.6" cy="5.0" r="2.4"/>
+  <circle cx="19.6" cy="7.4" r="2.4"/>
+  <ellipse cx="12" cy="16.4" rx="6.5" ry="5.0"/>
+</svg>

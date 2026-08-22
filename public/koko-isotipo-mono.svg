@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 158 110" fill="currentColor" role="img" aria-labelledby="koko-mono-title">
+  <title id="koko-mono-title">Koko — isotipo reducido</title>
+  <!-- Versión de una sola tinta para tamaños chicos (barra lateral,
+       cabecera móvil, membretes). Las almohadillas van más altas que en
+       la versión a color: sin contorno, si no se empastan con la pata.
+       Hereda el color con currentColor. -->
+  <g transform="translate(1,3)">
+    <circle cx="8" cy="16" r="7.5"/><circle cx="19" cy="7" r="7.5"/><circle cx="31" cy="7" r="7.5"/><circle cx="42" cy="16" r="7.5"/>
+    <path d="M8 103 V38 a17 17 0 0 1 34 0 v65 Z"/>
+  </g>
+  <g transform="translate(53,3)">
+    <circle cx="8" cy="16" r="7.5"/><circle cx="19" cy="7" r="7.5"/><circle cx="31" cy="7" r="7.5"/><circle cx="42" cy="16" r="7.5"/>
+    <path d="M8 103 V38 a17 17 0 0 1 34 0 v65 Z"/>
+  </g>
+  <g transform="translate(105,3)">
+    <circle cx="8" cy="16" r="7.5"/><circle cx="19" cy="7" r="7.5"/><circle cx="31" cy="7" r="7.5"/><circle cx="42" cy="16" r="7.5"/>
+    <path d="M8 103 V38 a17 17 0 0 1 34 0 v65 Z"/>
+  </g>
+</svg>

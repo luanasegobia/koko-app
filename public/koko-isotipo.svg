@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 262 110" role="img" aria-labelledby="koko-isotipo-title">
+  <title id="koko-isotipo-title">Koko — isotipo de cinco patas</title>
+
+  <!-- 1 · dálmata -->
+  <g transform="translate(1,1)">
+    <circle cx="8" cy="20" r="7.5" fill="#FFFFFF" stroke="#141414" stroke-width="2.8"/>
+    <circle cx="19" cy="11" r="7.5" fill="#FFFFFF" stroke="#141414" stroke-width="2.8"/>
+    <circle cx="31" cy="11" r="7.5" fill="#FFFFFF" stroke="#141414" stroke-width="2.8"/>
+    <circle cx="42" cy="20" r="7.5" fill="#FFFFFF" stroke="#141414" stroke-width="2.8"/>
+    <path d="M7 106 V36 a18 18 0 0 1 36 0 v70" fill="#FFFFFF" stroke="#141414" stroke-width="2.8" stroke-linejoin="round"/>
+    <ellipse cx="17" cy="52" rx="6" ry="5" fill="#141414"/>
+    <ellipse cx="33" cy="72" rx="5" ry="6.5" fill="#141414"/>
+    <ellipse cx="16" cy="92" rx="4.5" ry="4" fill="#141414"/>
+  </g>
+
+  <!-- 2 · blanca -->
+  <g transform="translate(53,1)">
+    <circle cx="8" cy="20" r="7.5" fill="#FFFFFF" stroke="#141414" stroke-width="2.8"/>
+    <circle cx="19" cy="11" r="7.5" fill="#FFFFFF" stroke="#141414" stroke-width="2.8"/>
+    <circle cx="31" cy="11" r="7.5" fill="#FFFFFF" stroke="#141414" stroke-width="2.8"/>
+    <circle cx="42" cy="20" r="7.5" fill="#FFFFFF" stroke="#141414" stroke-width="2.8"/>
+    <path d="M7 106 V36 a18 18 0 0 1 36 0 v70" fill="#FFFFFF" stroke="#141414" stroke-width="2.8" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 3 · negra -->
+  <g transform="translate(105,1)">
+    <circle cx="8" cy="20" r="7.5" fill="#141414" stroke="#FFFFFF" stroke-width="2.4"/>
+    <circle cx="19" cy="11" r="7.5" fill="#141414" stroke="#FFFFFF" stroke-width="2.4"/>
+    <circle cx="31" cy="11" r="7.5" fill="#141414" stroke="#FFFFFF" stroke-width="2.4"/>
+    <circle cx="42" cy="20" r="7.5" fill="#141414" stroke="#FFFFFF" stroke-width="2.4"/>
+    <path d="M7 106 V36 a18 18 0 0 1 36 0 v70" fill="#141414" stroke="#FFFFFF" stroke-width="2.4" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 4 · gris con almohadillas -->
+  <g transform="translate(157,1)">
+    <circle cx="8" cy="20" r="7.5" fill="#F5C0CE" stroke="#3A3A3C" stroke-width="2.8"/>
+    <circle cx="19" cy="11" r="7.5" fill="#F5C0CE" stroke="#3A3A3C" stroke-width="2.8"/>
+    <circle cx="31" cy="11" r="7.5" fill="#F5C0CE" stroke="#3A3A3C" stroke-width="2.8"/>
+    <circle cx="42" cy="20" r="7.5" fill="#F5C0CE" stroke="#3A3A3C" stroke-width="2.8"/>
+    <path d="M7 106 V36 a18 18 0 0 1 36 0 v70" fill="#3A3A3C" stroke="#3A3A3C" stroke-width="2.8" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 5 · tostada -->
+  <g transform="translate(209,1)">
+    <circle cx="8" cy="20" r="7.5" fill="#E8C9A0" stroke="#C09A6B" stroke-width="2.8"/>
+    <circle cx="19" cy="11" r="7.5" fill="#E8C9A0" stroke="#C09A6B" stroke-width="2.8"/>
+    <circle cx="31" cy="11" r="7.5" fill="#E8C9A0" stroke="#C09A6B" stroke-width="2.8"/>
+    <circle cx="42" cy="20" r="7.5" fill="#E8C9A0" stroke="#C09A6B" stroke-width="2.8"/>
+    <path d="M7 106 V36 a18 18 0 0 1 36 0 v70" fill="#E8C9A0" stroke="#C09A6B" stroke-width="2.8" stroke-linejoin="round"/>
+    <path d="M11 54 L39 88 M39 54 L11 88" fill="none" stroke="#C09A6B" stroke-width="2.4" stroke-linecap="round"/>
+  </g>
+</svg>
