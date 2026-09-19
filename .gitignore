@@ -34,3 +34,13 @@ dist-ssr
 
 .env
 .vite
+
+# PDF generados a partir de docs/*.md con `npm run docs:pdf`
+docs/pdf
+
+# Video de respaldo renderizado con HyperFrames (pesado; se regenera desde docs/video)
+docs/video/*.mp4
+docs/video/*.webm
+docs/video/.hyperframes
+docs/presentacion/img/_*.html
+docs/video/snapshots

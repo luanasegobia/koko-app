@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Koko App — video de demostración</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/pan.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #0b0f14; }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: system-ui, sans-serif;
+        color: #f4f4f5;
+        background: #0b0f14;
+      }
+      .fondo {
+        position: absolute; inset: 0;
+        background:
+          radial-gradient(900px 600px at 15% 20%, rgba(16, 185, 129, 0.22), transparent 60%),
+          radial-gradient(700px 500px at 85% 85%, rgba(59, 130, 246, 0.14), transparent 60%),
+          #0b0f14;
+      }
+      .clip { position: absolute; inset: 0; }
+
+      /* Portada y cierre */
+      .centrado { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%; }
+      .marca { display: flex; align-items: center; gap: 28px; }
+      .logo { width: 120px; height: 120px; border-radius: 32px; background: #10b981; display: grid; place-items: center; box-shadow: 0 20px 60px rgba(16, 185, 129, 0.35); }
+      .logo svg { width: 72px; height: 72px; fill: #052e22; }
+      .titulo { font-size: 120px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+      .titulo span { color: #34d399; }
+      .subtitulo { margin-top: 28px; font-size: 40px; color: #a1a1aa; font-weight: 400; }
+      .chip { margin-top: 44px; font-size: 26px; letter-spacing: 0.12em; text-transform: uppercase; color: #34d399; border: 2px solid rgba(52, 211, 153, 0.5); border-radius: 999px; padding: 12px 30px; }
+      .pie { position: absolute; bottom: 60px; left: 0; right: 0; text-align: center; font-size: 26px; color: #71717a; }
+
+      /* Escenas de módulo */
+      .escena { display: grid; grid-template-columns: 760px 1fr; align-items: center; height: 100%; padding: 0 120px; gap: 60px; }
+      .texto { display: flex; flex-direction: column; justify-content: center; }
+      .numero { font-size: 26px; letter-spacing: 0.18em; text-transform: uppercase; color: #34d399; margin-bottom: 18px; }
+      .texto h2 { font-size: 78px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.02; margin-bottom: 34px; }
+      .texto li { list-style: none; font-size: 34px; color: #d4d4d8; line-height: 1.35; margin-bottom: 18px; padding-left: 44px; position: relative; }
+      .texto li::before { content: ""; position: absolute; left: 0; top: 16px; width: 18px; height: 18px; border-radius: 50%; background: #10b981; }
+      .dispositivos { position: relative; height: 100%; display: flex; align-items: center; justify-content: center; gap: 60px; }
+      .telefono { width: 390px; height: 844px; border-radius: 48px; border: 10px solid #1f2937; background: #000; overflow: hidden; position: relative; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6); flex: none; }
+      .telefono img { display: block; width: 370px; height: auto; }
+      .telefono.chico { transform: scale(0.82); transform-origin: center; }
+      .notebook { width: 960px; border-radius: 18px; border: 10px solid #1f2937; background: #000; overflow: hidden; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6); }
+      .notebook img { display: block; width: 100%; height: auto; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="76" data-width="1920" data-height="1080">
+      <div class="fondo"></div>
+
+      <!-- Portada -->
+      <section id="portada" class="clip" data-start="0" data-duration="6" data-track-index="0">
+        <div class="centrado">
+          <div class="marca" id="portada-marca">
+            <div class="logo"><svg viewBox="0 0 24 24"><circle cx="12" cy="14" r="5"/><circle cx="6" cy="8" r="2.4"/><circle cx="12" cy="5" r="2.4"/><circle cx="18" cy="8" r="2.4"/></svg></div>
+            <div class="titulo">Koko <span>App</span></div>
+          </div>
+          <div class="subtitulo" id="portada-sub">Conectando Huellas · la red solidaria para las mascotas de Orán</div>
+          <div class="chip" id="portada-chip">Demostración</div>
+        </div>
+      </section>
+
+      <!-- 1. Mascotas perdidas -->
+      <section id="e1" class="clip" data-start="6" data-duration="9" data-track-index="1">
+        <div class="escena">
+          <div class="texto">
+            <div class="numero" id="e1-n">Módulo 1</div>
+            <h2 id="e1-t">Mascotas perdidas</h2>
+            <ul>
+              <li id="e1-l1">Publicá con foto y ubicación en dos minutos</li>
+              <li id="e1-l2">Lista y mapa con filtros por especie y cercanía</li>
+              <li id="e1-l3">Alertas de tu zona</li>
+            </ul>
+          </div>
+          <div class="dispositivos">
+            <div class="telefono" id="e1-tel"><img id="e1-img" src="assets/movil/02-perdidas-lista.png" alt="" /></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Avistamientos -->
+      <section id="e2" class="clip" data-start="15" data-duration="8" data-track-index="1">
+        <div class="escena">
+          <div class="texto">
+            <div class="numero" id="e2-n">Módulo 1 · comunidad</div>
+            <h2 id="e2-t">"La vi": avisar sin cuenta</h2>
+            <ul>
+              <li id="e2-l1">Cualquier vecino reporta dónde la vio</li>
+              <li id="e2-l2">El aviso aparece en el mapa al instante</li>
+              <li id="e2-l3">El dueño recibe la notificación</li>
+            </ul>
+          </div>
+          <div class="dispositivos">
+            <div class="telefono chico" id="e2-tel1"><img src="assets/movil/03-perdidas-mapa.png" alt="" /></div>
+            <div class="telefono" id="e2-tel2"><img src="assets/movil/05-perdidas-avistamiento.png" alt="" /></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Adopción -->
+      <section id="e3" class="clip" data-start="23" data-duration="8" data-track-index="1">
+        <div class="escena">
+          <div class="texto">
+            <div class="numero" id="e3-n">Módulo 2</div>
+            <h2 id="e3-t">Adopción responsable</h2>
+            <ul>
+              <li id="e3-l1">Catálogo con filtros por especie y tamaño</li>
+              <li id="e3-l2">Vacunas, esterilización y barrio a la vista</li>
+              <li id="e3-l3">Contacto directo por teléfono o chat</li>
+            </ul>
+          </div>
+          <div class="dispositivos">
+            <div class="telefono" id="e3-tel"><img id="e3-img" src="assets/movil/08-adopcion-lista.png" alt="" /></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Veterinarias -->
+      <section id="e4" class="clip" data-start="31" data-duration="8" data-track-index="1">
+        <div class="escena">
+          <div class="texto">
+            <div class="numero" id="e4-n">Módulo 3</div>
+            <h2 id="e4-t">Veterinarias de turno</h2>
+            <ul>
+              <li id="e4-l1">Directorio verificado por administración</li>
+              <li id="e4-l2">Emergencias 24 h primero, horarios y mapa</li>
+              <li id="e4-l3">Llamar con un toque</li>
+            </ul>
+          </div>
+          <div class="dispositivos">
+            <div class="telefono" id="e4-tel"><img id="e4-img" src="assets/movil/10-veterinarias-lista.png" alt="" /></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Identificación QR -->
+      <section id="e5" class="clip" data-start="39" data-duration="9" data-track-index="1">
+        <div class="escena">
+          <div class="texto">
+            <div class="numero" id="e5-n">Módulo 4</div>
+            <h2 id="e5-t">Chapa con código QR</h2>
+            <ul>
+              <li id="e5-l1">Registrás tu mascota y descargás su QR</li>
+              <li id="e5-l2">Quien la encuentra escanea y ve la ficha</li>
+              <li id="e5-l3">Alergias destacadas, llamar o WhatsApp</li>
+            </ul>
+          </div>
+          <div class="dispositivos">
+            <div class="telefono chico" id="e5-tel1"><img id="e5-img1" src="assets/movil/12-identificacion-lista.png" alt="" /></div>
+            <div class="telefono" id="e5-tel2"><img src="assets/movil/14-ficha-publica.png" alt="" /></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Denuncias -->
+      <section id="e6" class="clip" data-start="48" data-duration="8" data-track-index="1">
+        <div class="escena">
+          <div class="texto">
+            <div class="numero" id="e6-n">Módulo 5</div>
+            <h2 id="e6-t">Denuncias por maltrato</h2>
+            <ul>
+              <li id="e6-l1">Urgente, regular o anónima, con evidencia</li>
+              <li id="e6-l2">Código de seguimiento único</li>
+              <li id="e6-l3">Estado consultable sin cuenta</li>
+            </ul>
+          </div>
+          <div class="dispositivos">
+            <div class="telefono chico" id="e6-tel1"><img id="e6-img1" src="assets/movil/15-denuncias-lista.png" alt="" /></div>
+            <div class="telefono" id="e6-tel2"><img src="assets/movil/17-denuncias-seguimiento.png" alt="" /></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Casos urgentes -->
+      <section id="e7" class="clip" data-start="56" data-duration="7" data-track-index="1">
+        <div class="escena">
+          <div class="texto">
+            <div class="numero" id="e7-n">Módulo 6</div>
+            <h2 id="e7-t">Casos urgentes</h2>
+            <ul>
+              <li id="e7-l1">Meta, recaudado y necesidades cubiertas</li>
+              <li id="e7-l2">Alias bancario para donar con un toque</li>
+              <li id="e7-l3">Chat rápido por caso</li>
+            </ul>
+          </div>
+          <div class="dispositivos">
+            <div class="telefono" id="e7-tel"><img id="e7-img" src="assets/movil/19-casos-lista.png" alt="" /></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Administración -->
+      <section id="e8" class="clip" data-start="63" data-duration="7" data-track-index="1">
+        <div class="escena">
+          <div class="texto">
+            <div class="numero" id="e8-n">Administración</div>
+            <h2 id="e8-t">Panel de moderación</h2>
+            <ul>
+              <li id="e8-l1">Verificar veterinarias antes de publicarlas</li>
+              <li id="e8-l2">Cambiar estados de casos y denuncias</li>
+              <li id="e8-l3">Seguridad a nivel de fila en la base</li>
+            </ul>
+          </div>
+          <div class="dispositivos">
+            <div class="notebook" id="e8-nb"><img src="assets/22-admin-estadisticas.png" alt="" /></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cierre -->
+      <section id="cierre" class="clip" data-start="70" data-duration="6" data-track-index="0">
+        <div class="centrado">
+          <div class="marca" id="cierre-marca">
+            <div class="logo"><svg viewBox="0 0 24 24"><circle cx="12" cy="14" r="5"/><circle cx="6" cy="8" r="2.4"/><circle cx="12" cy="5" r="2.4"/><circle cx="18" cy="8" r="2.4"/></svg></div>
+            <div class="titulo">Koko <span>App</span></div>
+          </div>
+          <div class="subtitulo" id="cierre-sub">React · Vite · Supabase · PWA</div>
+          <div class="chip" id="cierre-chip">github.com/luanasegobia/koko-app</div>
+        </div>
+        <div class="pie" id="cierre-pie">Prácticas Profesionalizantes III · 2026</div>
+      </section>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const E = "power3.out";
+
+      // Portada
+      tl.fromTo("#portada-marca", { opacity: 0, y: 40, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: E }, 0.2)
+        .fromTo("#portada-sub", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: E }, 0.9)
+        .fromTo("#portada-chip", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 1.4)
+        .to(["#portada-marca", "#portada-sub", "#portada-chip"], { opacity: 0, y: -30, duration: 0.5, ease: "power2.in" }, 5.4);
+
+      // Escena de módulo: texto entra desde la izquierda, teléfonos desde abajo,
+      // la captura hace un paneo lento hacia arriba y todo sale al final.
+      function escena(id, inicio, duracion, telefonos, panes) {
+        const t = inicio;
+        tl.fromTo(`#${id}-n`, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.5, ease: E }, t + 0.1)
+          .fromTo(`#${id}-t`, { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.7, ease: E }, t + 0.25)
+          .fromTo(`#${id}-l1`, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.5, ease: E }, t + 0.9)
+          .fromTo(`#${id}-l2`, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.5, ease: E }, t + 1.3)
+          .fromTo(`#${id}-l3`, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.5, ease: E }, t + 1.7);
+        telefonos.forEach((sel, i) => {
+          tl.fromTo(sel, { opacity: 0, y: 120 }, { opacity: 1, y: 0, duration: 0.9, ease: E }, t + 0.3 + i * 0.25);
+        });
+        panes.forEach(([sel, distancia]) => {
+          tl.fromTo(sel, { y: 0 }, { y: -distancia, duration: duracion - 2.2, ease: "none" }, t + 1.4);
+        });
+        tl.to(`#${id} .escena`, { opacity: 0, duration: 0.45, ease: "power2.in" }, t + duracion - 0.5);
+      }
+
+      // Las distancias de paneo dependen del alto de cada captura de página completa;
+      // se ajustan en el script de armado (armar-assets.mjs) o a mano.
+      escena("e1", 6, 9, ["#e1-tel"], [["#e1-img", PAN.e1]]);
+      escena("e2", 15, 8, ["#e2-tel1", "#e2-tel2"], []);
+      escena("e3", 23, 8, ["#e3-tel"], [["#e3-img", PAN.e3]]);
+      escena("e4", 31, 8, ["#e4-tel"], [["#e4-img", PAN.e4]]);
+      escena("e5", 39, 9, ["#e5-tel1", "#e5-tel2"], [["#e5-img1", PAN.e5]]);
+      escena("e6", 48, 8, ["#e6-tel1", "#e6-tel2"], [["#e6-img1", PAN.e6]]);
+      escena("e7", 56, 7, ["#e7-tel"], [["#e7-img", PAN.e7]]);
+      escena("e8", 63, 7, ["#e8-nb"], []);
+
+      // Cierre
+      tl.fromTo("#cierre-marca", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.9, ease: E }, 70.2)
+        .fromTo("#cierre-sub", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: E }, 70.9)
+        .fromTo("#cierre-chip", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 71.4)
+        .fromTo("#cierre-pie", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: E }, 71.8);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
