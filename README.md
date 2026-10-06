@@ -25,7 +25,9 @@ cd koko-app && npm install
 ```
 
 Necesitás [Node.js](https://nodejs.org/) **22 LTS** (Angular 21 también acepta 20.19+ y 24;
-con una versión impar como la 25 funciona pero avisa que no está soportada).
+con una versión impar como la 25 funciona pero avisa que no está soportada). La versión
+está fijada en `.nvmrc`: si usás [nvm-windows](https://github.com/coreybutler/nvm-windows)
+o nvm, alcanza con `nvm install 22` y `nvm use 22`.
 
 ### 2. Configurar las credenciales
 
