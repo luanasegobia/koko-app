@@ -1,0 +1,109 @@
+@if (esperandoCodigo()) {
+  <app-layout-auth
+    icono="mail-outline"
+    titulo="Verificá tu correo"
+    [subtitulo]="'Te mandamos un código a ' + formulario.controls.email.value"
+  >
+    @if (error()) {
+      <p class="error-formulario">{{ error() }}</p>
+    }
+    <div class="codigo">
+      <ion-input-otp
+        [length]="6"
+        type="number"
+        autocomplete="one-time-code"
+        (ionInput)="alCambiarCodigo($any($event))"
+        (ionComplete)="verificar()"
+        aria-label="Código de verificación"
+      ></ion-input-otp>
+    </div>
+    <ion-button expand="block" (click)="verificar()" [disabled]="cargando() || codigo().length < 6">
+      @if (cargando()) {
+        <ion-spinner slot="start" name="crescent"></ion-spinner>
+        Verificando...
+      } @else {
+        Verificar
+      }
+    </ion-button>
+    <p class="texto-chico texto-secundario texto-centrado reenviar">
+      ¿No te llegó el código?
+      <button type="button" class="enlace" (click)="reenviar()">Reenviar</button>
+    </p>
+  </app-layout-auth>
+} @else {
+  <app-layout-auth icono="person-add-outline" titulo="Creá tu cuenta" subtitulo="Registrate para empezar">
+    <ion-button expand="block" fill="outline" color="medium" class="google" (click)="continuarConGoogle()">
+      <app-icono-google />
+      Continuar con Google
+    </ion-button>
+
+    <div class="divisor"><span>o con email</span></div>
+
+    @if (error()) {
+      <p class="error-formulario">{{ error() }}</p>
+    }
+
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="crearCuenta()">
+      <ion-input
+        label="Nombre"
+        labelPlacement="stacked"
+        fill="outline"
+        formControlName="nombre"
+        placeholder="Ej: Ana Gómez"
+        autocomplete="name"
+        errorText="Ingresá tu nombre"
+      >
+        <ion-icon slot="start" name="person-outline" aria-hidden="true"></ion-icon>
+      </ion-input>
+      <ion-input
+        label="Email"
+        labelPlacement="stacked"
+        fill="outline"
+        type="email"
+        formControlName="email"
+        placeholder="vos@ejemplo.com"
+        autocomplete="email"
+        errorText="Ingresá un email válido"
+      >
+        <ion-icon slot="start" name="mail-outline" aria-hidden="true"></ion-icon>
+      </ion-input>
+      <ion-input
+        label="Contraseña"
+        labelPlacement="stacked"
+        fill="outline"
+        type="password"
+        formControlName="password"
+        placeholder="••••••••"
+        autocomplete="new-password"
+        helperText="Al menos 6 caracteres"
+        errorText="La contraseña tiene que tener al menos 6 caracteres"
+      >
+        <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
+        <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+      </ion-input>
+      <ion-input
+        label="Repetí la contraseña"
+        labelPlacement="stacked"
+        fill="outline"
+        type="password"
+        formControlName="confirmacion"
+        placeholder="••••••••"
+        autocomplete="new-password"
+        errorText="Repetí la contraseña"
+      >
+        <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
+      </ion-input>
+
+      <ion-button type="submit" expand="block" [disabled]="cargando()">
+        @if (cargando()) {
+          <ion-spinner slot="start" name="crescent"></ion-spinner>
+          Creando cuenta...
+        } @else {
+          Crear cuenta
+        }
+      </ion-button>
+    </form>
+
+    <span pie>¿Ya tenés cuenta? <a routerLink="/login" class="enlace">Iniciá sesión</a></span>
+  </app-layout-auth>
+}

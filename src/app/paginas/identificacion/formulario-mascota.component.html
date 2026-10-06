@@ -1,0 +1,48 @@
+<form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+  <div class="campos-en-fila">
+    <ion-input label="Nombre" labelPlacement="stacked" fill="outline" formControlName="name" placeholder="Ej: Luna" errorText="El nombre es obligatorio"></ion-input>
+    <ion-select label="Especie" labelPlacement="stacked" fill="outline" formControlName="species" interface="popover">
+      <ion-select-option value="perro">Perro</ion-select-option>
+      <ion-select-option value="gato">Gato</ion-select-option>
+      <ion-select-option value="otro">Otro</ion-select-option>
+    </ion-select>
+  </div>
+
+  <div class="campos-en-fila-tres">
+    <ion-input label="Raza" labelPlacement="stacked" fill="outline" formControlName="breed"></ion-input>
+    <ion-input label="Edad" labelPlacement="stacked" fill="outline" type="number" inputmode="numeric" [min]="0" formControlName="age_years"></ion-input>
+    <ion-select label="Sexo" labelPlacement="stacked" fill="outline" formControlName="sex" interface="popover">
+      <ion-select-option value="macho">Macho</ion-select-option>
+      <ion-select-option value="hembra">Hembra</ion-select-option>
+    </ion-select>
+  </div>
+
+  <ion-textarea label="Descripción" labelPlacement="stacked" fill="outline" formControlName="description" [rows]="2" [autoGrow]="true"></ion-textarea>
+
+  <ion-input label="Alergias" labelPlacement="stacked" fill="outline" formControlName="allergies" placeholder="Ej: Alérgica a la amoxicilina"></ion-input>
+
+  <div class="campos-en-fila">
+    <ion-input label="Tu nombre" labelPlacement="stacked" fill="outline" formControlName="owner_name"></ion-input>
+    <ion-input label="Teléfono" labelPlacement="stacked" fill="outline" type="tel" formControlName="owner_phone"></ion-input>
+  </div>
+
+  <ion-input label="WhatsApp" labelPlacement="stacked" fill="outline" type="tel" formControlName="owner_whatsapp" helperText="Con código de país, sin espacios. Ej: 5493878123456"></ion-input>
+
+  <div class="pila-chica">
+    <p class="etiqueta-campo">Foto</p>
+    <app-selector-foto [fotoActual]="registroInicial()?.photo_url" (archivos)="alElegirFoto($event)" />
+  </div>
+
+  @if (error()) {
+    <p class="error-formulario">{{ error() }}</p>
+  }
+
+  <ion-button type="submit" expand="block" [disabled]="guardando()">
+    @if (guardando()) {
+      <ion-spinner slot="start" name="crescent"></ion-spinner>
+    } @else {
+      <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+    }
+    {{ editando ? 'Guardar cambios' : 'Registrar mascota' }}
+  </ion-button>
+</form>

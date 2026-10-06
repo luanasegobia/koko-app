@@ -1,0 +1,76 @@
+<ion-card class="tarjeta">
+  <div class="cuerpo">
+    <div class="encabezado">
+      <div class="titulos">
+        <div class="fila">
+          <h3>{{ caso().title }}</h3>
+          <ion-badge [color]="estado().color">{{ estado().etiqueta }}</ion-badge>
+        </div>
+        @if (caso().published_by) {
+          <p class="texto-mini texto-secundario">Publicado por <strong>{{ caso().published_by }}</strong></p>
+        }
+      </div>
+      @if (caso().photo_url) {
+        <img [src]="caso().photo_url" alt="" class="miniatura" />
+      }
+      <app-acciones-de-duenio
+        [registro]="$any(caso())"
+        [etiqueta]="'el caso &quot;' + caso().title + '&quot;'"
+        [eliminar]="eliminar()"
+        (editar)="editar.emit()"
+      />
+    </div>
+
+    <p class="texto-chico">{{ caso().description }}</p>
+
+    @if ((caso().goal_amount ?? 0) > 0) {
+      <div class="recaudacion">
+        <div class="fila entre texto-chico">
+          <span class="texto-secundario">Recaudado</span>
+          <strong>${{ monto(caso().raised_amount) }} de ${{ monto(caso().goal_amount) }}</strong>
+        </div>
+        <ion-progress-bar [value]="progreso()" color="primary"></ion-progress-bar>
+        <p class="texto-mini texto-secundario">
+          {{ (progreso() * 100).toFixed(0) }}% alcanzado · {{ caso().contributors_count || 0 }} personas colaboraron
+        </p>
+      </div>
+    }
+
+    @if (caso().needs?.length) {
+      <div class="necesidades">
+        <p class="texto-chico"><strong>Ayuda necesaria</strong></p>
+        <div class="fila">
+          @for (necesidad of caso().needs; track $index) {
+            <ion-chip color="medium" [attr.data-estado]="necesidad.status">
+              <span class="icono-necesidad">{{ iconoNecesidad[necesidad.status] }}</span>
+              {{ necesidad.label }}{{ necesidad.status === 'parcial' ? ' — parcial' : '' }}
+            </ion-chip>
+          }
+        </div>
+      </div>
+    }
+
+    @if (caso().donation_alias) {
+      <div class="alias">
+        <div>
+          <p class="texto-mini texto-secundario">Alias para colaborar</p>
+          <p class="monoespaciado"><strong>{{ caso().donation_alias }}</strong></p>
+        </div>
+        <ion-button fill="outline" size="small" color="medium" (click)="copiarAlias()">
+          <ion-icon slot="start" [name]="copiado() ? 'checkmark' : 'copy-outline'" [color]="copiado() ? 'primary' : undefined"></ion-icon>
+          {{ copiado() ? 'Copiado' : 'Copiar' }}
+        </ion-button>
+      </div>
+    }
+
+    <div class="fila acciones">
+      <app-boton-donar-stripe [idDeCaso]="caso().id" [titulo]="caso().title" [aliasDeDonacion]="caso().donation_alias" />
+      <ion-button fill="outline" color="medium" class="crecer">
+        <ion-icon slot="start" name="notifications-outline"></ion-icon>
+        Seguir caso
+      </ion-button>
+    </div>
+  </div>
+
+  <app-chat-rapido tipoDeContexto="urgent_case" [idDeContexto]="caso().id" [tituloDeContexto]="caso().title" />
+</ion-card>

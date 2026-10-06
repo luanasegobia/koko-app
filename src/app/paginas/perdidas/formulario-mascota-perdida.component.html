@@ -1,0 +1,75 @@
+<form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+  <div class="campos-en-fila">
+    <ion-input
+      label="Nombre"
+      labelPlacement="stacked"
+      fill="outline"
+      formControlName="pet_name"
+      placeholder="Ej: Max"
+      errorText="El nombre es obligatorio"
+    ></ion-input>
+    <ion-select label="Especie" labelPlacement="stacked" fill="outline" formControlName="species" interface="popover">
+      <ion-select-option value="perro">Perro</ion-select-option>
+      <ion-select-option value="gato">Gato</ion-select-option>
+      <ion-select-option value="otro">Otro</ion-select-option>
+    </ion-select>
+  </div>
+
+  <div class="campos-en-fila">
+    <ion-input label="Raza" labelPlacement="stacked" fill="outline" formControlName="breed" placeholder="Ej: Labrador"></ion-input>
+    <ion-input
+      label="Edad (años)"
+      labelPlacement="stacked"
+      fill="outline"
+      type="number"
+      inputmode="numeric"
+      [min]="0"
+      formControlName="age_years"
+      placeholder="Ej: 2"
+    ></ion-input>
+  </div>
+
+  <ion-textarea
+    label="Descripción y señas particulares"
+    labelPlacement="stacked"
+    fill="outline"
+    formControlName="description"
+    placeholder="Color, tamaño, collar..."
+    [rows]="3"
+    [autoGrow]="true"
+  ></ion-textarea>
+
+  <div class="pila-chica">
+    <ion-input
+      label="Última ubicación vista"
+      labelPlacement="stacked"
+      fill="outline"
+      formControlName="last_seen_address"
+      placeholder="Ej: Av. San Martín y Belgrano, Orán"
+    ></ion-input>
+    <app-boton-ubicacion [(valor)]="ubicacion" />
+  </div>
+
+  <div class="campos-en-fila">
+    <ion-input label="Teléfono" labelPlacement="stacked" fill="outline" type="tel" formControlName="contact_phone" placeholder="3878-..."></ion-input>
+    <ion-input label="WhatsApp" labelPlacement="stacked" fill="outline" type="tel" formControlName="contact_whatsapp" placeholder="3878-..."></ion-input>
+  </div>
+
+  <div class="pila-chica">
+    <p class="etiqueta-campo">Foto</p>
+    <app-selector-foto [fotoActual]="registroInicial()?.photo_url" [capturar]="true" (archivos)="alElegirFoto($event)" />
+  </div>
+
+  @if (error()) {
+    <p class="error-formulario">{{ error() }}</p>
+  }
+
+  <ion-button type="submit" expand="block" color="danger" [disabled]="guardando()">
+    @if (guardando()) {
+      <ion-spinner slot="start" name="crescent"></ion-spinner>
+    } @else {
+      <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+    }
+    {{ editando ? 'Guardar cambios' : 'Publicar reporte' }}
+  </ion-button>
+</form>

@@ -1,0 +1,115 @@
+<app-cabecera titulo="Inicio" />
+
+<ion-content class="ion-padding">
+  <div class="contenedor pila-grande">
+    <!-- Portada -->
+    <section class="portada aparece">
+      @for (huella of huellas; track $index) {
+        <ion-icon
+          name="paw"
+          class="huella"
+          [style.left]="huella.x"
+          [style.top]="huella.y"
+          [style.font-size.px]="huella.tamanio"
+          [style.opacity]="huella.opacidad"
+          [style.--rotacion]="huella.rotacion + 'deg'"
+          [style.animation-delay]="huella.retraso + 's'"
+          aria-hidden="true"
+        ></ion-icon>
+      }
+      <div class="mancha mancha-verde"></div>
+      <div class="mancha mancha-ambar"></div>
+
+      <div class="contenido-portada">
+        <div class="insignia">
+          <ion-icon name="sparkles" class="gira"></ion-icon>
+          <span>Conectando Huellas · Orán</span>
+        </div>
+
+        <h1>Bienvenidos a <span class="resaltado">Koko</span></h1>
+        <p class="bajada">
+          La red solidaria para proteger, identificar y rescatar a los animales que más lo
+          necesitan.
+        </p>
+
+        <form class="buscador" (submit)="$event.preventDefault(); buscar()">
+          <ion-searchbar
+            [value]="busqueda()"
+            (ionInput)="busqueda.set($any($event).detail.value || '')"
+            placeholder="Buscar por raza, zona o nombre..."
+            [debounce]="0"
+            mode="ios"
+          ></ion-searchbar>
+          <ion-button type="submit">Buscar</ion-button>
+        </form>
+
+        <div class="llamados">
+          <ion-button color="danger" class="llamado" (click)="irAReportar()">
+            <ion-icon slot="start" name="megaphone"></ion-icon>
+            Perdí mi mascota
+          </ion-button>
+          <ion-button fill="outline" color="light" class="llamado" (click)="irAAvistamiento()">
+            <ion-icon slot="start" name="eye"></ion-icon>
+            Encontré un animal
+          </ion-button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Estadísticas -->
+    <section class="estadisticas">
+      @for (dato of estadisticas; track dato.etiqueta; let i = $index) {
+        <div class="dato aparece" [style.animation-delay]="0.1 + i * 0.07 + 's'">
+          <ion-icon [name]="dato.icono" [color]="dato.color"></ion-icon>
+          <span class="valor" [style.color]="'var(--ion-color-' + dato.color + ')'">{{ dato.valor }}</span>
+          <span class="texto-mini texto-secundario">{{ dato.etiqueta }}</span>
+        </div>
+      }
+    </section>
+
+    <!-- Módulos -->
+    <section class="modulos">
+      <div class="titulo-seccion">
+        <h2>Explorar Servicios</h2>
+        <span class="linea"></span>
+        <span class="contador">6 módulos</span>
+      </div>
+
+      <div class="cuadricula-tarjetas">
+        @for (modulo of modulos; track modulo.ruta; let i = $index) {
+          <a
+            class="modulo aparece"
+            [routerLink]="modulo.ruta"
+            [style.animation-delay]="0.08 + i * 0.08 + 's'"
+            [style.--color-modulo]="'var(--ion-color-' + modulo.color + ')'"
+            [style.--color-modulo-rgb]="'var(--ion-color-' + modulo.color + '-rgb)'"
+          >
+            <div class="fila-superior">
+              <div class="icono"><ion-icon [name]="modulo.icono"></ion-icon></div>
+              <span class="etiqueta">{{ modulo.etiqueta }}</span>
+              <span class="flecha"><ion-icon name="arrow-forward"></ion-icon></span>
+            </div>
+            <h3>{{ modulo.titulo }}</h3>
+            <p class="texto-chico texto-secundario">{{ modulo.descripcion }}</p>
+            <span class="ir">Ir al módulo <ion-icon name="arrow-forward"></ion-icon></span>
+          </a>
+        }
+      </div>
+    </section>
+
+    <!-- Llamado a alertas -->
+    <section class="alertas aparece">
+      <div class="mancha mancha-blanca"></div>
+      <div class="texto-alertas">
+        <p class="sobre-titulo"><ion-icon name="notifications"></ion-icon> Alertas de zona</p>
+        <h3>Activá alertas cerca tuyo</h3>
+        <p>Recibí notificaciones cuando aparezca una mascota perdida en tu barrio.</p>
+      </div>
+      <ion-button color="light" routerLink="/perdidas">
+        <ion-icon slot="start" name="notifications"></ion-icon>
+        Configurar alertas
+        <ion-icon slot="end" name="arrow-forward"></ion-icon>
+      </ion-button>
+    </section>
+  </div>
+</ion-content>

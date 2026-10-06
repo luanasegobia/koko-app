@@ -1,0 +1,73 @@
+<div class="chat-rapido">
+  <button type="button" class="alternar" (click)="alternar()">
+    <span class="izquierda">
+      <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+      Chat rápido
+      @if (!abierto() && mensajes().length > 0) {
+        <ion-badge color="primary">{{ mensajes().length }}</ion-badge>
+      }
+    </span>
+    <ion-icon [name]="abierto() ? 'chevron-up' : 'chevron-down'"></ion-icon>
+  </button>
+
+  @if (abierto()) {
+    <div class="mensajes" #lista>
+      @if (mensajes().length === 0) {
+        <p class="texto-mini texto-secundario texto-centrado vacio">
+          Nadie ha escrito aún. ¡Sé el primero en aportar información!
+        </p>
+      }
+      @for (mensaje of mensajes(); track mensaje.id) {
+        <div class="mensaje" [class.propio]="esMio(mensaje)">
+          @if (!esMio(mensaje)) {
+            <span class="remitente">{{ mensaje.sender_name }}</span>
+          }
+          <div class="burbuja">{{ mensaje.text }}</div>
+          <span class="hora">{{ mensaje.created_at | haceTiempo }}</span>
+        </div>
+      }
+    </div>
+
+    @if (pidiendoNombre()) {
+      <div class="pedir-nombre">
+        <p class="texto-chico"><strong>¿Cómo querés que te identifiquen?</strong></p>
+        <p class="texto-mini texto-secundario">Podés poner un apodo o dejarlo vacío para ser "Anónimo"</p>
+        <div class="entrada">
+          <ion-input
+            [value]="nombreTentativo()"
+            (ionInput)="nombreTentativo.set($any($event).detail.value || '')"
+            (keydown.enter)="confirmarNombre()"
+            (keydown.escape)="cancelarNombre()"
+            placeholder="Tu nombre o apodo..."
+            [maxlength]="30"
+            aria-label="Tu nombre o apodo"
+            fill="outline"
+          ></ion-input>
+          <ion-button size="small" (click)="confirmarNombre()">Enviar</ion-button>
+        </div>
+      </div>
+    } @else {
+      <div class="entrada">
+        <ion-input
+          [value]="texto()"
+          (ionInput)="alEscribir($any($event))"
+          (keydown.enter)="enviar()"
+          [placeholder]="usuario() ? 'Escribí un mensaje...' : 'Aportá información sin registrarte...'"
+          aria-label="Mensaje"
+          fill="outline"
+        ></ion-input>
+        <ion-button size="small" (click)="enviar()" [disabled]="!texto().trim() || enviando()" aria-label="Enviar">
+          @if (enviando()) {
+            <ion-spinner name="crescent"></ion-spinner>
+          } @else {
+            <ion-icon slot="icon-only" name="send"></ion-icon>
+          }
+        </ion-button>
+      </div>
+    }
+
+    @if (!usuario()) {
+      <p class="texto-mini texto-secundario texto-centrado pie">No necesitás cuenta para participar</p>
+    }
+  }
+</div>

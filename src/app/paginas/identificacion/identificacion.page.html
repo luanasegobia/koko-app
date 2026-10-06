@@ -1,0 +1,71 @@
+<app-cabecera titulo="ID Digital" />
+
+<ion-content class="ion-padding">
+  <div class="contenedor pila">
+    <div class="encabezado-pagina">
+      <div>
+        <h1>Identificación Digital</h1>
+        <p class="subtitulo">Registrá tu mascota y generá un QR para su collar</p>
+      </div>
+      <ion-button (click)="abrirFormulario()">
+        <ion-icon slot="start" name="add"></ion-icon>
+        Registrar mascota
+      </ion-button>
+    </div>
+
+    <ion-card class="como-funciona">
+      <h3>¿Cómo funciona?</h3>
+      <div class="pasos">
+        @for (paso of pasos; track $index) {
+          <div class="paso">
+            <span class="numero">{{ $index + 1 }}</span>
+            <p class="texto-chico">{{ paso }}</p>
+          </div>
+        }
+      </div>
+    </ion-card>
+
+    @if (cargando()) {
+      <div class="cargando"><ion-spinner name="crescent" color="primary"></ion-spinner></div>
+    } @else if (mascotas().length === 0) {
+      <ion-card class="tarjeta-vacia">
+        <ion-icon name="qr-code-outline"></ion-icon>
+        <p>No tenés mascotas registradas todavía.</p>
+      </ion-card>
+    } @else {
+      <div class="cuadricula-dos">
+        @for (mascota of mascotas(); track mascota.id; let i = $index) {
+          <div class="con-acciones aparece" [style.animation-delay]="i * 50 + 'ms'">
+            <div class="acciones">
+              <app-acciones-de-duenio
+                [registro]="$any(mascota)"
+                [etiqueta]="'la ficha de ' + mascota.name"
+                [eliminar]="eliminarMascota(mascota)"
+                (editar)="abrirFormulario(mascota)"
+              />
+            </div>
+            <app-tarjeta-qr [mascota]="mascota" />
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <ion-modal [isOpen]="mostrarFormulario()" (didDismiss)="cerrarFormulario()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ enEdicion() ? 'Editar a ' + enEdicion()!.name : 'Registrar mascota' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarFormulario()" aria-label="Cerrar">
+              <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <app-formulario-mascota [registroInicial]="enEdicion()" (guardado)="alGuardar()" />
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

@@ -1,0 +1,145 @@
+<app-cabecera titulo="Veterinarias" />
+
+<ion-content class="ion-padding">
+  <div class="contenedor pila">
+    <div class="encabezado-pagina">
+      <div>
+        <h1>Veterinarias de Turno</h1>
+        <p class="subtitulo">Consultá qué veterinaria está de turno ahora en Orán</p>
+      </div>
+      <ion-segment [value]="vista()" (ionChange)="vista.set($any($event).detail.value)" class="segmento-vista">
+        <ion-segment-button value="lista">
+          <ion-icon name="list-outline"></ion-icon>
+          <span>Lista</span>
+        </ion-segment-button>
+        <ion-segment-button value="mapa">
+          <ion-icon name="map-outline"></ion-icon>
+          <span>Mapa</span>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <div class="fila">
+      <span class="pildora pildora-roja">
+        <span class="punto pulso"></span>
+        Emergencia 24h
+        <span class="contador">{{ cantidadEmergencia() }}</span>
+      </span>
+      <span class="pildora pildora-verde">
+        <span class="punto pulso"></span>
+        De turno ahora
+        <span class="contador">{{ cantidadAbiertas() }}</span>
+      </span>
+      <span class="pildora pildora-gris">
+        <span class="punto"></span>
+        Cerradas
+        <span class="contador">{{ cantidadCerradas() }}</span>
+      </span>
+    </div>
+
+    @if (cargando()) {
+      <div class="cargando"><ion-spinner name="crescent" color="primary"></ion-spinner></div>
+    } @else if (vista() === 'mapa') {
+      <div class="pila">
+        <app-mapa [marcadores]="marcadores()" altura="520px" />
+        <div class="cuadricula-tarjetas">
+          @for (item of ordenadas(); track item.veterinaria.id) {
+            <ion-card class="tarjeta-mini" [attr.data-estado]="item.estado.color">
+              <span class="punto" [class.pulso]="item.estado.pulso" [attr.data-color]="item.estado.color"></span>
+              <div class="texto">
+                <p class="nombre">{{ item.veterinaria.name }}</p>
+                <p class="texto-mini texto-secundario recortar">{{ item.veterinaria.address }}</p>
+              </div>
+              <ion-button fill="clear" size="small" [href]="'tel:' + item.veterinaria.phone" aria-label="Llamar">
+                <ion-icon slot="icon-only" name="call-outline"></ion-icon>
+              </ion-button>
+            </ion-card>
+          }
+        </div>
+      </div>
+    } @else if (ordenadas().length === 0) {
+      <ion-card class="tarjeta-vacia">
+        <ion-icon name="medkit-outline"></ion-icon>
+        <p>No hay veterinarias registradas.</p>
+      </ion-card>
+    } @else {
+      <div class="lista">
+        @for (item of ordenadas(); track item.veterinaria.id; let i = $index) {
+          <ion-card class="tarjeta aparece" [style.animation-delay]="i * 60 + 'ms'" [attr.data-estado]="item.estado.color">
+            <div class="info">
+              <div class="fila titulo-fila">
+                <span class="punto" [class.pulso]="item.estado.pulso" [attr.data-color]="item.estado.color"></span>
+                <h3>{{ item.veterinaria.name }}</h3>
+                <span class="insignia" [attr.data-color]="item.estado.color">
+                  <ion-icon [name]="item.estado.icono"></ion-icon>
+                  {{ item.estado.etiqueta }}
+                </span>
+                <span class="verificada texto-mini">✓ Verificada</span>
+                <div class="acciones">
+                  <!-- La ficha la edita quien la registró; darla de baja queda para administración. -->
+                  <app-acciones-de-duenio
+                    [registro]="$any(item.veterinaria)"
+                    columnaAutor="registered_by_user_id"
+                    [etiqueta]="'la ficha de ' + item.veterinaria.name"
+                    [soloAdminPuedeEliminar]="true"
+                    [eliminar]="eliminarVeterinaria(item.veterinaria)"
+                    (editar)="enEdicion.set(item.veterinaria)"
+                  />
+                </div>
+              </div>
+
+              <div class="fila detalles texto-chico texto-secundario">
+                <span><ion-icon name="location-outline"></ion-icon> {{ item.veterinaria.address }}</span>
+                @if (item.estado.horario) {
+                  <span class="abierta"><ion-icon name="time-outline"></ion-icon> {{ item.estado.horario }}</span>
+                }
+                @if (item.estado.proximaApertura) {
+                  <span><ion-icon name="time-outline"></ion-icon> {{ item.estado.proximaApertura }}</span>
+                }
+                @if (item.veterinaria.is_emergency) {
+                  <span class="emergencia"><ion-icon name="alert-circle-outline"></ion-icon> Siempre disponible</span>
+                }
+              </div>
+
+              @if (item.veterinaria.services) {
+                <p class="texto-mini texto-secundario recortar">{{ item.veterinaria.services }}</p>
+              }
+            </div>
+
+            <div class="llamar">
+              <ion-button
+                size="small"
+                [color]="item.estado.abierta ? (item.veterinaria.is_emergency ? 'danger' : 'success') : 'medium'"
+                [fill]="item.estado.abierta ? 'solid' : 'outline'"
+                [href]="'tel:' + item.veterinaria.phone"
+              >
+                <ion-icon slot="start" name="call-outline"></ion-icon>
+                Llamar
+              </ion-button>
+            </div>
+          </ion-card>
+        }
+      </div>
+    }
+  </div>
+
+  <ion-modal [isOpen]="!!enEdicion()" (didDismiss)="enEdicion.set(null)">
+    <ng-template>
+      @if (enEdicion(); as veterinaria) {
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Editar {{ veterinaria.name }}</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="enEdicion.set(null)" aria-label="Cerrar">
+                <ion-icon slot="icon-only" name="close"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <app-formulario-veterinaria [registroInicial]="veterinaria" (guardado)="alGuardar()" />
+        </ion-content>
+      }
+    </ng-template>
+  </ion-modal>
+</ion-content>

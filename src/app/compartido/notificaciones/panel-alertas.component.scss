@@ -1,0 +1,72 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.etiqueta {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.zona {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  ion-input {
+    flex: 1;
+    --padding-start: 10px;
+    --padding-end: 10px;
+    min-height: 36px;
+    font-size: 0.9rem;
+  }
+}
+
+.entre {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.valor {
+  color: var(--ion-color-primary);
+}
+
+ion-range {
+  --bar-height: 4px;
+  --knob-size: 18px;
+  padding: 0 4px;
+}
+
+ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --min-height: 36px;
+  --background: transparent;
+  font-size: 0.9rem;
+}
+
+.acciones {
+  display: flex;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.crecer {
+  flex: 1;
+}
+
+ion-spinner {
+  width: 16px;
+  height: 16px;
+}

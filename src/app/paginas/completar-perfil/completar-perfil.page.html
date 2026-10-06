@@ -1,0 +1,137 @@
+<ion-content class="ion-padding">
+  <div class="envoltorio aparece">
+    <div class="cabecera">
+      <div class="logo"><ion-icon name="paw"></ion-icon></div>
+      <h1>¡Bienvenido/a!</h1>
+      <p class="texto-secundario">Contanos un poco sobre vos para personalizar tu experiencia</p>
+    </div>
+
+    <ion-card>
+      <ion-card-header>
+        <div class="progreso">
+          <span [class.completo]="paso() >= 1"></span>
+          <span [class.completo]="paso() >= 2"></span>
+        </div>
+        <ion-card-title>
+          @if (paso() === 1) {
+            ¿Cuál es tu rol?
+          } @else if (esVeterinario()) {
+            Datos de tu clínica / consultorio
+          } @else {
+            Datos de contacto
+          }
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        @if (paso() === 1) {
+          <app-selector-rol [(seleccionado)]="tipoDeCuenta" />
+          <ion-button expand="block" class="continuar" (click)="paso.set(2)">
+            Continuar
+            <ion-icon slot="end" name="arrow-forward"></ion-icon>
+          </ion-button>
+        } @else {
+          <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+            @if (esVeterinario()) {
+              <div class="aviso aviso-purpura">
+                <ion-icon name="time-outline" color="purpura"></ion-icon>
+                <span>
+                  Tu perfil será <strong>revisado por un administrador</strong> antes de aparecer
+                  en el directorio público.
+                </span>
+              </div>
+              <ion-input
+                label="Nombre de la clínica / consultorio *"
+                labelPlacement="stacked"
+                fill="outline"
+                formControlName="vet_clinic_name"
+                placeholder="Ej: Clínica Veterinaria San Roque"
+              ></ion-input>
+              <ion-input
+                label="Dirección *"
+                labelPlacement="stacked"
+                fill="outline"
+                formControlName="vet_address"
+                placeholder="Ej: Av. Libertad 450, Orán"
+              ></ion-input>
+              <ion-input
+                label="Teléfono de la clínica"
+                labelPlacement="stacked"
+                fill="outline"
+                formControlName="vet_phone"
+                placeholder="+54 9 387 ..."
+                type="tel"
+              ></ion-input>
+              <ion-textarea
+                label="Servicios que brindás (opcional)"
+                labelPlacement="stacked"
+                fill="outline"
+                formControlName="vet_services"
+                placeholder="Ej: consultas generales, cirugías, vacunación, odontología, guardia 24h, ecografías..."
+                [rows]="3"
+                [autoGrow]="true"
+              ></ion-textarea>
+              <ion-textarea
+                label="Descripción / bio (opcional)"
+                labelPlacement="stacked"
+                fill="outline"
+                formControlName="bio"
+                placeholder="Años de experiencia, especialidades, presentación..."
+                [rows]="2"
+                [autoGrow]="true"
+              ></ion-textarea>
+            } @else {
+              @if (tipoDeCuenta() === 'organizacion') {
+                <ion-input
+                  label="Nombre de la organización *"
+                  labelPlacement="stacked"
+                  fill="outline"
+                  formControlName="organization_name"
+                  placeholder="Ej: Rescate Animal Buenos Aires"
+                ></ion-input>
+              }
+              <ion-input
+                label="Teléfono / WhatsApp"
+                labelPlacement="stacked"
+                fill="outline"
+                formControlName="phone"
+                placeholder="+54 9 11 ..."
+                type="tel"
+              ></ion-input>
+              <ion-input
+                label="Zona / Barrio"
+                labelPlacement="stacked"
+                fill="outline"
+                formControlName="location"
+                placeholder="Ej: Palermo, CABA"
+              ></ion-input>
+              <ion-textarea
+                label="Bio breve (opcional)"
+                labelPlacement="stacked"
+                fill="outline"
+                formControlName="bio"
+                placeholder="Contanos algo sobre vos..."
+                [rows]="3"
+                [autoGrow]="true"
+              ></ion-textarea>
+            }
+
+            @if (error()) {
+              <p class="error-formulario">{{ error() }}</p>
+            }
+
+            <div class="acciones">
+              <ion-button type="button" fill="outline" color="medium" (click)="paso.set(1)">Atrás</ion-button>
+              <ion-button type="submit" [disabled]="guardando() || !puedeEnviar()">
+                @if (guardando()) {
+                  <ion-spinner slot="start" name="crescent"></ion-spinner>
+                }
+                {{ esVeterinario() ? 'Enviar para revisión' : 'Comenzar' }}
+              </ion-button>
+            </div>
+          </form>
+        }
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

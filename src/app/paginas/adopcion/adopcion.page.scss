@@ -1,0 +1,98 @@
+.selectores {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  ion-select {
+    min-height: 36px;
+    min-width: 130px;
+    font-size: 0.85rem;
+    --padding-start: 10px;
+    --padding-end: 6px;
+  }
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
+  transition: box-shadow 0.3s;
+
+  &:hover {
+    box-shadow: 0 10px 25px -10px rgba(15, 23, 42, 0.3);
+  }
+}
+
+.foto {
+  position: relative;
+  height: 192px;
+  background: rgba(var(--ion-color-medium-rgb), 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .sin-foto {
+    font-size: 64px;
+    color: rgba(var(--ion-color-medium-rgb), 0.4);
+  }
+
+  .estado {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+  }
+
+  .sexo {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+  }
+}
+
+.cuerpo {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+
+  h3 {
+    font-size: 1.1rem;
+  }
+}
+
+.titulo-fila {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+ion-chip {
+  --background: rgba(var(--ion-color-medium-rgb), 0.12);
+  font-size: 0.75rem;
+  height: 26px;
+  margin: 0;
+
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
+.botones {
+  display: flex;
+  gap: 8px;
+  padding-top: 4px;
+
+  ion-button {
+    flex: 1;
+    margin: 0;
+  }
+}

@@ -1,0 +1,76 @@
+@if (!splashTerminado()) {
+  <app-splash (terminado)="splashTerminado.set(true)" />
+}
+
+<ion-content class="ion-padding">
+  <div class="login" [class.visible]="splashTerminado()">
+    <div class="marca">
+      <div class="logo">
+        <ion-icon name="paw"></ion-icon>
+      </div>
+      <h1>Koko</h1>
+      <p class="texto-secundario texto-chico">Comunidad mascoteril</p>
+    </div>
+
+    <div class="tarjeta">
+      <h2>Bienvenido de vuelta</h2>
+      <p class="texto-secundario texto-chico subtitulo">Iniciá sesión para continuar</p>
+
+      <ion-button expand="block" fill="outline" color="medium" class="google" (click)="continuarConGoogle()">
+        <app-icono-google />
+        Continuar con Google
+      </ion-button>
+
+      <div class="divisor"><span>o con email</span></div>
+
+      @if (error()) {
+        <p class="error-formulario">{{ error() }}</p>
+      }
+
+      <form class="formulario" [formGroup]="formulario" (ngSubmit)="ingresar()">
+        <ion-input
+          label="Email"
+          labelPlacement="stacked"
+          fill="outline"
+          type="email"
+          formControlName="email"
+          placeholder="tu@email.com"
+          autocomplete="email"
+          errorText="Ingresá un email válido"
+        >
+          <ion-icon slot="start" name="mail-outline" aria-hidden="true"></ion-icon>
+        </ion-input>
+
+        <div class="campo-contrasena">
+          <ion-input
+            label="Contraseña"
+            labelPlacement="stacked"
+            fill="outline"
+            type="password"
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            errorText="Ingresá tu contraseña"
+          >
+            <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
+            <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+          </ion-input>
+          <a routerLink="/forgot-password" class="enlace texto-mini">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <ion-button type="submit" expand="block" [disabled]="cargando()">
+          @if (cargando()) {
+            <ion-spinner slot="start" name="crescent"></ion-spinner>
+            Ingresando...
+          } @else {
+            Ingresar
+          }
+        </ion-button>
+      </form>
+    </div>
+
+    <p class="pie texto-chico texto-secundario">
+      ¿No tenés cuenta? <a routerLink="/register" class="enlace">Registrate</a>
+    </p>
+  </div>
+</ion-content>
