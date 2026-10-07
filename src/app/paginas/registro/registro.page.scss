@@ -1,0 +1,31 @@
+.codigo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.reenviar {
+  margin-top: 16px;
+}
+
+.enlace {
+  color: var(--ion-color-primary);
+  font-weight: 600;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+ion-spinner {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}

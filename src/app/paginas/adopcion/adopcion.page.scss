@@ -1,0 +1,57 @@
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);
+  transition: box-shadow 0.3s;
+
+  &:hover {
+    box-shadow: 0 10px 25px -10px rgba(var(--koko-sombra-rgb), 0.3);
+  }
+}
+
+.foto-tarjeta .sexo {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.cuerpo {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+
+  h3 {
+    font-size: 1.1rem;
+  }
+}
+
+.titulo-fila {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+ion-chip {
+  --background: rgba(var(--ion-color-medium-rgb), 0.12);
+  font-size: 0.75rem;
+  height: 26px;
+  margin: 0;
+
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
+.botones {
+  display: flex;
+  gap: 8px;
+  padding-top: 4px;
+
+  ion-button {
+    flex: 1;
+    margin: 0;
+  }
+}

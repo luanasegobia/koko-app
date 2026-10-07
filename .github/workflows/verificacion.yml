@@ -15,7 +15,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # Angular 21 soporta Node 20.19+, 22.12+ y 24. Se usa la LTS actual.
+          node-version: "22"
           cache: npm
 
       - run: npm ci
@@ -35,7 +36,8 @@ jobs:
           # determinístico.
           #
           # Esto funciona porque la validación del entorno es perezosa: se
-          # ejecuta en el primer uso del cliente, no al importar el módulo. Si
-          # alguna vez se valida al importar, este paso se rompe.
-          VITE_SUPABASE_URL: https://ejemplo.supabase.co
-          VITE_SUPABASE_ANON_KEY: sb_publishable_valor_de_prueba
+          # ejecuta en el primer uso del cliente, no al importar el módulo.
+          # scripts/generar-entorno.mjs toma estos valores del entorno del
+          # proceso (tienen prioridad sobre .env.local, que acá no existe).
+          SUPABASE_URL: https://ejemplo.supabase.co
+          SUPABASE_ANON_KEY: sb_publishable_valor_de_prueba

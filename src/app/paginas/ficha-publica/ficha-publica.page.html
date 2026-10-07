@@ -1,0 +1,82 @@
+<ion-content class="ion-padding">
+  <div class="contenedor-angosto pila">
+    @if (cargando()) {
+      <div class="cargando"><ion-spinner name="crescent" color="primary"></ion-spinner></div>
+    } @else if (!mascota()) {
+      <div class="tarjeta-vacia">
+        <ion-icon name="paw"></ion-icon>
+        <h2>Mascota no encontrada</h2>
+        <p>El código QR no corresponde a ninguna mascota registrada.</p>
+      </div>
+    } @else if (mascota(); as mascota) {
+      <div class="marca">
+        <ion-icon name="paw" color="primary"></ion-icon>
+        <span>Conectando Huellas · Ficha pública</span>
+      </div>
+
+      @if (mascota.allergies) {
+        <div class="aviso aviso-peligro">
+          <ion-icon name="warning-outline"></ion-icon>
+          <strong>{{ mascota.allergies }}</strong>
+        </div>
+      }
+
+      <ion-card class="ficha">
+        @if (mascota.photo_url) {
+          <img [src]="mascota.photo_url" [alt]="mascota.name" class="foto" />
+        } @else {
+          <div class="foto sin-foto"><ion-icon name="paw"></ion-icon></div>
+        }
+        <div class="datos">
+          <h1>{{ mascota.name }}</h1>
+          <p class="texto-secundario">
+            {{ mascota.breed || mascota.species }}
+            @if (mascota.age_years) { · {{ mascota.age_years }} años }
+            @if (mascota.sex) { · {{ mascota.sex === 'macho' ? 'Macho' : 'Hembra' }} }
+          </p>
+          @if (mascota.description) {
+            <p class="texto-chico">{{ mascota.description }}</p>
+          }
+        </div>
+      </ion-card>
+
+      @if (mascota.owner_name) {
+        <ion-card class="duenio">
+          <div class="avatar">{{ iniciales(mascota.owner_name) }}</div>
+          <div>
+            <p class="nombre">{{ mascota.owner_name }}</p>
+            <p class="texto-chico texto-secundario">Dueño registrado</p>
+          </div>
+        </ion-card>
+      }
+
+      <div class="contacto">
+        @if (mascota.owner_phone) {
+          <ion-button expand="block" [href]="'tel:' + mascota.owner_phone">
+            <ion-icon slot="start" name="call"></ion-icon>
+            Llamar
+          </ion-button>
+        }
+        @if (mascota.owner_whatsapp) {
+          <ion-button expand="block" color="success" [href]="'https://wa.me/' + mascota.owner_whatsapp" target="_blank" rel="noopener noreferrer">
+            <ion-icon slot="start" name="logo-whatsapp"></ion-icon>
+            WhatsApp
+          </ion-button>
+        }
+      </div>
+
+      <ion-button expand="block" fill="outline" color="secondary" [disabled]="notificando() || notificado()" (click)="avisarQueLaEncontre()">
+        @if (notificado()) {
+          <ion-icon slot="start" name="checkmark"></ion-icon>
+          ¡Dueño notificado!
+        } @else if (notificando()) {
+          <ion-spinner slot="start" name="crescent"></ion-spinner>
+          Notificando...
+        } @else {
+          <ion-icon slot="start" name="location-outline"></ion-icon>
+          Encontré esta mascota
+        }
+      </ion-button>
+    }
+  </div>
+</ion-content>

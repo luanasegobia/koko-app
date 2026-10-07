@@ -1,0 +1,162 @@
+<div class="pila">
+  <ion-segment [value]="pestania()" (ionChange)="pestania.set($any($event).detail.value)">
+    <ion-segment-button value="urgentes">
+      Casos Urgentes <span class="texto-mini texto-secundario">({{ casosUrgentes().length }})</span>
+    </ion-segment-button>
+    <ion-segment-button value="perdidas">
+      Mascotas Perdidas <span class="texto-mini texto-secundario">({{ mascotasPerdidas().length }})</span>
+    </ion-segment-button>
+    <ion-segment-button value="denuncias">
+      Denuncias
+      @if (denunciasPendientes() > 0) {
+        <ion-badge color="danger">{{ denunciasPendientes() }}</ion-badge>
+      }
+    </ion-segment-button>
+  </ion-segment>
+
+  @if (cargando()) {
+    <div class="cargando"><ion-spinner name="crescent" color="primary"></ion-spinner></div>
+  } @else {
+    @switch (pestania()) {
+      @case ('urgentes') {
+        @if (casosUrgentes().length === 0) {
+          <ion-card class="tarjeta-vacia"><ion-icon name="hand-left-outline"></ion-icon><p>No hay casos urgentes.</p></ion-card>
+        } @else {
+          <div class="lista">
+            @for (caso of casosUrgentes(); track caso.id; let i = $index) {
+              <ion-card class="tarjeta aparece" [style.animation-delay]="i * 40 + 'ms'">
+                @if (caso.photo_url) {
+                  <img [src]="caso.photo_url" [alt]="caso.title" class="miniatura" />
+                }
+                <div class="info">
+                  <div class="fila">
+                    <h3>{{ caso.title }}</h3>
+                    <ion-badge [color]="estadoCaso[caso.status].color">{{ estadoCaso[caso.status].etiqueta }}</ion-badge>
+                  </div>
+                  <p class="texto-chico texto-secundario recortar-2">{{ caso.description }}</p>
+                  @if (caso.published_by) {
+                    <p class="texto-mini texto-secundario"><ion-icon name="person-outline"></ion-icon> {{ caso.published_by }}</p>
+                  }
+                  @if (caso.created_at) {
+                    <p class="texto-mini texto-secundario">{{ caso.created_at | fecha }}</p>
+                  }
+                </div>
+                <ion-select
+                  [value]="caso.status"
+                  [disabled]="actualizando()"
+                  (ionChange)="cambiarCaso.emit({ id: caso.id, status: $any($event).detail.value })"
+                  interface="popover"
+                  fill="outline"
+                  aria-label="Estado del caso"
+                >
+                  <ion-select-option value="activo">Activo</ion-select-option>
+                  <ion-select-option value="en_curso">En curso</ion-select-option>
+                  <ion-select-option value="resuelto">Resuelto</ion-select-option>
+                </ion-select>
+              </ion-card>
+            }
+          </div>
+        }
+      }
+
+      @case ('perdidas') {
+        @if (mascotasPerdidas().length === 0) {
+          <ion-card class="tarjeta-vacia"><ion-icon name="paw-outline"></ion-icon><p>No hay mascotas reportadas.</p></ion-card>
+        } @else {
+          <div class="lista">
+            @for (mascota of mascotasPerdidas(); track mascota.id; let i = $index) {
+              <ion-card class="tarjeta aparece" [style.animation-delay]="i * 40 + 'ms'">
+                @if (mascota.photo_url) {
+                  <img [src]="mascota.photo_url" [alt]="mascota.pet_name" class="miniatura" />
+                }
+                <div class="info">
+                  <div class="fila">
+                    <h3>{{ mascota.pet_name }}</h3>
+                    <ion-badge [color]="mascota.status === 'perdida' ? 'danger' : 'primary'">
+                      {{ mascota.status === 'perdida' ? 'Perdida' : 'Encontrada' }}
+                    </ion-badge>
+                    <ion-badge color="light">{{ mascota.species }}</ion-badge>
+                  </div>
+                  @if (mascota.last_seen_address) {
+                    <p class="texto-chico texto-secundario"><ion-icon name="location-outline"></ion-icon> {{ mascota.last_seen_address }}</p>
+                  }
+                  @if (mascota.created_at) {
+                    <p class="texto-mini texto-secundario">{{ mascota.created_at | fecha }}</p>
+                  }
+                </div>
+                <ion-select
+                  [value]="mascota.status"
+                  [disabled]="actualizando()"
+                  (ionChange)="cambiarPerdida.emit({ id: mascota.id, status: $any($event).detail.value })"
+                  interface="popover"
+                  fill="outline"
+                  aria-label="Estado del reporte"
+                >
+                  <ion-select-option value="perdida">Perdida</ion-select-option>
+                  <ion-select-option value="encontrada">Encontrada</ion-select-option>
+                </ion-select>
+              </ion-card>
+            }
+          </div>
+        }
+      }
+
+      @case ('denuncias') {
+        @if (denuncias().length === 0) {
+          <ion-card class="tarjeta-vacia"><ion-icon name="shield-half-outline"></ion-icon><p>No hay denuncias registradas.</p></ion-card>
+        } @else {
+          <div class="lista">
+            @for (denuncia of denuncias(); track denuncia.id; let i = $index) {
+              <ion-card class="tarjeta aparece" [style.animation-delay]="i * 40 + 'ms'">
+                <div class="info">
+                  <div class="fila">
+                    <ion-badge [color]="estadoDenuncia[denuncia.status].color">{{ estadoDenuncia[denuncia.status].etiqueta }}</ion-badge>
+                    <ion-badge color="light" class="capitalizar">{{ denuncia.type }}</ion-badge>
+                    @if (denuncia.tracking_code) {
+                      <span class="texto-mini texto-secundario monoespaciado">#{{ denuncia.tracking_code }}</span>
+                    }
+                  </div>
+                  <p class="texto-chico">{{ denuncia.description }}</p>
+                  @if (denuncia.address) {
+                    <p class="texto-chico texto-secundario"><ion-icon name="location-outline"></ion-icon> {{ denuncia.address }}</p>
+                  }
+                  @if (denuncia.reporter_name) {
+                    <p class="texto-mini texto-secundario">
+                      <ion-icon name="person-outline"></ion-icon> {{ denuncia.reporter_name }}
+                      @if (denuncia.reporter_phone) { · {{ denuncia.reporter_phone }} }
+                    </p>
+                  }
+                  @if (denuncia.created_at) {
+                    <p class="texto-mini texto-secundario">{{ denuncia.created_at | fecha }}</p>
+                  }
+                  @if (denuncia.evidence_urls?.length) {
+                    <div class="evidencias">
+                      @for (url of denuncia.evidence_urls!.slice(0, 3); track url) {
+                        <a [href]="url" target="_blank" rel="noopener noreferrer">
+                          <img [src]="url" alt="Evidencia" />
+                        </a>
+                      }
+                    </div>
+                  }
+                </div>
+                <ion-select
+                  [value]="denuncia.status"
+                  [disabled]="actualizando()"
+                  (ionChange)="cambiarDenuncia.emit({ id: denuncia.id, status: $any($event).detail.value })"
+                  interface="popover"
+                  fill="outline"
+                  aria-label="Estado de la denuncia"
+                >
+                  <ion-select-option value="pendiente">Pendiente</ion-select-option>
+                  <ion-select-option value="en_revision">En revisión</ion-select-option>
+                  <ion-select-option value="derivada">Derivada</ion-select-option>
+                  <ion-select-option value="resuelta">Resuelta</ion-select-option>
+                </ion-select>
+              </ion-card>
+            }
+          </div>
+        }
+      }
+    }
+  }
+</div>
