@@ -32,7 +32,7 @@ ion-content {
     height: 80px;
     border-radius: 24px;
     background: var(--ion-color-primary);
-    color: #fff;
+    color: var(--koko-texto-sobre-color);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -63,37 +63,6 @@ ion-content {
 
   .subtitulo {
     margin: 4px 0 20px;
-  }
-}
-
-.google {
-  margin-bottom: 20px;
-  --border-color: var(--ion-border-color);
-  --color: var(--ion-text-color);
-}
-
-.divisor {
-  position: relative;
-  text-align: center;
-  margin-bottom: 20px;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    border-top: 1px solid var(--ion-border-color);
-  }
-
-  span {
-    position: relative;
-    background: var(--ion-card-background);
-    padding: 0 12px;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--koko-texto-secundario);
   }
 }
 

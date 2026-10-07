@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, inject, input, OnInit, output, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonButton, IonIcon, IonInput, IonSpinner, IonTextarea } from '@ionic/angular';
 import { SelectorFotoComponent } from '../../compartido/selector-foto/selector-foto.component';
@@ -38,7 +38,7 @@ import { SupabaseService } from '../../core/servicios/supabase.service';
     }
   `,
 })
-export class FormularioCasoUrgenteComponent {
+export class FormularioCasoUrgenteComponent implements OnInit {
   private readonly supabase = inject(SupabaseService);
   private readonly fb = inject(FormBuilder);
 
@@ -53,28 +53,27 @@ export class FormularioCasoUrgenteComponent {
     title: ['', Validators.required],
     description: ['', Validators.required],
     published_by: '',
-    goal_amount: null as number | null,
+    goal_amount: [null as number | null, Validators.min(0)],
     donation_alias: '',
     necesidades: this.fb.array<FormControl<string>>([this.fb.nonNullable.control('')]),
   });
 
-  constructor() {
-    const inicial = this.registroInicial;
-    queueMicrotask(() => {
-      const registro = inicial();
-      if (!registro) return;
-      this.formulario.patchValue({
-        title: registro.title,
-        description: registro.description,
-        published_by: registro.published_by ?? '',
-        goal_amount: registro.goal_amount ?? null,
-        donation_alias: registro.donation_alias ?? '',
-      });
-      this.necesidades.clear();
-      for (const necesidad of registro.needs?.length ? registro.needs : [{ label: '' }]) {
-        this.necesidades.push(this.fb.nonNullable.control(necesidad.label ?? ''));
-      }
+  ngOnInit(): void {
+    // Angular asigna los inputs antes de ngOnInit (y antes del primer
+    // renderizado): recién acá se puede leer registroInicial al editar.
+    const registro = this.registroInicial();
+    if (!registro) return;
+    this.formulario.patchValue({
+      title: registro.title,
+      description: registro.description,
+      published_by: registro.published_by ?? '',
+      goal_amount: registro.goal_amount ?? null,
+      donation_alias: registro.donation_alias ?? '',
     });
+    this.necesidades.clear();
+    for (const necesidad of registro.needs?.length ? registro.needs : [{ label: '' }]) {
+      this.necesidades.push(this.fb.nonNullable.control(necesidad.label ?? ''));
+    }
   }
 
   protected get necesidades(): FormArray<FormControl<string>> {

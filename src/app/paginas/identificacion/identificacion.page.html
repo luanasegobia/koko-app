@@ -38,9 +38,9 @@
           <div class="con-acciones aparece" [style.animation-delay]="i * 50 + 'ms'">
             <div class="acciones">
               <app-acciones-de-duenio
-                [registro]="$any(mascota)"
+                [registro]="mascota"
                 [etiqueta]="'la ficha de ' + mascota.name"
-                [eliminar]="eliminarMascota(mascota)"
+                [eliminar]="eliminarMascota"
                 (editar)="abrirFormulario(mascota)"
               />
             </div>

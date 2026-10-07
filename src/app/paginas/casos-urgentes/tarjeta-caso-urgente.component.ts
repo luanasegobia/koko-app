@@ -32,7 +32,7 @@ const ICONO_NECESIDAD: Record<EstadoNecesidad, string> = { cubierto: '✓', parc
 })
 export class TarjetaCasoUrgenteComponent {
   readonly caso = input.required<CasoUrgente>();
-  readonly eliminar = input<() => Promise<unknown>>();
+  readonly eliminar = input<(caso: CasoUrgente) => Promise<unknown>>();
   readonly editar = output<void>();
 
   protected readonly copiado = signal(false);

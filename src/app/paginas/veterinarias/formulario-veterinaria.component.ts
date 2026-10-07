@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, inject, input, OnInit, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonSpinner, IonTextarea, IonToggle } from '@ionic/angular';
 import { BotonUbicacionComponent } from '../../compartido/boton-ubicacion/boton-ubicacion.component';
@@ -118,7 +118,7 @@ import { SupabaseService } from '../../core/servicios/supabase.service';
     }
   `,
 })
-export class FormularioVeterinariaComponent {
+export class FormularioVeterinariaComponent implements OnInit {
   private readonly supabase = inject(SupabaseService);
   private readonly fb = inject(FormBuilder);
 
@@ -138,20 +138,19 @@ export class FormularioVeterinariaComponent {
     bio: '',
   });
 
-  constructor() {
-    const inicial = this.registroInicial;
-    queueMicrotask(() => {
-      const registro = inicial();
-      this.formulario.patchValue({
-        name: registro.name,
-        address: registro.address,
-        phone: registro.phone,
-        is_emergency: registro.is_emergency ?? false,
-        services: registro.services ?? '',
-        bio: registro.bio ?? '',
-      });
-      this.ubicacion.set({ lat: registro.lat ?? undefined, lng: registro.lng ?? undefined });
+  ngOnInit(): void {
+    // Angular asigna los inputs antes de ngOnInit (y antes del primer
+    // renderizado): recién acá se puede leer registroInicial al editar.
+    const registro = this.registroInicial();
+    this.formulario.patchValue({
+      name: registro.name,
+      address: registro.address,
+      phone: registro.phone,
+      is_emergency: registro.is_emergency ?? false,
+      services: registro.services ?? '',
+      bio: registro.bio ?? '',
     });
+    this.ubicacion.set({ lat: registro.lat ?? undefined, lng: registro.lng ?? undefined });
   }
 
   async guardar(): Promise<void> {

@@ -8,7 +8,7 @@
   background: var(--ion-card-background);
   border: 1px solid var(--ion-border-color);
   border-radius: 16px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 25px 50px -12px rgba(var(--koko-sombra-rgb), 0.35);
   overflow: hidden;
 }
 

@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonButton, IonIcon, IonInput, IonSpinner, IonTextarea } from '@ionic/angular';
 import { BotonUbicacionComponent } from '../../compartido/boton-ubicacion/boton-ubicacion.component';
@@ -98,6 +98,18 @@ export class DialogoAvistamientoComponent {
     nota: '',
   });
 
+  /** Cierre diferido después del mensaje de agradecimiento. */
+  private temporizadorDeCierre: ReturnType<typeof setTimeout> | null = null;
+
+  constructor() {
+    // Si la persona cierra el modal antes de que venza el temporizador, el
+    // componente ya no existe: emitir `cerrar` en ese momento no hace nada
+    // útil y Angular avisa NG0953 en consola (emit sobre un output destruido).
+    inject(DestroyRef).onDestroy(() => {
+      if (this.temporizadorDeCierre) clearTimeout(this.temporizadorDeCierre);
+    });
+  }
+
   async enviar(): Promise<void> {
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
@@ -117,7 +129,7 @@ export class DialogoAvistamientoComponent {
       });
       this.listo.set(true);
       this.guardado.emit();
-      setTimeout(() => this.cerrar.emit(), 1500);
+      this.temporizadorDeCierre = setTimeout(() => this.cerrar.emit(), 1500);
     } catch (error) {
       this.error.set(mensajeDeError(error));
     } finally {

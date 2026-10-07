@@ -1,5 +1,6 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import {
   IonButton,
   IonButtons,
@@ -60,11 +61,12 @@ import { TarjetaMascotaPerdidaComponent } from './tarjeta-mascota-perdida.compon
   templateUrl: './perdidas.page.html',
   styleUrl: './perdidas.page.scss',
 })
-export class PerdidasPage implements OnInit {
+export class PerdidasPage {
   private readonly supabase = inject(SupabaseService);
   private readonly auth = inject(AuthService);
   private readonly avisos = inject(AvisosService);
   private readonly rutaActiva = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   protected readonly cargando = signal(true);
   protected readonly mascotas = signal<MascotaPerdida[]>([]);
@@ -117,8 +119,8 @@ export class PerdidasPage implements OnInit {
           lineas: m.last_seen_address ? [`📍 ${m.last_seen_address}`] : [],
           etiqueta:
             m.status === 'encontrada'
-              ? { texto: 'Encontrada', fondo: '#dcfce7', color: '#15803d' }
-              : { texto: 'Perdida', fondo: '#fee2e2', color: '#b91c1c' },
+              ? { texto: 'Encontrada', color: 'success' }
+              : { texto: 'Perdida', color: 'danger' },
           telefono: m.contact_phone || undefined,
         },
       }));
@@ -141,16 +143,46 @@ export class PerdidasPage implements OnInit {
     return [...deMascotas, ...deAvistamientos];
   });
 
-  ngOnInit(): void {
-    // Los accesos directos de la portada: ?action=report abre el formulario,
-    // ?action=sighting además dispara la cámara; ?search= precarga el buscador.
-    const parametros = this.rutaActiva.snapshot.queryParamMap;
+  constructor() {
+    // Ionic reutiliza esta vista cada vez que se vuelve a /perdidas (la busca
+    // por URL sin mirar los parámetros), así que ngOnInit corre una sola vez.
+    // Por eso los parámetros se escuchan en vez de leerse del snapshot: así
+    // los accesos directos de la portada funcionan también la segunda vez.
+    this.rutaActiva.queryParamMap
+      .pipe(takeUntilDestroyed())
+      .subscribe((parametros) => void this.aplicarParametros(parametros));
+  }
+
+  /**
+   * Accesos directos de la portada: ?action=report abre el formulario,
+   * ?action=sighting además dispara la cámara y ?search= precarga el buscador.
+   */
+  async aplicarParametros(parametros: ParamMap): Promise<void> {
+    const busqueda = parametros.get('search');
+    if (busqueda !== null) this.busqueda.set(busqueda);
+
     const accion = parametros.get('action');
-    if (accion === 'report' || accion === 'sighting') {
-      this.abrirCamara.set(accion === 'sighting');
-      this.abrirFormulario();
+    if (accion !== 'report' && accion !== 'sighting') return;
+
+    // Al recargar la página la sesión todavía se está leyendo: sin esperarla,
+    // una persona con sesión iniciada terminaba mandada al login.
+    await this.auth.listo();
+    if (!this.auth.autenticado()) {
+      // Se va al login con la URL completa, para volver con el formulario abierto.
+      this.auth.irAlLogin();
+      return;
     }
-    this.busqueda.set(parametros.get('search') || '');
+
+    // La acción se consume una sola vez: si quedara en la URL, volver con
+    // "atrás" a esta página reabriría el formulario.
+    void this.router.navigate(['/perdidas'], {
+      queryParams: { action: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+    this.abrirCamara.set(accion === 'sighting');
+    this.enEdicion.set(null);
+    this.mostrarFormulario.set(true);
   }
 
   ionViewWillEnter(): void {
@@ -191,10 +223,9 @@ export class PerdidasPage implements OnInit {
     void this.cargar();
   }
 
-  protected eliminarMascota(mascota: MascotaPerdida): () => Promise<void> {
-    return async () => {
-      await this.supabase.mascotasPerdidas.eliminar(mascota.id);
-      await this.cargar();
-    };
-  }
+  /** Referencia estable: se pasa tal cual a cada tarjeta, sin crear una función por ciclo. */
+  protected readonly eliminarMascota = async (mascota: MascotaPerdida): Promise<void> => {
+    await this.supabase.mascotasPerdidas.eliminar(mascota.id);
+    await this.cargar();
+  };
 }

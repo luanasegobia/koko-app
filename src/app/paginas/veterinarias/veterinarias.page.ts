@@ -29,11 +29,6 @@ interface VeterinariaConEstado {
   estado: EstadoDeVeterinaria;
 }
 
-const COLOR_ETIQUETA: Record<EstadoDeVeterinaria['color'], { fondo: string; color: string }> = {
-  danger: { fondo: '#fee2e2', color: '#b91c1c' },
-  success: { fondo: '#dcfce7', color: '#15803d' },
-  medium: { fondo: '#e5e7eb', color: '#4b5563' },
-};
 
 @Component({
   selector: 'app-veterinarias',
@@ -102,7 +97,7 @@ export class VeterinariasPage {
         icono: veterinaria.is_emergency || estado.abierta ? 'veterinariaAbierta' : 'veterinaria',
         popup: {
           titulo: veterinaria.name,
-          etiqueta: { texto: estado.etiqueta, ...COLOR_ETIQUETA[estado.color] },
+          etiqueta: { texto: estado.etiqueta, color: estado.color },
           lineas: [
             `📍 ${veterinaria.address}`,
             estado.horario ? `🕐 ${estado.horario}` : '',
@@ -132,10 +127,9 @@ export class VeterinariasPage {
     void this.cargar();
   }
 
-  protected eliminarVeterinaria(veterinaria: Veterinaria): () => Promise<void> {
-    return async () => {
-      await this.supabase.veterinarias.eliminar(veterinaria.id);
-      await this.cargar();
-    };
-  }
+  /** Referencia estable: se pasa tal cual a cada tarjeta, sin crear una función por ciclo. */
+  protected readonly eliminarVeterinaria = async (veterinaria: Veterinaria): Promise<void> => {
+    await this.supabase.veterinarias.eliminar(veterinaria.id);
+    await this.cargar();
+  };
 }

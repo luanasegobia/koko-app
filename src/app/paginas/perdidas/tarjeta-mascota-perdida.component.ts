@@ -10,7 +10,7 @@ import { FechaPipe } from '../../core/pipes/fecha.pipe';
   imports: [IonCard, IonBadge, IonButton, IonIcon, FechaPipe, AccionesDeDuenioComponent, ChatRapidoComponent],
   template: `
     <ion-card class="tarjeta">
-      <div class="foto">
+      <div class="foto-tarjeta">
         @if (mascota().photo_url) {
           <img [src]="mascota().photo_url" [alt]="mascota().pet_name" />
         } @else {
@@ -21,7 +21,7 @@ import { FechaPipe } from '../../core/pipes/fecha.pipe';
         </ion-badge>
         <div class="acciones">
           <app-acciones-de-duenio
-            [registro]="$any(mascota())"
+            [registro]="mascota()"
             [etiqueta]="'el reporte de ' + mascota().pet_name"
             [eliminar]="eliminar()"
             (editar)="editar.emit()"
@@ -88,43 +88,17 @@ import { FechaPipe } from '../../core/pipes/fecha.pipe';
       transition: box-shadow 0.3s;
 
       &:hover {
-        box-shadow: 0 10px 25px -10px rgba(15, 23, 42, 0.3);
+        box-shadow: 0 10px 25px -10px rgba(var(--koko-sombra-rgb), 0.3);
       }
     }
 
-    .foto {
-      position: relative;
-      height: 192px;
-      background: rgba(var(--ion-color-medium-rgb), 0.12);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .sin-foto {
-        font-size: 64px;
-        color: rgba(var(--ion-color-medium-rgb), 0.4);
-      }
-
-      .estado {
-        position: absolute;
-        top: 12px;
-        left: 12px;
-      }
-
-      .acciones {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        background: rgba(var(--ion-background-color-rgb), 0.85);
-        border-radius: 999px;
-        backdrop-filter: blur(4px);
-      }
+    .foto-tarjeta .acciones {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(var(--ion-background-color-rgb), 0.85);
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
     }
 
     .cuerpo {
@@ -165,7 +139,7 @@ import { FechaPipe } from '../../core/pipes/fecha.pipe';
 })
 export class TarjetaMascotaPerdidaComponent {
   readonly mascota = input.required<MascotaPerdida>();
-  readonly eliminar = input<() => Promise<unknown>>();
+  readonly eliminar = input<(mascota: MascotaPerdida) => Promise<unknown>>();
   readonly avistamiento = output<void>();
   readonly editar = output<void>();
 }

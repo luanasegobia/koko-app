@@ -101,7 +101,7 @@
             class="aparece"
             [style.animation-delay]="i * 50 + 'ms'"
             [mascota]="mascota"
-            [eliminar]="eliminarMascota(mascota)"
+            [eliminar]="eliminarMascota"
             (avistamiento)="mascotaAvistada.set(mascota)"
             (editar)="abrirFormulario(mascota)"
           />

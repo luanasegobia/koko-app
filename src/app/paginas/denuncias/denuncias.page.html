@@ -104,11 +104,11 @@
               </div>
             </div>
             <app-acciones-de-duenio
-              [registro]="$any(denuncia)"
+              [registro]="denuncia"
               etiqueta="esta denuncia"
               [soloAdminPuedeEliminar]="true"
               [tieneEdicion]="false"
-              [eliminar]="eliminarDenuncia(denuncia)"
+              [eliminar]="eliminarDenuncia"
             />
           </ion-card>
         }

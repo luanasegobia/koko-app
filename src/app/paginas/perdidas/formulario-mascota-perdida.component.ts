@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, input, output, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, input, OnInit, output, signal, viewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   IonButton,
@@ -32,7 +32,7 @@ import { SupabaseService } from '../../core/servicios/supabase.service';
   ],
   templateUrl: './formulario-mascota-perdida.component.html',
 })
-export class FormularioMascotaPerdidaComponent implements AfterViewInit {
+export class FormularioMascotaPerdidaComponent implements OnInit, AfterViewInit {
   private readonly supabase = inject(SupabaseService);
   private readonly fb = inject(FormBuilder);
 
@@ -51,33 +51,31 @@ export class FormularioMascotaPerdidaComponent implements AfterViewInit {
     pet_name: ['', Validators.required],
     species: 'perro' as Especie,
     breed: '',
-    age_years: null as number | null,
+    age_years: [null as number | null, Validators.min(0)],
     description: '',
     last_seen_address: '',
     contact_phone: '',
     contact_whatsapp: '',
   });
 
-  constructor() {
-    // Al editar, el formulario arranca con los datos del reporte.
-    const inicial = this.registroInicial;
-    queueMicrotask(() => {
-      const registro = inicial();
-      if (!registro) return;
-      this.formulario.patchValue({
-        pet_name: registro.pet_name,
-        species: registro.species,
-        breed: registro.breed ?? '',
-        age_years: registro.age_years ?? null,
-        description: registro.description ?? '',
-        last_seen_address: registro.last_seen_address ?? '',
-        contact_phone: registro.contact_phone ?? '',
-        contact_whatsapp: registro.contact_whatsapp ?? '',
-      });
-      this.ubicacion.set({
-        lat: registro.last_seen_lat ?? undefined,
-        lng: registro.last_seen_lng ?? undefined,
-      });
+  ngOnInit(): void {
+    // Angular asigna los inputs antes de ngOnInit (y antes del primer
+    // renderizado): recién acá se puede leer registroInicial al editar.
+    const registro = this.registroInicial();
+    if (!registro) return;
+    this.formulario.patchValue({
+      pet_name: registro.pet_name,
+      species: registro.species,
+      breed: registro.breed ?? '',
+      age_years: registro.age_years ?? null,
+      description: registro.description ?? '',
+      last_seen_address: registro.last_seen_address ?? '',
+      contact_phone: registro.contact_phone ?? '',
+      contact_whatsapp: registro.contact_whatsapp ?? '',
+    });
+    this.ubicacion.set({
+      lat: registro.last_seen_lat ?? undefined,
+      lng: registro.last_seen_lng ?? undefined,
     });
   }
 

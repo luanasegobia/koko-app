@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {
   IonButton,
@@ -12,15 +12,9 @@ import {
 import { IconoGoogleComponent } from '../../compartido/icono-google/icono-google.component';
 import { LayoutAuthComponent } from '../../compartido/layout-auth/layout-auth.component';
 import { mensajeDeError } from '../../core/mensaje-de-error';
+import { camposCoinciden } from '../../core/validadores';
 import { AuthService } from '../../core/servicios/auth.service';
 import { AvisosService } from '../../core/servicios/avisos.service';
-
-/** Validador de grupo: las dos contraseñas tienen que coincidir. */
-function contrasenasCoinciden(grupo: AbstractControl): ValidationErrors | null {
-  const password = grupo.get('password')?.value;
-  const confirmacion = grupo.get('confirmacion')?.value;
-  return password && confirmacion && password !== confirmacion ? { noCoinciden: true } : null;
-}
 
 @Component({
   selector: 'app-registro',
@@ -57,7 +51,7 @@ export class RegistroPage {
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmacion: ['', Validators.required],
     },
-    { validators: contrasenasCoinciden },
+    { validators: camposCoinciden('password', 'confirmacion') },
   );
 
   async crearCuenta(): Promise<void> {

@@ -14,7 +14,7 @@
         <img [src]="caso().photo_url" alt="" class="miniatura" />
       }
       <app-acciones-de-duenio
-        [registro]="$any(caso())"
+        [registro]="caso()"
         [etiqueta]="'el caso &quot;' + caso().title + '&quot;'"
         [eliminar]="eliminar()"
         (editar)="editar.emit()"

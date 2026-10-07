@@ -21,7 +21,7 @@
 
   <div class="campos-en-fila">
     <ion-input label="Publicado por" labelPlacement="stacked" fill="outline" formControlName="published_by" placeholder="Nombre u organización"></ion-input>
-    <ion-input label="Meta de recaudación ($)" labelPlacement="stacked" fill="outline" type="number" inputmode="numeric" [min]="0" formControlName="goal_amount" placeholder="Ej: 45000"></ion-input>
+    <ion-input label="Meta de recaudación ($)" labelPlacement="stacked" fill="outline" type="number" inputmode="numeric" [min]="0" formControlName="goal_amount" errorText="La meta no puede ser negativa" placeholder="Ej: 45000"></ion-input>
   </div>
 
   <ion-input label="Alias para donaciones" labelPlacement="stacked" fill="outline" formControlName="donation_alias" placeholder="Ej: rescatistas.oran"></ion-input>

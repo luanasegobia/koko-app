@@ -102,10 +102,10 @@ export class DenunciasPage {
           subtitulo: ETIQUETA_ESTADO_DENUNCIA[d.status] ?? d.status,
           etiqueta:
             d.type === 'urgente'
-              ? { texto: 'Urgente', fondo: '#fee2e2', color: '#b91c1c' }
+              ? { texto: 'Urgente', color: 'danger' }
               : d.type === 'anonima'
-                ? { texto: 'Anónima', fondo: '#dbeafe', color: '#1d4ed8' }
-                : { texto: 'Regular', fondo: '#ffedd5', color: '#c2410c' },
+                ? { texto: 'Anónima', color: 'tertiary' }
+                : { texto: 'Regular', color: 'naranja' },
           lineas: [
             d.description.length > 120 ? `${d.description.slice(0, 120)}…` : d.description,
             d.address ? `📍 ${d.address}` : '',
@@ -135,10 +135,9 @@ export class DenunciasPage {
   }
 
   /** Eliminar queda solo para administración: que quien denuncia no pueda borrar la evidencia. */
-  protected eliminarDenuncia(denuncia: Denuncia): () => Promise<void> {
-    return async () => {
-      await this.supabase.denuncias.eliminar(denuncia.id);
-      await this.cargar();
-    };
-  }
+  /** Referencia estable: se pasa tal cual a cada tarjeta, sin crear una función por ciclo. */
+  protected readonly eliminarDenuncia = async (denuncia: Denuncia): Promise<void> => {
+    await this.supabase.denuncias.eliminar(denuncia.id);
+    await this.cargar();
+  };
 }

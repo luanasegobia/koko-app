@@ -40,7 +40,7 @@
       <div class="cuadricula-tarjetas">
         @for (mascota of filtradas(); track mascota.id; let i = $index) {
           <ion-card class="tarjeta aparece" [style.animation-delay]="i * 50 + 'ms'">
-            <div class="foto">
+            <div class="foto-tarjeta">
               @if (mascota.photo_url) {
                 <img [src]="mascota.photo_url" [alt]="mascota.name" />
               } @else {
@@ -62,9 +62,9 @@
                   </p>
                 </div>
                 <app-acciones-de-duenio
-                  [registro]="$any(mascota)"
+                  [registro]="mascota"
                   [etiqueta]="'la publicación de ' + mascota.name"
-                  [eliminar]="eliminarMascota(mascota)"
+                  [eliminar]="eliminarMascota"
                   (editar)="abrirFormulario(mascota)"
                 />
               </div>

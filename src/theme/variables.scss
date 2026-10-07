@@ -85,6 +85,14 @@
   --ion-color-rosa-shade: #d03f87;
   --ion-color-rosa-tint: #ee5aa3;
 
+  // Naranja: denuncias regulares (en el mapa y en las etiquetas).
+  --ion-color-naranja: #f97316;
+  --ion-color-naranja-rgb: 249, 115, 22;
+  --ion-color-naranja-contrast: #ffffff;
+  --ion-color-naranja-contrast-rgb: 255, 255, 255;
+  --ion-color-naranja-shade: #db6514;
+  --ion-color-naranja-tint: #fa812d;
+
   // Fondos y texto del modo claro.
   --ion-background-color: #f7f7f7;
   --ion-background-color-rgb: 247, 247, 247;
@@ -106,9 +114,26 @@
   --koko-radio: 14px;
   --koko-lateral-fondo: #151c2b;
   --koko-lateral-texto: #d6dae3;
+  --koko-lateral-texto-rgb: 214, 218, 227;
   --koko-lateral-borde: #232b3d;
   --koko-texto-secundario: #6b7280;
-  --koko-sombra: 0 10px 30px -12px rgba(15, 23, 42, 0.25);
+  // Texto, íconos y brillos sobre fondos de color (verde, portada oscura, splash).
+  --koko-texto-sobre-color: #ffffff;
+  --koko-texto-sobre-color-rgb: 255, 255, 255;
+  // Base de todas las sombras: se usa como rgba(var(--koko-sombra-rgb), opacidad).
+  --koko-sombra-rgb: 15, 23, 42;
+  --koko-sombra: 0 10px 30px -12px rgba(var(--koko-sombra-rgb), 0.25);
+  // El QR necesita fondo blanco en los dos modos para que se pueda escanear.
+  --koko-fondo-qr: #ffffff;
+}
+
+.ion-color-naranja {
+  --ion-color-base: var(--ion-color-naranja);
+  --ion-color-base-rgb: var(--ion-color-naranja-rgb);
+  --ion-color-contrast: var(--ion-color-naranja-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-naranja-contrast-rgb);
+  --ion-color-shade: var(--ion-color-naranja-shade);
+  --ion-color-tint: var(--ion-color-naranja-tint);
 }
 
 .ion-color-purpura {
@@ -159,5 +184,6 @@
   --koko-lateral-fondo: #0e121c;
   --koko-lateral-borde: #1b2232;
   --koko-texto-secundario: #9ca3af;
-  --koko-sombra: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+  --koko-sombra-rgb: 0, 0, 0;
+  --koko-sombra: 0 10px 30px -12px rgba(var(--koko-sombra-rgb), 0.6);
 }

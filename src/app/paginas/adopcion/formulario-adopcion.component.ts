@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, inject, input, OnInit, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   IonButton,
@@ -35,7 +35,7 @@ import { SupabaseService } from '../../core/servicios/supabase.service';
   ],
   templateUrl: './formulario-adopcion.component.html',
 })
-export class FormularioAdopcionComponent {
+export class FormularioAdopcionComponent implements OnInit {
   private readonly supabase = inject(SupabaseService);
   private readonly fb = inject(FormBuilder);
 
@@ -50,7 +50,7 @@ export class FormularioAdopcionComponent {
     name: ['', Validators.required],
     species: 'perro' as Especie,
     breed: '',
-    age_years: null as number | null,
+    age_years: [null as number | null, Validators.min(0)],
     sex: 'macho' as Sexo,
     size: 'mediano' as Tamanio,
     description: '',
@@ -61,25 +61,24 @@ export class FormularioAdopcionComponent {
     location: '',
   });
 
-  constructor() {
-    const inicial = this.registroInicial;
-    queueMicrotask(() => {
-      const registro = inicial();
-      if (!registro) return;
-      this.formulario.patchValue({
-        name: registro.name,
-        species: registro.species,
-        breed: registro.breed ?? '',
-        age_years: registro.age_years ?? null,
-        sex: registro.sex ?? 'macho',
-        size: registro.size ?? 'mediano',
-        description: registro.description ?? '',
-        vaccinated: registro.vaccinated ?? false,
-        sterilized: registro.sterilized ?? false,
-        contact_name: registro.contact_name ?? '',
-        contact_phone: registro.contact_phone ?? '',
-        location: registro.location ?? '',
-      });
+  ngOnInit(): void {
+    // Angular asigna los inputs antes de ngOnInit (y antes del primer
+    // renderizado): recién acá se puede leer registroInicial al editar.
+    const registro = this.registroInicial();
+    if (!registro) return;
+    this.formulario.patchValue({
+      name: registro.name,
+      species: registro.species,
+      breed: registro.breed ?? '',
+      age_years: registro.age_years ?? null,
+      sex: registro.sex ?? 'macho',
+      size: registro.size ?? 'mediano',
+      description: registro.description ?? '',
+      vaccinated: registro.vaccinated ?? false,
+      sterilized: registro.sterilized ?? false,
+      contact_name: registro.contact_name ?? '',
+      contact_phone: registro.contact_phone ?? '',
+      location: registro.location ?? '',
     });
   }
 

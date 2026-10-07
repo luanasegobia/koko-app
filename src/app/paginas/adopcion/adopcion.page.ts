@@ -118,10 +118,9 @@ export class AdopcionPage {
     this.gestorChat.abrir({ tipoDeContexto: 'adoption', idDeContexto: mascota.id, tituloDeContexto: mascota.name });
   }
 
-  protected eliminarMascota(mascota: MascotaAdopcion): () => Promise<void> {
-    return async () => {
-      await this.supabase.mascotasEnAdopcion.eliminar(mascota.id);
-      await this.cargar();
-    };
-  }
+  /** Referencia estable: se pasa tal cual a cada tarjeta, sin crear una función por ciclo. */
+  protected readonly eliminarMascota = async (mascota: MascotaAdopcion): Promise<void> => {
+    await this.supabase.mascotasEnAdopcion.eliminar(mascota.id);
+    await this.cargar();
+  };
 }

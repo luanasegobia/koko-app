@@ -73,7 +73,7 @@ import { Mascota } from '../../core/modelos';
       transition: box-shadow 0.3s;
 
       &:hover {
-        box-shadow: 0 10px 25px -10px rgba(15, 23, 42, 0.3);
+        box-shadow: 0 10px 25px -10px rgba(var(--koko-sombra-rgb), 0.3);
       }
     }
 
@@ -136,7 +136,7 @@ import { Mascota } from '../../core/modelos';
       height: 112px;
       border-radius: 10px;
       border: 1px solid var(--ion-border-color);
-      background: #fff;
+      background: var(--koko-fondo-qr);
 
       &.cargando-qr {
         background: rgba(var(--ion-color-medium-rgb), 0.15);

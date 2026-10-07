@@ -87,10 +87,9 @@ export class CasosUrgentesPage {
     void this.cargar();
   }
 
-  protected eliminarCaso(caso: CasoUrgente): () => Promise<void> {
-    return async () => {
-      await this.supabase.casosUrgentes.eliminar(caso.id);
-      await this.cargar();
-    };
-  }
+  /** Referencia estable: se pasa tal cual a cada tarjeta, sin crear una función por ciclo. */
+  protected readonly eliminarCaso = async (caso: CasoUrgente): Promise<void> => {
+    await this.supabase.casosUrgentes.eliminar(caso.id);
+    await this.cargar();
+  };
 }

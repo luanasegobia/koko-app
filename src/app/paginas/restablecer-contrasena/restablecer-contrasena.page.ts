@@ -1,16 +1,11 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonButton, IonIcon, IonInput, IonInputPasswordToggle, IonSpinner } from '@ionic/angular';
 import { LayoutAuthComponent } from '../../compartido/layout-auth/layout-auth.component';
 import { mensajeDeError } from '../../core/mensaje-de-error';
+import { camposCoinciden } from '../../core/validadores';
 import { AuthService } from '../../core/servicios/auth.service';
-
-function contrasenasCoinciden(grupo: AbstractControl): ValidationErrors | null {
-  const nueva = grupo.get('nueva')?.value;
-  const confirmacion = grupo.get('confirmacion')?.value;
-  return nueva && confirmacion && nueva !== confirmacion ? { noCoinciden: true } : null;
-}
 
 /** Se llega desde el enlace del correo de recuperación, que trae la sesión en la URL. */
 @Component({
@@ -118,7 +113,7 @@ export class RestablecerContrasenaPage implements OnInit, OnDestroy {
       nueva: ['', [Validators.required, Validators.minLength(6)]],
       confirmacion: ['', Validators.required],
     },
-    { validators: contrasenasCoinciden },
+    { validators: camposCoinciden('nueva', 'confirmacion') },
   );
 
   ngOnInit(): void {

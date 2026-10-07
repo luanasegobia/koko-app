@@ -93,10 +93,9 @@ export class IdentificacionPage {
     void this.cargar();
   }
 
-  protected eliminarMascota(mascota: Mascota): () => Promise<void> {
-    return async () => {
-      await this.supabase.mascotas.eliminar(mascota.id);
-      await this.cargar();
-    };
-  }
+  /** Referencia estable: se pasa tal cual a cada tarjeta, sin crear una función por ciclo. */
+  protected readonly eliminarMascota = async (mascota: Mascota): Promise<void> => {
+    await this.supabase.mascotas.eliminar(mascota.id);
+    await this.cargar();
+  };
 }

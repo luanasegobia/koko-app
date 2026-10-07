@@ -78,11 +78,11 @@
                 <div class="acciones">
                   <!-- La ficha la edita quien la registró; darla de baja queda para administración. -->
                   <app-acciones-de-duenio
-                    [registro]="$any(item.veterinaria)"
+                    [registro]="item.veterinaria"
                     columnaAutor="registered_by_user_id"
                     [etiqueta]="'la ficha de ' + item.veterinaria.name"
                     [soloAdminPuedeEliminar]="true"
-                    [eliminar]="eliminarVeterinaria(item.veterinaria)"
+                    [eliminar]="eliminarVeterinaria"
                     (editar)="enEdicion.set(item.veterinaria)"
                   />
                 </div>

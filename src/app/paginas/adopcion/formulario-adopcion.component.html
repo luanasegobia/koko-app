@@ -10,7 +10,8 @@
 
   <div class="campos-en-fila-tres">
     <ion-input label="Raza" labelPlacement="stacked" fill="outline" formControlName="breed" placeholder="Ej: Golden"></ion-input>
-    <ion-input label="Edad" labelPlacement="stacked" fill="outline" type="number" inputmode="numeric" [min]="0" formControlName="age_years" placeholder="Años"></ion-input>
+    <ion-input label="Edad" labelPlacement="stacked" fill="outline" type="number" inputmode="numeric" [min]="0" formControlName="age_years"
+      errorText="La edad no puede ser negativa" placeholder="Años"></ion-input>
     <ion-select label="Sexo" labelPlacement="stacked" fill="outline" formControlName="sex" interface="popover">
       <ion-select-option value="macho">Macho</ion-select-option>
       <ion-select-option value="hembra">Hembra</ion-select-option>

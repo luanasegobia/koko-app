@@ -72,7 +72,7 @@ import { IonContent, IonIcon } from '@ionic/angular';
       border: 1px solid var(--ion-border-color);
       border-radius: 20px;
       padding: 28px;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+      box-shadow: 0 1px 3px rgba(var(--koko-sombra-rgb), 0.06);
     }
 
     .pie {

@@ -64,11 +64,18 @@ export class CompletarPerfilPage {
     vet_services: '',
   });
 
+  /**
+   * Campos obligatorios según el tipo de cuenta. Para veterinarias son los
+   * mismos que exige la ficha (nombre, dirección y teléfono): sin teléfono, el
+   * botón "Llamar" del directorio quedaría apuntando a la nada.
+   */
   protected puedeEnviar(): boolean {
     const valores = this.formulario.getRawValue();
     if (this.tipoDeCuenta() === 'organizacion' && !valores.organization_name.trim()) return false;
-    if (this.esVeterinario() && (!valores.vet_clinic_name.trim() || !valores.vet_address.trim())) {
-      return false;
+    if (this.esVeterinario()) {
+      return [valores.vet_clinic_name, valores.vet_address, valores.vet_phone].every((campo) =>
+        Boolean(campo.trim()),
+      );
     }
     return true;
   }
@@ -95,7 +102,7 @@ export class CompletarPerfilPage {
         await this.supabase.veterinarias.crear({
           name: valores.vet_clinic_name.trim(),
           address: valores.vet_address.trim(),
-          phone: valores.vet_phone || valores.phone,
+          phone: valores.vet_phone.trim(),
           services: valores.vet_services,
           bio: valores.bio,
           is_emergency: false,

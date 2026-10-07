@@ -118,7 +118,7 @@ const ROLES: OpcionDeRol[] = [
       border-radius: 10px;
       background: var(--ion-card-background);
       color: var(--color-rol);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 1px 2px rgba(var(--koko-sombra-rgb), 0.08);
 
       ion-icon {
         font-size: 20px;
