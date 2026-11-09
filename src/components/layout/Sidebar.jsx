@@ -30,7 +30,7 @@ export default function Sidebar() {
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-sidebar border-b border-sidebar-border px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <PawPrint className="w-6 h-6 text-primary" />
+          <PawPrint className="w-6 h-6 text-sidebar-primary" />
           <span className="font-heading font-bold text-sidebar-foreground text-lg">Koko</span>
         </div>
         <div className="flex items-center gap-1">
@@ -51,12 +51,12 @@ export default function Sidebar() {
         <div className="p-5 border-b border-sidebar-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                <PawPrint className="w-6 h-6 text-primary" />
+              <div className="w-10 h-10 rounded-xl bg-sidebar-primary/20 flex items-center justify-center">
+                <PawPrint className="w-6 h-6 text-sidebar-primary" />
               </div>
               <div>
                 <h1 className="font-heading font-bold text-sidebar-foreground text-lg leading-tight">Conectando</h1>
-                <h1 className="font-heading font-bold text-primary text-lg leading-tight">Huellas</h1>
+                <h1 className="font-heading font-bold text-sidebar-primary text-lg leading-tight">Huellas</h1>
               </div>
             </div>
             <NotificationBell />
@@ -73,7 +73,7 @@ export default function Sidebar() {
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive ?
-                "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-primary/20" :
+                "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-black/20" :
                 "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"}`
                 }>
                 <item.icon className="w-4.5 h-4.5" />
@@ -125,7 +125,7 @@ export default function Sidebar() {
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                   location.pathname.startsWith("/admin")
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-primary/20"
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-black/20"
                     : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
                 }`}
               >

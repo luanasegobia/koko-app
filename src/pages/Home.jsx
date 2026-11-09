@@ -320,7 +320,7 @@ export default function Home() {
           animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.6, 0.4] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
         
-        <div className="absolute top-1/3 left-1/2 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 left-1/2 w-48 h-48 bg-sidebar-primary/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 p-8 md:p-12 max-w-3xl space-y-7">
           {/* Badge */}
@@ -328,15 +328,15 @@ export default function Home() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.25 }}
-            className="inline-flex items-center gap-2 bg-primary/20 border border-primary/35 rounded-full px-4 py-1.5">
+            className="inline-flex items-center gap-2 bg-sidebar-primary/20 border border-sidebar-primary/35 rounded-full px-4 py-1.5">
             
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 8, repeat: Infinity, ease: "linear" }}>
               
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
+              <Sparkles className="w-3.5 h-3.5 text-sidebar-primary" />
             </motion.div>
-            <span className="text-primary font-heading font-bold text-xs uppercase tracking-widest">
+            <span className="text-sidebar-primary font-heading font-bold text-xs uppercase tracking-widest">
               Conectando Huellas · Orán
             </span>
           </motion.div>
@@ -350,10 +350,10 @@ export default function Home() {
             
             <h1 className="font-heading text-4xl md:text-6xl font-extrabold text-white leading-tight">
               Bienvenidos a{" "}
-              <span className="text-primary relative">
+              <span className="text-sidebar-primary relative">
                 Koko
                 <motion.span
-                  className="absolute -bottom-1 left-0 h-1 bg-primary rounded-full"
+                  className="absolute -bottom-1 left-0 h-1 bg-sidebar-primary rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: "100%" }}
                   transition={{ delay: 0.9, duration: 0.6, ease: "easeOut" }} />
@@ -385,14 +385,14 @@ export default function Home() {
                 placeholder="Buscar por raza, zona o nombre..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 bg-white/10 border border-white/20 text-white pl-9 pr-3 rounded-xl placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm backdrop-blur-sm transition-all" />
+                className="w-full h-10 bg-white/10 border border-white/20 text-white pl-9 pr-3 rounded-xl placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-sidebar-primary focus:border-sidebar-primary text-sm backdrop-blur-sm transition-all" />
               
             </div>
             <motion.button
               type="submit"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="h-10 px-5 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-primary/40">
+              className="h-10 px-5 bg-sidebar-primary hover:bg-sidebar-primary/90 text-sidebar-primary-foreground font-bold rounded-xl text-sm transition-colors shadow-lg shadow-sidebar-primary/40">
               
               Buscar
             </motion.button>
@@ -484,7 +484,7 @@ export default function Home() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/90 to-emerald-600 p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-primary/20">
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary to-sidebar p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-primary/20">
         
         <motion.div
           className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"

@@ -1,82 +1,92 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Temática Koko. La paleta sale del diseño de referencia
+ * (docs/koko_splash_login):
+ *
+ *   crema        #FAEDCD   fondo
+ *   azul noche   #313857   texto y contornos
+ *   azul acero   #598099   campos, enlaces y acción principal
+ *   celeste      #A0C2D5   botones secundarios
+ *   naranja      #E38B3D   realces y gráficos (oscurecido donde va como texto)
+ */
 @layer base {
   :root {
-    --font-heading: 'Plus Jakarta Sans', sans-serif;
-    --font-body: 'Inter', sans-serif;
+    --font-heading: 'Fredoka', sans-serif;
+    --font-body: 'Quicksand', sans-serif;
 
-    --background: 0 0% 97%;
-    --foreground: 274 64% 43%;
-    --card: 0 0% 100%;
-    --card-foreground: 278 34% 56%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
-    --primary: 160 84% 39%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 95%;
-    --secondary-foreground: 220 20% 10%;
-    --muted: 220 14% 95%;
-    --muted-foreground: 220 10% 46%;
-    --accent: 35 92% 55%;
-    --accent-foreground: 0 0% 100%;
+    --background: 43 82% 89%;
+    --foreground: 229 28% 27%;
+    --card: 40 100% 96%;
+    --card-foreground: 229 28% 27%;
+    --popover: 40 100% 96%;
+    --popover-foreground: 229 28% 27%;
+    --primary: 203 26% 47%;
+    --primary-foreground: 43 82% 89%;
+    --secondary: 202 39% 73%;
+    --secondary-foreground: 229 28% 27%;
+    --muted: 43 55% 83%;
+    --muted-foreground: 229 16% 40%;
+    --accent: 26 78% 44%;
+    --accent-foreground: 40 100% 96%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 90%;
-    --input: 220 13% 90%;
-    --ring: 160 84% 39%;
-    --chart-1: 160 84% 39%;
-    --chart-2: 35 92% 55%;
-    --chart-3: 220 70% 50%;
-    --chart-4: 0 72% 51%;
-    --chart-5: 280 65% 60%;
-    --radius: 0.75rem;
-    --sidebar-background: 220 25% 11%;
-    --sidebar-foreground: 220 14% 85%;
-    --sidebar-primary: 160 84% 39%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 18%;
-    --sidebar-accent-foreground: 220 14% 85%;
-    --sidebar-border: 220 20% 18%;
-    --sidebar-ring: 160 84% 39%;
+    --border: 43 40% 76%;
+    --input: 43 40% 76%;
+    --ring: 203 26% 47%;
+    --chart-1: 203 26% 47%;
+    --chart-2: 28 75% 56%;
+    --chart-3: 229 28% 27%;
+    --chart-4: 202 39% 73%;
+    --chart-5: 34 48% 71%;
+    --radius: 1rem;
+    --sidebar-background: 229 28% 27%;
+    --sidebar-foreground: 43 82% 89%;
+    --sidebar-primary: 202 39% 73%;
+    --sidebar-primary-foreground: 229 28% 27%;
+    --sidebar-accent: 229 26% 34%;
+    --sidebar-accent-foreground: 43 82% 89%;
+    --sidebar-border: 229 24% 35%;
+    --sidebar-ring: 202 39% 73%;
   }
 
   .dark {
-    --background: 220 25% 7%;
-    --foreground: 220 14% 95%;
-    --card: 220 25% 11%;
-    --card-foreground: 220 14% 95%;
-    --popover: 220 25% 11%;
-    --popover-foreground: 220 14% 95%;
-    --primary: 160 84% 39%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 20% 18%;
-    --secondary-foreground: 220 14% 95%;
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 10% 55%;
-    --accent: 35 92% 55%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 229 30% 13%;
+    --foreground: 43 82% 89%;
+    --card: 229 28% 18%;
+    --card-foreground: 43 82% 89%;
+    --popover: 229 28% 18%;
+    --popover-foreground: 43 82% 89%;
+    --primary: 202 39% 73%;
+    --primary-foreground: 229 30% 16%;
+    --secondary: 203 26% 40%;
+    --secondary-foreground: 43 82% 89%;
+    --muted: 229 24% 22%;
+    --muted-foreground: 43 30% 72%;
+    --accent: 28 75% 56%;
+    --accent-foreground: 229 30% 13%;
+    --destructive: 0 62.8% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 20% 18%;
-    --input: 220 20% 18%;
-    --ring: 160 84% 39%;
-    --chart-1: 160 84% 39%;
-    --chart-2: 35 92% 55%;
-    --chart-3: 220 70% 50%;
-    --chart-4: 0 72% 51%;
-    --chart-5: 280 65% 60%;
-    --sidebar-background: 220 25% 7%;
-    --sidebar-foreground: 220 14% 85%;
-    --sidebar-primary: 160 84% 39%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 14%;
-    --sidebar-accent-foreground: 220 14% 85%;
-    --sidebar-border: 220 20% 14%;
-    --sidebar-ring: 160 84% 39%;
+    --border: 229 22% 28%;
+    --input: 229 22% 28%;
+    --ring: 202 39% 73%;
+    --chart-1: 202 39% 73%;
+    --chart-2: 28 75% 56%;
+    --chart-3: 43 82% 89%;
+    --chart-4: 203 26% 47%;
+    --chart-5: 34 48% 71%;
+    --sidebar-background: 229 32% 10%;
+    --sidebar-foreground: 43 82% 89%;
+    --sidebar-primary: 202 39% 73%;
+    --sidebar-primary-foreground: 229 30% 16%;
+    --sidebar-accent: 229 26% 18%;
+    --sidebar-accent-foreground: 43 82% 89%;
+    --sidebar-border: 229 24% 20%;
+    --sidebar-ring: 202 39% 73%;
   }
 }
 
@@ -86,5 +96,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
   }
 }
