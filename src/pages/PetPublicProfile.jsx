@@ -15,7 +15,9 @@ export default function PetPublicProfile() {
 
   const { data: pets = [], isLoading } = useQuery({
     queryKey: ["publicPet", qrId],
-    queryFn: () => db.entities.Pet.filter({ qr_id: qrId }),
+    // La tabla pet no es de lectura pública (tiene teléfonos): la ficha se pide
+    // por el código del QR y la base devuelve solo esa mascota.
+    queryFn: () => db.rpc("ficha_publica_mascota", { codigo: qrId }),
     enabled: !!qrId,
   });
 

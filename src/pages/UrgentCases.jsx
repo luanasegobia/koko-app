@@ -172,7 +172,7 @@ function UrgentCaseCard({ caseData: c, index, onEditar, onEliminar }) {
         )}
 
         <div className="flex gap-2 flex-wrap">
-          <BotonDonarStripe caseId={c.id} title={c.title} donationAlias={c.donation_alias} />
+          <BotonDonarStripe caseId={c.id} title={c.title} />
           <Button variant="outline" className="flex-1">
             <Bell className="w-4 h-4 mr-1" /> Seguir caso
           </Button>

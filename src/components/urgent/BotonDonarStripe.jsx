@@ -8,7 +8,7 @@ import { redirigirAStripe } from "@/lib/stripe";
 import { hayStripeConfigurado } from "@/api/entorno";
 import { mensajeDeError } from "@/lib/mensajeDeError";
 
-export default function BotonDonarStripe({ caseId, title, donationAlias }) {
+export default function BotonDonarStripe({ caseId, title }) {
   const [open, setOpen] = useState(false);
   const [monto, setMonto] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,7 +24,7 @@ export default function BotonDonarStripe({ caseId, title, donationAlias }) {
     setLoading(true);
     setError("");
     try {
-      await redirigirAStripe({ caseId, title, amount: cantidad, donationAlias });
+      await redirigirAStripe({ caseId, amount: cantidad });
     } catch (err) {
       setError(mensajeDeError(err));
       setLoading(false);

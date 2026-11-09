@@ -44,7 +44,9 @@ export default function AbuseReports() {
 
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ["abuseReports"],
-    queryFn: () => db.entities.AbuseReport.list("-created_at", 100),
+    // La tabla ya no se puede leer entera: la función devuelve solo lo que es
+    // público de cada denuncia (sin datos de contacto, autor ni código).
+    queryFn: () => db.rpc("denuncias_publicas"),
   });
 
   const filtered = useMemo(() => {

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { db } from "@/api/supabaseClient";
+import { mensajeDeError } from "@/lib/mensajeDeError";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,19 +18,28 @@ export default function TrackingLookup() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [notFound, setNotFound] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSearch = async (e) => {
     e.preventDefault();
     setLoading(true);
     setNotFound(false);
+    setError("");
     setResult(null);
-    const reports = await db.entities.AbuseReport.filter({ tracking_code: code.toUpperCase() });
-    if (reports.length > 0) {
-      setResult(reports[0]);
-    } else {
-      setNotFound(true);
+    try {
+      // El código es lo único que abre la denuncia: la base la busca por él y
+      // devuelve solo el estado, sin datos de quien denunció.
+      const reports = await db.rpc("consultar_denuncia", { codigo: code });
+      if (reports?.length > 0) {
+        setResult(reports[0]);
+      } else {
+        setNotFound(true);
+      }
+    } catch (e) {
+      setError(mensajeDeError(e));
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -40,6 +50,8 @@ export default function TrackingLookup() {
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
         </Button>
       </form>
+
+      {error && <p className="text-sm text-destructive text-center py-4">{error}</p>}
 
       {notFound && (
         <p className="text-sm text-muted-foreground text-center py-4">No se encontró ninguna denuncia con ese código.</p>
