@@ -148,6 +148,16 @@ Solo si vas a modificar el esquema:
 
 ---
 
+### Datos de demostración
+
+`supabase/seed_demo.sql` carga cuentas ficticias y publicaciones de ejemplo en Orán
+(mascotas perdidas con avistamientos, adopciones, veterinarias, casos urgentes, denuncias,
+fichas QR y un chat) para el manual de usuario y la defensa del proyecto. Se pega en el
+SQL Editor del panel y es re-ejecutable. Las cuentas y su contraseña están en el
+encabezado del archivo.
+
+---
+
 ## Comandos
 
 | Comando | Qué hace |
