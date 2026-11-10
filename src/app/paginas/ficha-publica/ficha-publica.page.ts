@@ -28,8 +28,12 @@ export class FichaPublicaPage implements OnInit {
       return;
     }
     try {
-      const resultados = await this.supabase.mascotas.filtrar({ qr_id: qrId });
-      this.mascota.set(resultados[0] ?? null);
+      // La tabla pet no es de lectura pública (tiene teléfonos): la ficha se
+      // pide por el código del QR y la base devuelve solo esa mascota.
+      const resultados = await this.supabase.rpc<Mascota[]>('ficha_publica_mascota', {
+        codigo: qrId,
+      });
+      this.mascota.set(resultados?.[0] ?? null);
     } catch (error) {
       console.error('No se pudo cargar la ficha:', error);
     } finally {

@@ -13,5 +13,8 @@ additional_redirect_urls = ["http://localhost:5173", "http://localhost:5173/**"]
 enabled = true
 
 [functions.create-checkout-session]
-# Sin esto la función queda invocable de forma anónima con cualquier monto.
+# verify_jwt no exige una persona con sesión: la clave anónima también es un JWT
+# válido, y donar sin cuenta es un caso de uso. Lo que protege a la función es
+# que valida el monto, lee el caso de la base y arma ella las URLs de retorno.
+# Necesita los secretos STRIPE_SECRET_KEY y, en producción, ORIGENES_PERMITIDOS.
 verify_jwt = true

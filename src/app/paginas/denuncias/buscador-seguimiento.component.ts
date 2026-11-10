@@ -104,9 +104,11 @@ export class BuscadorSeguimientoComponent {
     this.noEncontrada.set(false);
     this.resultado.set(null);
     try {
-      const codigo = this.formulario.controls.codigo.value.trim().toUpperCase();
-      const denuncias = await this.supabase.denuncias.filtrar({ tracking_code: codigo });
-      if (denuncias.length > 0) this.resultado.set(denuncias[0]);
+      // El código es lo único que abre la denuncia: la base la busca por él y
+      // devuelve solo el estado, sin datos de quien denunció.
+      const codigo = this.formulario.controls.codigo.value;
+      const denuncias = await this.supabase.rpc<Denuncia[]>('consultar_denuncia', { codigo });
+      if (denuncias?.length > 0) this.resultado.set(denuncias[0]);
       else this.noEncontrada.set(true);
     } catch (error) {
       await this.avisos.error(mensajeDeError(error));

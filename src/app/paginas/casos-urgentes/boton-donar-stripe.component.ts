@@ -122,7 +122,6 @@ export class BotonDonarStripeComponent {
 
   readonly idDeCaso = input.required<string>();
   readonly titulo = input.required<string>();
-  readonly aliasDeDonacion = input<string>();
 
   protected readonly habilitado = hayStripeConfigurado();
   protected readonly abierto = signal(false);
@@ -148,12 +147,7 @@ export class BotonDonarStripeComponent {
     this.cargando.set(true);
     this.error.set('');
     try {
-      await this.stripe.redirigirADonar({
-        idDeCaso: this.idDeCaso(),
-        titulo: this.titulo(),
-        monto,
-        aliasDeDonacion: this.aliasDeDonacion(),
-      });
+      await this.stripe.redirigirADonar({ idDeCaso: this.idDeCaso(), monto });
     } catch (error) {
       this.error.set(mensajeDeError(error));
       this.cargando.set(false);
