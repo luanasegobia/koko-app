@@ -32,5 +32,6 @@ Estas reglas de personalización aplican a cualquier agente de inteligencia arti
 - **Nunca trabajar sobre `main`:** Antes de modificar código, si la rama actual es `main` se debe crear una rama nueva (`git checkout -b feat/nombre-descriptivo`). Los cambios llegan a `main` únicamente mediante Pull Request.
 - **Prefijos de rama:** `feat/`, `fix/`, `refactor/`, `chore/` o `docs/` según el tipo de cambio.
 - **Push y merge:** No ejecutar `git push` ni mergear a `main` salvo pedido explícito de la persona con la que se trabaja.
+- **Verificar el Pull Request antes de sumar cambios:** Antes de agregar un commit a una rama que ya tiene un Pull Request, comprobar su estado (`gh pr view <número> --json state`). Si está mergeado o cerrado, no se commitea en esa rama: se actualiza `main`, se crea una rama nueva y se abre un Pull Request nuevo. Un commit subido a una rama ya mergeada no llega a `main` y nadie lo nota. Lo mismo vale para un Pull Request apilado sobre otra rama: comprobar que esa rama base no se haya mergeado ya.
 - **Reportar la rama:** Al terminar, indicar siempre en qué rama quedaron los commits.
 - El flujo completo, la convención de commits y el checklist previo al Pull Request están documentados en [`CONTRIBUTING.md`](../CONTRIBUTING.md).

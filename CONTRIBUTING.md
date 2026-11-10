@@ -37,6 +37,15 @@ un Pull Request.
 6. **Abrí un Pull Request** hacia `main` y esperá la revisión de al menos una
    persona del equipo antes de mergear.
 
+7. **Antes de sumar otro cambio a la misma rama, fijate si el Pull Request sigue
+   abierto:**
+   ```bash
+   gh pr view <número> --json state
+   ```
+   Si ya está mergeado o cerrado, **no sigas commiteando en esa rama**: volvé al
+   paso 1 y arrancá una rama nueva. Un commit que se sube a una rama ya mergeada
+   queda en la rama y no llega a `main`, sin ningún aviso. Ya nos pasó dos veces.
+
 ## Convención de nombres de rama
 
 Usá el prefijo que corresponda al tipo de cambio, seguido de una descripción corta
@@ -104,3 +113,6 @@ Puntualmente:
 - No hagas `push` ni mergees a `main` sin que la persona con la que trabajás lo pida
   explícitamente.
 - Reportá siempre en qué rama quedaron los cambios.
+- Antes de sumar un commit a una rama que ya tiene Pull Request, verificá que siga
+  abierto (paso 7 del flujo de trabajo). Si se mergeó o se cerró, rama nueva desde
+  `main` y Pull Request nuevo. Hacelo antes de editar, no después de subir.
