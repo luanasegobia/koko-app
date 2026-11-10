@@ -3,9 +3,7 @@ import { SupabaseService } from './supabase.service';
 
 export interface DatosDeDonacion {
   idDeCaso: string;
-  titulo: string;
   monto: number;
-  aliasDeDonacion?: string;
 }
 
 /**
@@ -16,23 +14,19 @@ export interface DatosDeDonacion {
 export class StripeService {
   private readonly supabase = inject(SupabaseService);
 
-  async crearSesionDeDonacion({ idDeCaso, titulo, monto, aliasDeDonacion }: DatosDeDonacion) {
-    const base = window.location.origin;
+  // Solo viajan el caso y el monto. El título, el alias y las URLs de retorno
+  // los resuelve la función del lado del servidor: si los mandara el navegador,
+  // cualquiera podría crear un pago con otro texto y otro destino.
+  async crearSesionDeDonacion({ idDeCaso, monto }: DatosDeDonacion) {
     return this.supabase.invocarFuncion<{ sessionId: string; url: string }>(
       'create-checkout-session',
-      {
-        caseId: idDeCaso,
-        title: titulo,
-        amount: monto,
-        donationAlias: aliasDeDonacion,
-        successUrl: `${base}/donar/exito?case_id=${idDeCaso}&status=exito`,
-        cancelUrl: `${base}/donar/exito?case_id=${idDeCaso}&status=cancelado`,
-      },
+      { caseId: idDeCaso, amount: monto },
     );
   }
 
   async redirigirADonar(datos: DatosDeDonacion): Promise<void> {
     const sesion = await this.crearSesionDeDonacion(datos);
+    if (!sesion?.url) throw new Error('No se pudo iniciar el pago');
     window.location.href = sesion.url;
   }
 }
