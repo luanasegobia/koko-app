@@ -88,27 +88,40 @@ export class CompletarPerfilPage {
       tipo_cuenta: this.tipoDeCuenta(),
       profile_completed: true,
       bio: valores.bio,
-      phone: valores.phone,
-      location: valores.location,
     };
+    // El paso de veterinaria no muestra teléfono ni ubicación personales:
+    // mandarlos vacíos borraba los que la persona ya tuviera cargados.
+    if (!this.esVeterinario()) {
+      datos.phone = valores.phone;
+      datos.location = valores.location;
+    }
     if (this.tipoDeCuenta() === 'organizacion') datos.organization_name = valores.organization_name;
 
     try {
-      await this.auth.actualizarPerfil(datos);
-
-      // Si es veterinario, se crea la ficha pendiente de verificación.
+      // La ficha va antes que el perfil: si se marcara el perfil como completo
+      // y la ficha fallara, quedaría una cuenta de veterinaria sin clínica y sin
+      // ninguna pantalla desde donde crearla. Se busca primero una ya existente
+      // para que reintentar después de un error no la duplique.
       // registered_by_user_id lo pone el servidor con auth.uid().
       if (this.esVeterinario()) {
-        await this.supabase.veterinarias.crear({
-          name: valores.vet_clinic_name.trim(),
-          address: valores.vet_address.trim(),
-          phone: valores.vet_phone.trim(),
-          services: valores.vet_services,
-          bio: valores.bio,
-          is_emergency: false,
-          is_verified: false,
-        });
+        const idDeUsuario = this.auth.usuario()?.id;
+        const propias = idDeUsuario
+          ? await this.supabase.veterinarias.filtrar({ registered_by_user_id: idDeUsuario })
+          : [];
+        if (propias.length === 0) {
+          await this.supabase.veterinarias.crear({
+            name: valores.vet_clinic_name.trim(),
+            address: valores.vet_address.trim(),
+            phone: valores.vet_phone.trim(),
+            services: valores.vet_services,
+            bio: valores.bio,
+            is_emergency: false,
+            is_verified: false,
+          });
+        }
       }
+
+      await this.auth.actualizarPerfil(datos);
 
       await this.auth.recargarUsuario();
       // Vuelve a donde la persona quería ir, que es lo que anotó la guardia de perfil.

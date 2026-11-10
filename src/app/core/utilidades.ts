@@ -56,3 +56,31 @@ export async function copiarAlPortapapeles(texto: string): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Edad tal como hay que mandarla a la base: un número (0 incluido) o null si el
+ * campo quedó vacío. El campo numérico de Ionic puede entregar texto vacío.
+ */
+export function edadONull(valor: number | string | null | undefined): number | null {
+  if (valor === null || valor === undefined || valor === '') return null;
+  const numero = Number(valor);
+  return Number.isFinite(numero) ? numero : null;
+}
+
+/**
+ * Enlace de WhatsApp para un teléfono cargado a mano. wa.me solo acepta
+ * dígitos con código de país, y para celulares de Argentina exige el 9 después
+ * del 54. No quita el "15" intercalado de los números viejos: no se puede
+ * distinguir de forma confiable de un número que de verdad lo contiene.
+ */
+export function enlaceDeWhatsApp(telefono: string): string {
+  let digitos = telefono.replace(/\D/g, '').replace(/^00/, '');
+  if (digitos.startsWith('549')) {
+    // Ya está completo.
+  } else if (digitos.startsWith('54')) {
+    digitos = `549${digitos.slice(2)}`;
+  } else {
+    digitos = `549${digitos.replace(/^0/, '')}`;
+  }
+  return `https://wa.me/${digitos}`;
+}

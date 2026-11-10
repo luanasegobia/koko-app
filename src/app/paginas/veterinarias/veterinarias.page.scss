@@ -237,3 +237,13 @@
     opacity: 0;
   }
 }
+
+// La propia ficha, mientras administración todavía no la verificó.
+.pendiente {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(var(--ion-color-warning-rgb), 0.18);
+  color: var(--ion-text-color);
+  font-weight: 600;
+  white-space: nowrap;
+}

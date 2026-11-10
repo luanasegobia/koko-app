@@ -13,6 +13,7 @@ import { SelectorFotoComponent } from '../../compartido/selector-foto/selector-f
 import { mensajeDeError } from '../../core/mensaje-de-error';
 import { Especie, Mascota, Sexo } from '../../core/modelos';
 import { SupabaseService } from '../../core/servicios/supabase.service';
+import { edadONull } from '../../core/utilidades';
 
 /** Alta y edición de la ficha de identificación de una mascota. */
 @Component({
@@ -95,7 +96,9 @@ export class FormularioMascotaComponent implements OnInit {
         photo_url = subida.file_url;
       }
       const valores = this.formulario.getRawValue();
-      const campos: Partial<Mascota> = { ...valores, age_years: valores.age_years || undefined, photo_url };
+      // null y no undefined: al serializar, undefined desaparece y vaciar la
+      // edad dejaba el valor viejo en la base.
+      const campos: Partial<Mascota> = { ...valores, age_years: edadONull(valores.age_years), photo_url };
 
       const registro = this.registroInicial();
       if (registro) {

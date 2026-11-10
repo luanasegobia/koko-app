@@ -131,7 +131,12 @@ export class DenunciasPage {
     }
   }
 
-  protected alEnviar(): void {
+  /**
+   * Se llama cuando el modal termina de cerrarse, sea con el botón "Cerrar",
+   * la X, Esc o tocando afuera. Antes el listado solo se actualizaba con el
+   * botón, y una denuncia recién enviada podía no aparecer.
+   */
+  protected alCerrarFormulario(): void {
     this.mostrarFormulario.set(false);
     void this.cargar();
   }

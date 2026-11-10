@@ -74,7 +74,11 @@
                   <ion-icon [name]="item.estado.icono"></ion-icon>
                   {{ item.estado.etiqueta }}
                 </span>
-                <span class="verificada texto-mini">✓ Verificada</span>
+                @if (item.veterinaria.is_verified) {
+                  <span class="verificada texto-mini">✓ Verificada</span>
+                } @else {
+                  <span class="pendiente texto-mini">Pendiente de verificación</span>
+                }
                 <div class="acciones">
                   <!-- La ficha la edita quien la registró; darla de baja queda para administración. -->
                   <app-acciones-de-duenio

@@ -14,6 +14,7 @@ import { SelectorFotoComponent } from '../../compartido/selector-foto/selector-f
 import { mensajeDeError } from '../../core/mensaje-de-error';
 import { Coordenadas, Especie, MascotaPerdida } from '../../core/modelos';
 import { SupabaseService } from '../../core/servicios/supabase.service';
+import { edadONull } from '../../core/utilidades';
 
 /** Alta y edición de un reporte de mascota perdida. `registroInicial` llega al editar. */
 @Component({
@@ -111,9 +112,11 @@ export class FormularioMascotaPerdidaComponent implements OnInit, AfterViewInit 
       const valores = this.formulario.getRawValue();
       const campos: Partial<MascotaPerdida> = {
         ...valores,
-        age_years: valores.age_years || undefined,
-        last_seen_lat: this.ubicacion().lat,
-        last_seen_lng: this.ubicacion().lng,
+        // null y no undefined: al serializar, undefined desaparece, así que
+        // vaciar la edad o quitar la ubicación dejaba el valor viejo en la base.
+        age_years: edadONull(valores.age_years),
+        last_seen_lat: this.ubicacion().lat ?? null,
+        last_seen_lng: this.ubicacion().lng ?? null,
         photo_url,
       };
 

@@ -125,8 +125,11 @@ export class PerdidasPage {
         },
       }));
 
-    const deAvistamientos: Marcador[] = this.mascotas().flatMap((m) =>
-      (m.sightings || [])
+    // Salen de la lista ya filtrada, igual que las mascotas: antes se armaban
+    // con todas y el mapa mostraba avistamientos de publicaciones ocultas por
+    // los filtros. sightings es JSONB sin validar, por eso el Array.isArray.
+    const deAvistamientos: Marcador[] = this.filtradas().flatMap((m) =>
+      (Array.isArray(m.sightings) ? m.sightings : [])
         .filter((s) => s.lat && s.lng)
         .map((s, i) => ({
           id: `${m.id}-avistamiento-${i}`,

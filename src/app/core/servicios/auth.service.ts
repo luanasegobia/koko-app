@@ -179,13 +179,18 @@ export class AuthService {
     try {
       const perfil = await this.obtenerPerfil();
       if (miGeneracion !== this.generacion) return null;
-      this.usuario.set(perfil);
+      // supabase-js avisa SIGNED_IN cada vez que se vuelve a la pestaña. Si el
+      // perfil no cambió no se toca el signal, para no reiniciar todo lo que
+      // depende de él (notificaciones, guardias).
+      if (JSON.stringify(perfil) !== JSON.stringify(this.usuario())) this.usuario.set(perfil);
       return perfil;
     } catch (error) {
       if (miGeneracion !== this.generacion) return null;
+      // Un fallo de red no es un cierre de sesión: se conserva lo que ya había.
+      // Antes se ponía el usuario en null y la persona aparecía deslogueada en
+      // medio de la sesión.
       console.error('No se pudo cargar la sesión:', error);
-      this.usuario.set(null);
-      return null;
+      return this.usuario();
     } finally {
       if (miGeneracion === this.generacion) this.terminarCarga();
     }
@@ -194,14 +199,30 @@ export class AuthService {
   private async obtenerPerfil(): Promise<Perfil | null> {
     const {
       data: { user },
+      error: errorDeUsuario,
     } = await this.supabase.cliente.auth.getUser();
-    if (!user) return null;
+    if (!user) {
+      // Un rechazo del servidor (4xx) es una sesión vencida o inexistente. Lo
+      // demás es un problema de red: si hay una sesión guardada, se avisa en
+      // vez de tratar a la persona como si no hubiera entrado.
+      const estado = (errorDeUsuario as { status?: number } | null)?.status;
+      const rechazada = typeof estado === 'number' && estado >= 400 && estado < 500;
+      if (errorDeUsuario && !rechazada) {
+        const { data } = await this.supabase.cliente.auth.getSession();
+        if (data.session) throw errorDeUsuario;
+      }
+      return null;
+    }
 
-    const { data: perfil } = await this.supabase.cliente
+    const { data: perfil, error } = await this.supabase.cliente
       .from('profiles')
       .select(PERFIL_VISIBLE)
       .eq('id', user.id)
       .maybeSingle();
+    // Si la lectura falla no se puede saber si el perfil está completo. Seguir
+    // con un perfil vacío mandaba a la persona al onboarding, y guardar ahí le
+    // pisaba los datos reales.
+    if (error) throw error;
 
     const datosDePerfil = (perfil || {}) as Partial<Perfil>;
     return {

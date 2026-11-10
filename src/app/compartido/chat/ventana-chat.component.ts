@@ -87,7 +87,9 @@ export class VentanaChatComponent implements OnInit, OnDestroy {
   protected async enviar(): Promise<void> {
     const texto = this.texto().trim();
     const usuario = this.usuario();
-    if (!texto || !usuario) return;
+    // Enter no pasa por el botón deshabilitado: sin este freno, apretarlo dos
+    // veces seguidas mandaba el mensaje dos veces.
+    if (!texto || !usuario || this.enviando()) return;
 
     const { idConversacion, tipoDeContexto, idDeContexto, tituloDeContexto } = this.chat();
     this.enviando.set(true);

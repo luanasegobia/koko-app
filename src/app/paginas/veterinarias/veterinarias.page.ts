@@ -63,10 +63,15 @@ export class VeterinariasPage {
   protected readonly vista = signal<'lista' | 'mapa'>('lista');
   protected readonly enEdicion = signal<Veterinaria | null>(null);
 
-  /** Solo las verificadas, con emergencias primero y abiertas antes que cerradas. */
+  /**
+   * Las verificadas, más la propia aunque siga pendiente: quien la registró
+   * tiene que poder verla y corregirla mientras espera la verificación. Las
+   * políticas de la base ya devuelven solo esas dos clases de fila.
+   * Emergencias primero y abiertas antes que cerradas.
+   */
   protected readonly ordenadas = computed<VeterinariaConEstado[]>(() =>
     this.veterinarias()
-      .filter((v) => v.is_verified)
+      .filter((v) => v.is_verified || this.esPropia(v))
       .map((veterinaria) => ({ veterinaria, estado: estadoDeVeterinaria(veterinaria) }))
       .sort((a, b) => {
         if (a.veterinaria.is_emergency && !b.veterinaria.is_emergency) return -1;
@@ -107,6 +112,11 @@ export class VeterinariasPage {
         },
       })),
   );
+
+  private esPropia(veterinaria: Veterinaria): boolean {
+    const idDeUsuario = this.auth.usuario()?.id;
+    return Boolean(idDeUsuario) && veterinaria.registered_by_user_id === idDeUsuario;
+  }
 
   ionViewWillEnter(): void {
     void this.cargar();

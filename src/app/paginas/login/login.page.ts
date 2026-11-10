@@ -67,8 +67,10 @@ export class LoginPage {
   }
 
   continuarConGoogle(): void {
-    // Sin destino: el servicio arma la URL absoluta que exige Supabase.
-    void this.auth.iniciarConProveedor('google').catch((error) => this.error.set(mensajeDeError(error)));
+    // El servicio arma la URL absoluta que exige Supabase a partir del destino.
+    void this.auth
+      .iniciarConProveedor('google', this.destino())
+      .catch((error) => this.error.set(mensajeDeError(error)));
   }
 
   /** A dónde volver después de entrar: lo que pidió ?redirect=, si es una ruta de la app. */

@@ -1,5 +1,7 @@
 import { Component, inject, output, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonBadge, IonButton, IonIcon } from '@ionic/angular';
+import { Notificacion } from '../../core/modelos';
 import { HaceTiempoPipe } from '../../core/pipes/fecha.pipe';
 import { NotificacionesService } from '../../core/servicios/notificaciones.service';
 import { PanelAlertasComponent } from './panel-alertas.component';
@@ -22,8 +24,26 @@ const ICONO_POR_TIPO: Record<string, { nombre: string; color: string }> = {
 })
 export class PanelNotificacionesComponent {
   protected readonly notificaciones = inject(NotificacionesService);
+  private readonly router = inject(Router);
   protected readonly pestania = signal<'lista' | 'configuracion'>('lista');
   readonly cerrar = output<void>();
+
+  /**
+   * Marca la notificación como leída y lleva a la pantalla a la que apunta.
+   * Antes solo la marcaba: cada notificación trae su `link`, pero nadie lo
+   * usaba, así que tocarla no llevaba a ningún lado.
+   */
+  protected abrir(notificacion: Notificacion): void {
+    if (!notificacion.read) void this.notificaciones.marcarLeida(notificacion.id);
+
+    // Solo rutas internas de la app: el link sale de la base, y una dirección
+    // externa o un "//sitio" no tienen por qué abrirse desde acá.
+    const destino = notificacion.link;
+    if (!destino || !destino.startsWith('/') || destino.startsWith('//')) return;
+
+    this.cerrar.emit();
+    void this.router.navigateByUrl(destino);
+  }
 
   protected icono(tipo: string): { nombre: string; color: string } {
     return ICONO_POR_TIPO[tipo] ?? { nombre: 'notifications', color: 'medium' };

@@ -1,10 +1,28 @@
 import { Component, inject, input, OnInit, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonSpinner, IonTextarea, IonToggle } from '@ionic/angular';
+import {
+  IonButton,
+  IonCheckbox,
+  IonIcon,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonSpinner,
+  IonTextarea,
+  IonToggle,
+} from '@ionic/angular';
 import { BotonUbicacionComponent } from '../../compartido/boton-ubicacion/boton-ubicacion.component';
 import { mensajeDeError } from '../../core/mensaje-de-error';
-import { Coordenadas, Veterinaria } from '../../core/modelos';
+import { Coordenadas, HorarioVeterinaria, Veterinaria } from '../../core/modelos';
 import { SupabaseService } from '../../core/servicios/supabase.service';
+import { DIAS } from './estado-veterinaria';
+
+interface HorarioEditable extends HorarioVeterinaria {
+  activo: boolean;
+}
+
+// De lunes a domingo, que es como se lee una semana de atención.
+const DIAS_DE_ATENCION = [...DIAS.slice(1), DIAS[0]];
 
 /**
  * Edición de la propia ficha de veterinaria. El alta ocurre en el onboarding
@@ -17,6 +35,7 @@ import { SupabaseService } from '../../core/servicios/supabase.service';
     IonInput,
     IonTextarea,
     IonToggle,
+    IonCheckbox,
     IonItem,
     IonLabel,
     IonButton,
@@ -83,6 +102,44 @@ import { SupabaseService } from '../../core/servicios/supabase.service';
         <ion-toggle slot="end" formControlName="is_emergency" aria-label="Atiende urgencias"></ion-toggle>
       </ion-item>
 
+      <fieldset class="horarios">
+        <legend>Horario de atención</legend>
+        <p class="texto-mini texto-secundario">
+          Marcá los días que atienden. Con esto se calcula si la veterinaria aparece de turno.
+        </p>
+        @for (horario of horarios(); track horario.day) {
+          <div class="dia">
+            <ion-checkbox
+              labelPlacement="end"
+              justify="start"
+              [checked]="horario.activo"
+              (ionChange)="cambiarHorario(horario.day, { activo: $event.detail.checked })"
+            >
+              {{ horario.day }}
+            </ion-checkbox>
+            @if (horario.activo) {
+              <div class="horas">
+                <input
+                  type="time"
+                  [value]="horario.open"
+                  [attr.aria-label]="'Hora de apertura del ' + horario.day"
+                  (change)="cambiarHorario(horario.day, { open: valorDe($event) })"
+                />
+                <span>a</span>
+                <input
+                  type="time"
+                  [value]="horario.close"
+                  [attr.aria-label]="'Hora de cierre del ' + horario.day"
+                  (change)="cambiarHorario(horario.day, { close: valorDe($event) })"
+                />
+              </div>
+            } @else {
+              <span class="texto-chico texto-secundario">Cerrado</span>
+            }
+          </div>
+        }
+      </fieldset>
+
       @if (error()) {
         <p class="error-formulario">{{ error() }}</p>
       }
@@ -111,6 +168,51 @@ import { SupabaseService } from '../../core/servicios/supabase.service';
       border-radius: 12px;
     }
 
+    .horarios {
+      margin: 0;
+      padding: 12px;
+      border: 1px solid var(--ion-border-color);
+      border-radius: 12px;
+
+      legend {
+        padding: 0 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      > p {
+        margin-bottom: 8px;
+      }
+    }
+
+    .dia {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 44px;
+
+      ion-checkbox {
+        text-transform: capitalize;
+      }
+    }
+
+    .horas {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+
+      input {
+        padding: 6px 8px;
+        border: 1px solid var(--ion-border-color);
+        border-radius: 8px;
+        background: var(--ion-item-background);
+        color: var(--ion-text-color);
+        font: inherit;
+      }
+    }
+
     ion-spinner {
       width: 18px;
       height: 18px;
@@ -128,6 +230,7 @@ export class FormularioVeterinariaComponent implements OnInit {
   protected readonly guardando = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly ubicacion = signal<Coordenadas>({});
+  protected readonly horarios = signal<HorarioEditable[]>([]);
 
   protected readonly formulario = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -151,11 +254,41 @@ export class FormularioVeterinariaComponent implements OnInit {
       bio: registro.bio ?? '',
     });
     this.ubicacion.set({ lat: registro.lat ?? undefined, lng: registro.lng ?? undefined });
+
+    // schedule es JSONB sin validar: solo se usa si de verdad es una lista.
+    const cargados = Array.isArray(registro.schedule) ? registro.schedule : [];
+    this.horarios.set(
+      DIAS_DE_ATENCION.map((day) => {
+        const cargado = cargados.find((h) => h.day === day);
+        return {
+          day,
+          activo: Boolean(cargado),
+          open: cargado?.open || '09:00',
+          close: cargado?.close || '18:00',
+        };
+      }),
+    );
+  }
+
+  protected valorDe(evento: Event): string {
+    return (evento.target as HTMLInputElement).value;
+  }
+
+  protected cambiarHorario(dia: string, cambios: Partial<HorarioEditable>): void {
+    this.horarios.update((lista) => lista.map((h) => (h.day === dia ? { ...h, ...cambios } : h)));
   }
 
   async guardar(): Promise<void> {
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
+      return;
+    }
+    const atencion = this.horarios().filter((h) => h.activo);
+    // El cálculo de "de turno" compara horas del mismo día, así que un horario
+    // que cruza la medianoche no se puede representar.
+    const invalido = atencion.find((h) => !h.open || !h.close || h.open >= h.close);
+    if (invalido) {
+      this.error.set(`Revisá el horario del ${invalido.day}: tiene que cerrar después de abrir.`);
       return;
     }
     this.guardando.set(true);
@@ -164,8 +297,11 @@ export class FormularioVeterinariaComponent implements OnInit {
       // is_verified queda deliberadamente afuera: lo decide administración.
       await this.supabase.veterinarias.actualizar(this.registroInicial().id, {
         ...this.formulario.getRawValue(),
-        lat: this.ubicacion().lat,
-        lng: this.ubicacion().lng,
+        // null y no undefined: al serializar, undefined desaparece y "Quitar"
+        // dejaba las coordenadas viejas en la base.
+        lat: this.ubicacion().lat ?? null,
+        lng: this.ubicacion().lng ?? null,
+        schedule: atencion.map(({ day, open, close }) => ({ day, open, close })),
       });
       this.guardado.emit();
     } catch (error) {

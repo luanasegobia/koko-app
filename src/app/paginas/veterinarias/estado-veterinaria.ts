@@ -11,7 +11,8 @@ export interface EstadoDeVeterinaria {
   proximaApertura?: string;
 }
 
-const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+/** En el orden de Date.getDay(): el índice 0 es domingo. */
+export const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 
 const CERRADA: EstadoDeVeterinaria = {
   etiqueta: 'Cerrada',
@@ -29,7 +30,9 @@ export function estadoDeVeterinaria(veterinaria: Veterinaria, ahora = new Date()
 
   const hoy = DIAS[ahora.getDay()];
   const horaActual = `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
-  const horarios = veterinaria.schedule ?? [];
+  // schedule es JSONB sin validar: si llega algo que no es una lista, se trata
+  // como "sin horario" en vez de romper el listado entero.
+  const horarios = Array.isArray(veterinaria.schedule) ? veterinaria.schedule : [];
 
   const deHoy = horarios.find((h) => h.day === hoy);
   if (deHoy && horaActual >= deHoy.open && horaActual <= deHoy.close) {
@@ -43,7 +46,9 @@ export function estadoDeVeterinaria(veterinaria: Veterinaria, ahora = new Date()
     };
   }
 
-  for (let i = 0; i < 7; i++) {
+  // Hasta 7 inclusive: si hoy ya cerró y es el único día que atiende, la
+  // próxima apertura es el mismo día de la semana que viene.
+  for (let i = 0; i <= 7; i++) {
     const dia = DIAS[(ahora.getDay() + i) % 7];
     const horario = horarios.find((h) => h.day === dia);
     if (!horario) continue;

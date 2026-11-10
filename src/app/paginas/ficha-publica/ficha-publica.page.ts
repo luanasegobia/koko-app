@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IonButton, IonCard, IonContent, IonIcon, IonSpinner } from '@ionic/angular';
 import { Mascota } from '../../core/modelos';
 import { SupabaseService } from '../../core/servicios/supabase.service';
-import { iniciales } from '../../core/utilidades';
+import { enlaceDeWhatsApp, iniciales } from '../../core/utilidades';
 
 /** Ficha que abre el QR del collar. Pública: no pide sesión ni layout. */
 @Component({
@@ -20,9 +20,12 @@ export class FichaPublicaPage implements OnInit {
   protected readonly mascota = signal<Mascota | null>(null);
   protected readonly notificando = signal(false);
   protected readonly notificado = signal(false);
+  protected readonly errorDeAviso = signal('');
+  private qrId: string | null = null;
 
   async ngOnInit(): Promise<void> {
     const qrId = this.rutaActiva.snapshot.paramMap.get('qrId');
+    this.qrId = qrId;
     if (!qrId) {
       this.cargando.set(false);
       return;
@@ -45,15 +48,31 @@ export class FichaPublicaPage implements OnInit {
     return iniciales(nombre);
   }
 
+  protected enlaceDeWhatsApp(telefono: string): string {
+    return enlaceDeWhatsApp(telefono);
+  }
+
   /**
-   * Todavía no avisa a la persona dueña: el aviso automático necesita el
-   * módulo de notificaciones. Se deja marcado en pantalla e invita a llamar.
+   * Deja una notificación en la campana de quien registró la mascota. La crea
+   * una función de la base a partir del código del QR: desde el navegador no se
+   * pueden crear notificaciones para otra persona. Solo se muestra "notificado"
+   * si la base confirma que el aviso quedó.
    */
-  protected avisarQueLaEncontre(): void {
+  protected async avisarQueLaEncontre(): Promise<void> {
+    if (!this.qrId || this.notificando()) return;
     this.notificando.set(true);
-    setTimeout(() => {
+    this.errorDeAviso.set('');
+    try {
+      const avisado = await this.supabase.rpc<boolean>('avisar_mascota_encontrada', {
+        codigo: this.qrId,
+      });
+      if (avisado) this.notificado.set(true);
+      else this.errorDeAviso.set('No pudimos dejarle el aviso. Llamá o escribile directamente.');
+    } catch (error) {
+      console.error('No se pudo avisar:', error);
+      this.errorDeAviso.set('No pudimos dejarle el aviso. Llamá o escribile directamente.');
+    } finally {
       this.notificando.set(false);
-      this.notificado.set(true);
-    }, 400);
+    }
   }
 }
