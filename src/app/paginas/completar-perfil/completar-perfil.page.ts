@@ -133,4 +133,8 @@ export class CompletarPerfilPage {
       this.guardando.set(false);
     }
   }
+
+  protected cerrarSesion(): void {
+    void this.auth.cerrarSesion('/login');
+  }
 }

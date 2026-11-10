@@ -25,6 +25,8 @@ import { isDevMode } from '@angular/core';
           <ion-icon slot="start" name="refresh"></ion-icon>
           Recargar
         </ion-button>
+        <!-- Si el error es de esta pantalla, recargar lo repite: el inicio es la otra salida. -->
+        <ion-button fill="outline" color="dark" (click)="irAlInicio()">Ir al inicio</ion-button>
         @if (enDesarrollo) {
           <pre class="detalle">{{ error().stack || error().message }}</pre>
         }
@@ -39,5 +41,11 @@ export class PantallaErrorComponent {
 
   recargar(): void {
     window.location.reload();
+  }
+
+  irAlInicio(): void {
+    // Carga completa y no navegación interna: después de un error fatal el
+    // estado de la app no es confiable.
+    window.location.href = '/';
   }
 }

@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonButton, IonCard, IonContent, IonIcon, IonSpinner } from '@ionic/angular';
+import { BotonVolverComponent } from '../../compartido/boton-volver/boton-volver.component';
 import { Mascota } from '../../core/modelos';
 import { SupabaseService } from '../../core/servicios/supabase.service';
 import { enlaceDeWhatsApp, iniciales } from '../../core/utilidades';
@@ -8,7 +9,7 @@ import { enlaceDeWhatsApp, iniciales } from '../../core/utilidades';
 /** Ficha que abre el QR del collar. Pública: no pide sesión ni layout. */
 @Component({
   selector: 'app-ficha-publica',
-  imports: [IonContent, IonCard, IonButton, IonIcon, IonSpinner],
+  imports: [IonContent, IonCard, IonButton, IonIcon, IonSpinner, BotonVolverComponent],
   templateUrl: './ficha-publica.page.html',
   styleUrl: './ficha-publica.page.scss',
 })

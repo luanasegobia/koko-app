@@ -8,6 +8,8 @@
   </div>
 
   <div class="login" [class.visible]="splashTerminado()">
+    <!-- Sin sesión se puede seguir usando las pantallas públicas: perdidas es la entrada. -->
+    <app-boton-volver class="volver" porDefecto="/perdidas" />
     <div class="encabezado">
       <p class="antetitulo">Koko · Comunidad Mascotera</p>
       <h1>Bienvenidos a KOKO</h1>

@@ -82,3 +82,18 @@ ion-spinner {
   height: 18px;
   margin-right: 8px;
 }
+
+.salir {
+  margin-top: 16px;
+  text-align: center;
+
+  .enlace {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--ion-color-primary);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}

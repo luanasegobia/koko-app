@@ -110,4 +110,10 @@ export class RegistroPage {
   protected alCambiarCodigo(evento: CustomEvent<{ value?: string | number | null }>): void {
     this.codigo.set(String(evento.detail.value ?? ''));
   }
+
+  /** Vuelve al formulario para cambiar el correo: sin esto, un error de tipeo dejaba la pantalla sin salida. */
+  protected corregirEmail(): void {
+    this.error.set('');
+    this.esperandoCodigo.set(false);
+  }
 }

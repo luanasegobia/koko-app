@@ -1,11 +1,12 @@
 import { Component, input } from '@angular/core';
 import { IonContent, IonIcon } from '@ionic/angular';
+import { BotonVolverComponent } from '../boton-volver/boton-volver.component';
 import { PatitaComponent } from '../patita/patita.component';
 
 /** Marco común de las pantallas de registro, recuperación y cambio de contraseña. */
 @Component({
   selector: 'app-layout-auth',
-  imports: [IonContent, IonIcon, PatitaComponent],
+  imports: [IonContent, IonIcon, PatitaComponent, BotonVolverComponent],
   template: `
     <ion-content class="ion-padding">
       <div slot="fixed" class="patita-esquina">
@@ -13,6 +14,7 @@ import { PatitaComponent } from '../patita/patita.component';
       </div>
 
       <div class="envoltorio">
+        <app-boton-volver class="volver" [porDefecto]="volverA()" />
         <div class="cabecera">
           <p class="antetitulo">
             <ion-icon [name]="icono()" aria-hidden="true"></ion-icon>
@@ -54,7 +56,11 @@ import { PatitaComponent } from '../patita/patita.component';
       position: relative;
       max-width: 440px;
       margin: 0 auto;
-      padding: 40px 0;
+      padding: 12px 0 40px;
+    }
+
+    .volver {
+      margin-bottom: 12px;
     }
 
     .cabecera {
@@ -118,4 +124,6 @@ export class LayoutAuthComponent {
   readonly icono = input.required<string>();
   readonly titulo = input.required<string>();
   readonly subtitulo = input<string>();
+  /** A dónde lleva "Volver" cuando la pantalla se abrió directo, sin una anterior. */
+  readonly volverA = input('/login');
 }
