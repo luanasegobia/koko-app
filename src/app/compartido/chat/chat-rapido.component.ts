@@ -17,6 +17,7 @@ import { SupabaseService } from '../../core/servicios/supabase.service';
 import { mensajeDeError } from '../../core/mensaje-de-error';
 
 const CLAVE_NOMBRE_INVITADO = 'quick_chat_guest_name';
+const CLAVE_ID_INVITADO = 'quick_chat_guest_id';
 
 /**
  * Chat desplegable al pie de cada tarjeta. Admite invitados sin cuenta: se
@@ -46,6 +47,11 @@ export class ChatRapidoComponent implements OnDestroy {
   protected readonly pidiendoNombre = signal(false);
   protected readonly nombreTentativo = signal('');
   private textoPendiente = '';
+  private idDeInvitadoEnMemoria?: string;
+
+  private get idDeInvitado(): string {
+    return (this.idDeInvitadoEnMemoria ??= this.obtenerIdDeInvitado());
+  }
 
   private readonly lista = viewChild<ElementRef<HTMLDivElement>>('lista');
   private desuscribir: (() => void) | null = null;
@@ -89,7 +95,32 @@ export class ChatRapidoComponent implements OnDestroy {
   protected esMio(mensaje: MensajeChat): boolean {
     const usuario = this.usuario();
     if (usuario) return mensaje.sender_id === usuario.id;
-    return Boolean(this.nombreInvitado()) && mensaje.sender_id?.startsWith(`guest_${this.nombreInvitado()}_`);
+    return mensaje.sender_id === this.idDeInvitado;
+  }
+
+  /**
+   * Identificador de este navegador para escribir sin cuenta. Antes se armaba
+   * con el apodo, así que todas las personas que entraban como "Anónimo" veían
+   * los mensajes de las demás como propios.
+   */
+  private obtenerIdDeInvitado(): string {
+    try {
+      const guardado = localStorage.getItem(CLAVE_ID_INVITADO);
+      if (guardado?.startsWith('guest_')) return guardado;
+    } catch {
+      // Sin almacenamiento, el identificador dura lo que dura la pestaña.
+    }
+    const aleatorio =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`;
+    const nuevo = `guest_${aleatorio}`;
+    try {
+      localStorage.setItem(CLAVE_ID_INVITADO, nuevo);
+    } catch {
+      // Ídem.
+    }
+    return nuevo;
   }
 
   protected alternar(): void {
@@ -102,7 +133,9 @@ export class ChatRapidoComponent implements OnDestroy {
 
   protected enviar(): void {
     const texto = this.texto().trim();
-    if (!texto) return;
+    // Enter no pasa por el botón deshabilitado: sin este freno, apretarlo dos
+    // veces seguidas mandaba el mensaje dos veces.
+    if (!texto || this.enviando()) return;
     if (!this.usuario() && !this.nombreInvitado()) {
       // Primero hay que saber cómo identificar a la persona invitada.
       this.textoPendiente = texto;
@@ -139,7 +172,7 @@ export class ChatRapidoComponent implements OnDestroy {
         context_type: this.tipoDeContexto(),
         context_id: this.idDeContexto(),
         context_title: this.tituloDeContexto(),
-        sender_id: usuario ? usuario.id : `guest_${nombreInvitado}_${Date.now()}`,
+        sender_id: usuario ? usuario.id : this.idDeInvitado,
         sender_name: usuario ? usuario.full_name || 'Usuario' : nombreInvitado || 'Anónimo',
         text: texto,
         read_by: [],

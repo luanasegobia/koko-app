@@ -115,4 +115,39 @@ describe('AuthService', () => {
     // La carga inicial (más vieja) terminó después, pero no puede revivir la sesión.
     expect(auth.usuario()).toBeNull();
   });
+
+  // Un perfil que no se pudo leer no es un perfil incompleto: tratarlo así
+  // mandaba a la persona al onboarding, y guardar ahí le pisaba los datos.
+  it('si falla la lectura del perfil, conserva el que ya tenía cargado', async () => {
+    const falso = supabaseFalso({
+      usuario: USUARIO,
+      perfil: { tipo_cuenta: 'rescatista', es_admin: false, profile_completed: true },
+    });
+    const auth = crearServicio(falso);
+    await auth.listo();
+    const antes = auth.usuario();
+    expect(antes?.profile_completed).toBe(true);
+
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    falso.consulta.maybeSingle.mockResolvedValueOnce({ data: null, error: { message: 'Failed to fetch' } });
+    await auth.recargarUsuario();
+
+    expect(auth.usuario()).toBe(antes);
+    expect(auth.usuario()?.profile_completed).toBe(true);
+  });
+
+  it('una recarga sin cambios no reemplaza el usuario', async () => {
+    const falso = supabaseFalso({
+      usuario: USUARIO,
+      perfil: { tipo_cuenta: 'usuario', es_admin: false, profile_completed: true },
+    });
+    const auth = crearServicio(falso);
+    await auth.listo();
+    const antes = auth.usuario();
+
+    await auth.recargarUsuario();
+
+    // Misma referencia: lo que depende del signal no se reinicia.
+    expect(auth.usuario()).toBe(antes);
+  });
 });

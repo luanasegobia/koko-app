@@ -16,6 +16,7 @@ import { SelectorFotoComponent } from '../../compartido/selector-foto/selector-f
 import { mensajeDeError } from '../../core/mensaje-de-error';
 import { Especie, MascotaAdopcion, Sexo, Tamanio } from '../../core/modelos';
 import { SupabaseService } from '../../core/servicios/supabase.service';
+import { edadONull } from '../../core/utilidades';
 
 @Component({
   selector: 'app-formulario-adopcion',
@@ -106,7 +107,9 @@ export class FormularioAdopcionComponent implements OnInit {
       const valores = this.formulario.getRawValue();
       const campos: Partial<MascotaAdopcion> = {
         ...valores,
-        age_years: valores.age_years || undefined,
+        // null y no undefined: al serializar, undefined desaparece y vaciar la
+        // edad dejaba el valor viejo en la base.
+        age_years: edadONull(valores.age_years),
         photo_url,
       };
 

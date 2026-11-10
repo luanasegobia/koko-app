@@ -1,8 +1,10 @@
 import { computed, effect, inject, Injectable, signal, untracked } from '@angular/core';
 import { alertasHabilitadas } from '../../../environments/entorno';
+import { mensajeDeError } from '../mensaje-de-error';
 import { Notificacion, Perfil, SuscripcionAlertas } from '../modelos';
 import { distanciaEnKm } from '../utilidades';
 import { AuthService } from './auth.service';
+import { AvisosService } from './avisos.service';
 import { SupabaseService } from './supabase.service';
 
 const INTERVALO_SONDEO_MS = 30000;
@@ -18,6 +20,7 @@ const INTERVALO_SONDEO_MS = 30000;
 export class NotificacionesService {
   private readonly supabase = inject(SupabaseService);
   private readonly auth = inject(AuthService);
+  private readonly avisos = inject(AvisosService);
 
   readonly notificaciones = signal<Notificacion[]>([]);
   readonly suscripcion = signal<SuscripcionAlertas | null>(null);
@@ -64,17 +67,31 @@ export class NotificacionesService {
     }
   }
 
+  // Las dos se llaman directo desde la plantilla, así que atrapan sus propios
+  // errores: sin esto un fallo quedaba como promesa rechazada y la persona no
+  // se enteraba de que la notificación seguía sin leer.
   async marcarTodasLeidas(): Promise<void> {
     const sinLeer = this.notificaciones().filter((n) => !n.read);
-    await Promise.all(
+    const resultados = await Promise.allSettled(
       sinLeer.map((n) => this.supabase.notificaciones.actualizar(n.id, { read: true })),
     );
-    this.notificaciones.update((lista) => lista.map((n) => ({ ...n, read: true })));
+    // Se marcan en pantalla solo las que la base confirmó.
+    const marcadas = new Set(sinLeer.filter((_, i) => resultados[i].status === 'fulfilled').map((n) => n.id));
+    this.notificaciones.update((lista) => lista.map((n) => (marcadas.has(n.id) ? { ...n, read: true } : n)));
+
+    const fallida = resultados.find((r): r is PromiseRejectedResult => r.status === 'rejected');
+    if (fallida) {
+      await this.avisos.error(mensajeDeError(fallida.reason), 'No se pudieron marcar todas como leídas');
+    }
   }
 
   async marcarLeida(id: string): Promise<void> {
-    await this.supabase.notificaciones.actualizar(id, { read: true });
-    this.notificaciones.update((lista) => lista.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    try {
+      await this.supabase.notificaciones.actualizar(id, { read: true });
+      this.notificaciones.update((lista) => lista.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    } catch (error) {
+      await this.avisos.error(mensajeDeError(error), 'No se pudo marcar como leída');
+    }
   }
 
   async guardarSuscripcion(datos: Partial<SuscripcionAlertas>): Promise<void> {

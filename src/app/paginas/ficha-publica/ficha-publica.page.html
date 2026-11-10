@@ -58,7 +58,7 @@
           </ion-button>
         }
         @if (mascota.owner_whatsapp) {
-          <ion-button expand="block" color="success" [href]="'https://wa.me/' + mascota.owner_whatsapp" target="_blank" rel="noopener noreferrer">
+          <ion-button expand="block" color="success" [href]="enlaceDeWhatsApp(mascota.owner_whatsapp)" target="_blank" rel="noopener noreferrer">
             <ion-icon slot="start" name="logo-whatsapp"></ion-icon>
             WhatsApp
           </ion-button>
@@ -77,6 +77,14 @@
           Encontré esta mascota
         }
       </ion-button>
+      @if (notificado()) {
+        <p class="texto-chico texto-secundario nota-aviso">
+          Le dejamos un aviso en la app. Si podés, llamá o escribile también: es la forma más rápida.
+        </p>
+      }
+      @if (errorDeAviso()) {
+        <p class="error-formulario nota-aviso">{{ errorDeAviso() }}</p>
+      }
     }
   </div>
 </ion-content>

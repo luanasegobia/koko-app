@@ -13,18 +13,29 @@ import { CompletarPerfilPage } from './completar-perfil.page';
  */
 describe('CompletarPerfilPage: alta de veterinaria', () => {
   let crearVeterinaria: ReturnType<typeof vi.fn>;
+  let filtrarVeterinarias: ReturnType<typeof vi.fn>;
+  let actualizarPerfil: ReturnType<typeof vi.fn>;
   let pagina: CompletarPerfilPage;
 
   beforeEach(() => {
     TestBed.resetTestingModule();
     crearVeterinaria = vi.fn(async () => ({}));
+    filtrarVeterinarias = vi.fn(async () => []);
+    actualizarPerfil = vi.fn(async () => ({}));
     TestBed.configureTestingModule({
       providers: [
         {
           provide: AuthService,
-          useValue: { actualizarPerfil: vi.fn(async () => ({})), recargarUsuario: vi.fn(async () => null) },
+          useValue: {
+            usuario: () => ({ id: 'u1' }),
+            actualizarPerfil,
+            recargarUsuario: vi.fn(async () => null),
+          },
         },
-        { provide: SupabaseService, useValue: { veterinarias: { crear: crearVeterinaria } } },
+        {
+          provide: SupabaseService,
+          useValue: { veterinarias: { crear: crearVeterinaria, filtrar: filtrarVeterinarias } },
+        },
         { provide: Router, useValue: { navigateByUrl: vi.fn(async () => true) } },
         { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: convertToParamMap({}) } } },
       ],
@@ -57,5 +68,39 @@ describe('CompletarPerfilPage: alta de veterinaria', () => {
     expect(crearVeterinaria).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'San Roque', phone: '3878 412233', is_verified: false }),
     );
+  });
+
+  const datosDeClinica = { vet_clinic_name: 'San Roque', vet_address: 'Av. Libertad 450', vet_phone: '3878 412233' };
+
+  it('si la ficha no se puede crear, el perfil no queda marcado como completo', async () => {
+    crearVeterinaria.mockRejectedValueOnce(new Error('sin conexión'));
+    pagina['formulario'].patchValue(datosDeClinica);
+
+    await pagina.guardar();
+
+    expect(actualizarPerfil).not.toHaveBeenCalled();
+    expect(pagina['error']()).not.toBe('');
+  });
+
+  it('al reintentar no duplica una ficha que ya se había creado', async () => {
+    filtrarVeterinarias.mockResolvedValueOnce([{ id: 'v1' }]);
+    pagina['formulario'].patchValue(datosDeClinica);
+
+    await pagina.guardar();
+
+    expect(filtrarVeterinarias).toHaveBeenCalledWith({ registered_by_user_id: 'u1' });
+    expect(crearVeterinaria).not.toHaveBeenCalled();
+    expect(actualizarPerfil).toHaveBeenCalled();
+  });
+
+  it('no manda teléfono ni ubicación personales, que este paso no muestra', async () => {
+    pagina['formulario'].patchValue(datosDeClinica);
+
+    await pagina.guardar();
+
+    const datos = actualizarPerfil.mock.calls[0][0];
+    expect(datos).toMatchObject({ tipo_cuenta: 'veterinario', profile_completed: true });
+    expect(datos).not.toHaveProperty('phone');
+    expect(datos).not.toHaveProperty('location');
   });
 });
