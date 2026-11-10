@@ -1,23 +1,31 @@
 // Paleta de Koko sobre las variables de tema de Ionic.
 // Documentación: https://ionicframework.com/docs/theming/color-generator
+//
+// Los colores de marca salen del diseño de la bienvenida y el login:
+//
+//   crema        #FAEDCD   fondo
+//   azul noche   #313857   texto, barras y contornos
+//   azul acero   #598099   acción principal, campos y enlaces
+//   celeste      #A0C2D5   botón de ingreso y realces sobre azul noche
+//   naranja      #E38B3D   acento (oscurecido donde va como texto)
 
 :root {
-  // Verde esmeralda de la marca.
-  --ion-color-primary: #10b981;
-  --ion-color-primary-rgb: 16, 185, 129;
-  --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #0ea372;
-  --ion-color-primary-tint: #28c08e;
+  // Azul acero de la marca.
+  --ion-color-primary: #598099;
+  --ion-color-primary-rgb: 89, 128, 153;
+  --ion-color-primary-contrast: #faedcd;
+  --ion-color-primary-contrast-rgb: 250, 237, 205;
+  --ion-color-primary-shade: #4e7187;
+  --ion-color-primary-tint: #6a8da3;
 
-  // Ámbar: acento.
-  --ion-color-secondary: #f59e0b;
-  --ion-color-secondary-rgb: 245, 158, 11;
-  --ion-color-secondary-contrast: #ffffff;
-  --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #d88b0a;
-  --ion-color-secondary-tint: #f6a823;
-
+  // Naranja: acento. Más oscuro que el del dibujo para que se lea como texto
+  // sobre el fondo crema.
+  --ion-color-secondary: #c86519;
+  --ion-color-secondary-rgb: 200, 101, 25;
+  --ion-color-secondary-contrast: #fff8eb;
+  --ion-color-secondary-contrast-rgb: 255, 248, 235;
+  --ion-color-secondary-shade: #b05916;
+  --ion-color-secondary-tint: #ce7430;
   // Azul: veterinarias.
   --ion-color-tertiary: #3b82f6;
   --ion-color-tertiary-rgb: 59, 130, 246;
@@ -48,27 +56,34 @@
   --ion-color-danger-shade: #d23c3c;
   --ion-color-danger-tint: #f15757;
 
-  --ion-color-light: #f3f4f6;
-  --ion-color-light-rgb: 243, 244, 246;
-  --ion-color-light-contrast: #111827;
-  --ion-color-light-contrast-rgb: 17, 24, 39;
-  --ion-color-light-shade: #d6d7d8;
-  --ion-color-light-tint: #f4f5f7;
+  --ion-color-light: #f3e3bd;
+  --ion-color-light-rgb: 243, 227, 189;
+  --ion-color-light-contrast: #313857;
+  --ion-color-light-contrast-rgb: 49, 56, 87;
+  --ion-color-light-shade: #d6c8a6;
+  --ion-color-light-tint: #f4e6c4;
 
-  --ion-color-medium: #6b7280;
-  --ion-color-medium-rgb: 107, 114, 128;
-  --ion-color-medium-contrast: #ffffff;
-  --ion-color-medium-contrast-rgb: 255, 255, 255;
-  --ion-color-medium-shade: #5e6471;
-  --ion-color-medium-tint: #7a808d;
+  --ion-color-medium: #5b6079;
+  --ion-color-medium-rgb: 91, 96, 121;
+  --ion-color-medium-contrast: #fff8eb;
+  --ion-color-medium-contrast-rgb: 255, 248, 235;
+  --ion-color-medium-shade: #50546a;
+  --ion-color-medium-tint: #6b7086;
 
-  --ion-color-dark: #111827;
-  --ion-color-dark-rgb: 17, 24, 39;
-  --ion-color-dark-contrast: #ffffff;
-  --ion-color-dark-contrast-rgb: 255, 255, 255;
-  --ion-color-dark-shade: #0f1522;
-  --ion-color-dark-tint: #292f3d;
+  --ion-color-dark: #313857;
+  --ion-color-dark-rgb: 49, 56, 87;
+  --ion-color-dark-contrast: #faedcd;
+  --ion-color-dark-contrast-rgb: 250, 237, 205;
+  --ion-color-dark-shade: #2b314d;
+  --ion-color-dark-tint: #464c68;
 
+  // Celeste: el botón de ingreso. Color propio, se usa con color="celeste".
+  --ion-color-celeste: #a0c2d5;
+  --ion-color-celeste-rgb: 160, 194, 213;
+  --ion-color-celeste-contrast: #313857;
+  --ion-color-celeste-contrast-rgb: 49, 56, 87;
+  --ion-color-celeste-shade: #8dabbb;
+  --ion-color-celeste-tint: #aac8d9;
   // Violeta: identificación digital. Color propio, se usa con color="purpura".
   --ion-color-purpura: #8b5cf6;
   --ion-color-purpura-rgb: 139, 92, 246;
@@ -94,37 +109,46 @@
   --ion-color-naranja-tint: #fa812d;
 
   // Fondos y texto del modo claro.
-  --ion-background-color: #f7f7f7;
-  --ion-background-color-rgb: 247, 247, 247;
-  --ion-text-color: #1f2937;
-  --ion-text-color-rgb: 31, 41, 55;
-  --ion-card-background: #ffffff;
-  --ion-item-background: #ffffff;
-  --ion-border-color: #e5e7eb;
+  --ion-background-color: #faedcd;
+  --ion-background-color-rgb: 250, 237, 205;
+  --ion-text-color: #313857;
+  --ion-text-color-rgb: 49, 56, 87;
+  --ion-card-background: #fff8eb;
+  --ion-item-background: #fff8eb;
+  --ion-border-color: #dccfa9;
 
-  // Barras oscuras, como la barra lateral del diseño original.
-  --ion-toolbar-background: #151c2b;
-  --ion-toolbar-color: #e5e7eb;
-  --ion-toolbar-border-color: #232b3d;
+  // Barras en azul noche, como la barra lateral.
+  --ion-toolbar-background: #313857;
+  --ion-toolbar-color: #faedcd;
+  --ion-toolbar-border-color: #434a6b;
 
-  --ion-font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --ion-font-family: 'Quicksand', system-ui, -apple-system, sans-serif;
 
   // Variables propias de Koko.
-  --koko-fuente-titulos: 'Plus Jakarta Sans', 'Inter', sans-serif;
-  --koko-radio: 14px;
-  --koko-lateral-fondo: #151c2b;
-  --koko-lateral-texto: #d6dae3;
-  --koko-lateral-texto-rgb: 214, 218, 227;
-  --koko-lateral-borde: #232b3d;
-  --koko-texto-secundario: #6b7280;
-  // Texto, íconos y brillos sobre fondos de color (verde, portada oscura, splash).
-  --koko-texto-sobre-color: #ffffff;
-  --koko-texto-sobre-color-rgb: 255, 255, 255;
+  --koko-fuente-titulos: 'Fredoka', 'Quicksand', sans-serif;
+  --koko-radio: 16px;
+  --koko-lateral-fondo: #313857;
+  --koko-lateral-texto: #faedcd;
+  --koko-lateral-texto-rgb: 250, 237, 205;
+  --koko-lateral-borde: #434a6b;
+  --koko-texto-secundario: #5b6079;
+  // Texto, íconos y brillos sobre fondos de color (azul acero, portada, splash).
+  --koko-texto-sobre-color: #faedcd;
+  --koko-texto-sobre-color-rgb: 250, 237, 205;
   // Base de todas las sombras: se usa como rgba(var(--koko-sombra-rgb), opacidad).
-  --koko-sombra-rgb: 15, 23, 42;
+  --koko-sombra-rgb: 49, 56, 87;
   --koko-sombra: 0 10px 30px -12px rgba(var(--koko-sombra-rgb), 0.25);
   // El QR necesita fondo blanco en los dos modos para que se pueda escanear.
   --koko-fondo-qr: #ffffff;
+}
+
+.ion-color-celeste {
+  --ion-color-base: var(--ion-color-celeste);
+  --ion-color-base-rgb: var(--ion-color-celeste-rgb);
+  --ion-color-contrast: var(--ion-color-celeste-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-celeste-contrast-rgb);
+  --ion-color-shade: var(--ion-color-celeste-shade);
+  --ion-color-tint: var(--ion-color-celeste-tint);
 }
 
 .ion-color-naranja {
@@ -154,36 +178,72 @@
   --ion-color-tint: var(--ion-color-rosa-tint);
 }
 
-// Modo oscuro: se activa con la clase ion-palette-dark en <html>
-// (ver TemaService). Ajusta la paleta estándar de Ionic a los tonos de Koko.
+// Sobre las superficies azul noche (barras, barra lateral, portada, cabecera del chat)
+// el azul acero no contrasta: ahí la acción principal pasa a celeste.
+.sobre-noche,
+ion-toolbar,
 .ion-palette-dark {
-  --ion-background-color: #0e121c;
-  --ion-background-color-rgb: 14, 18, 28;
-  --ion-text-color: #eef0f4;
-  --ion-text-color-rgb: 238, 240, 244;
-  --ion-card-background: #151c2b;
-  --ion-item-background: #151c2b;
-  --ion-border-color: #232b3d;
-  --ion-toolbar-background: #0e121c;
-  --ion-toolbar-color: #e5e7eb;
+  --ion-color-primary: #a0c2d5;
+  --ion-color-primary-rgb: 160, 194, 213;
+  --ion-color-primary-contrast: #262b45;
+  --ion-color-primary-contrast-rgb: 38, 43, 69;
+  --ion-color-primary-shade: #8dabbb;
+  --ion-color-primary-tint: #aac8d9;
+}
 
-  --ion-color-light: #1f2937;
-  --ion-color-light-rgb: 31, 41, 55;
-  --ion-color-light-contrast: #f3f4f6;
-  --ion-color-light-contrast-rgb: 243, 244, 246;
-  --ion-color-light-shade: #1b2430;
-  --ion-color-light-tint: #353d4b;
+// Modo oscuro: se activa con la clase ion-palette-dark en <html>
+// (ver TemaService). Ajusta la paleta estándar de Ionic a los tonos de Koko:
+// fondo azul noche y texto crema.
+.ion-palette-dark {
+  --ion-background-color: #171a2b;
+  --ion-background-color-rgb: 23, 26, 43;
+  --ion-text-color: #faedcd;
+  --ion-text-color-rgb: 250, 237, 205;
+  --ion-card-background: #21253b;
+  --ion-item-background: #21253b;
+  --ion-border-color: #373c57;
+  --ion-toolbar-background: #12141f;
+  --ion-toolbar-color: #faedcd;
+  --ion-toolbar-border-color: #23273a;
 
-  --ion-color-dark: #f3f4f6;
-  --ion-color-dark-rgb: 243, 244, 246;
-  --ion-color-dark-contrast: #111827;
-  --ion-color-dark-contrast-rgb: 17, 24, 39;
-  --ion-color-dark-shade: #d6d7d8;
-  --ion-color-dark-tint: #f4f5f7;
+  --ion-color-secondary: #e38b3d;
+  --ion-color-secondary-rgb: 227, 139, 61;
+  --ion-color-secondary-contrast: #171a2b;
+  --ion-color-secondary-contrast-rgb: 23, 26, 43;
+  --ion-color-secondary-shade: #c87a36;
+  --ion-color-secondary-tint: #e69750;
 
-  --koko-lateral-fondo: #0e121c;
-  --koko-lateral-borde: #1b2232;
-  --koko-texto-secundario: #9ca3af;
+  --ion-color-celeste: #598099;
+  --ion-color-celeste-rgb: 89, 128, 153;
+  --ion-color-celeste-contrast: #faedcd;
+  --ion-color-celeste-contrast-rgb: 250, 237, 205;
+  --ion-color-celeste-shade: #4e7187;
+  --ion-color-celeste-tint: #6a8da3;
+
+  --ion-color-light: #2a2f48;
+  --ion-color-light-rgb: 42, 47, 72;
+  --ion-color-light-contrast: #faedcd;
+  --ion-color-light-contrast-rgb: 250, 237, 205;
+  --ion-color-light-shade: #25293f;
+  --ion-color-light-tint: #3f445a;
+
+  --ion-color-medium: #c4b99a;
+  --ion-color-medium-rgb: 196, 185, 154;
+  --ion-color-medium-contrast: #171a2b;
+  --ion-color-medium-contrast-rgb: 23, 26, 43;
+  --ion-color-medium-shade: #aca388;
+  --ion-color-medium-tint: #cac0a4;
+
+  --ion-color-dark: #faedcd;
+  --ion-color-dark-rgb: 250, 237, 205;
+  --ion-color-dark-contrast: #313857;
+  --ion-color-dark-contrast-rgb: 49, 56, 87;
+  --ion-color-dark-shade: #dcd1b4;
+  --ion-color-dark-tint: #fbefd2;
+
+  --koko-lateral-fondo: #12141f;
+  --koko-lateral-borde: #23273a;
+  --koko-texto-secundario: #c4b99a;
   --koko-sombra-rgb: 0, 0, 0;
   --koko-sombra: 0 10px 30px -12px rgba(var(--koko-sombra-rgb), 0.6);
 }
