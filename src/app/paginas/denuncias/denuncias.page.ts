@@ -121,7 +121,9 @@ export class DenunciasPage {
 
   async cargar(): Promise<void> {
     try {
-      this.denuncias.set(await this.supabase.denuncias.listar('-created_at', 100));
+      // La tabla ya no se puede leer entera: la función devuelve solo lo que es
+      // público de cada denuncia (sin datos de contacto, autor ni código).
+      this.denuncias.set(await this.supabase.rpc<Denuncia[]>('denuncias_publicas'));
     } catch (error) {
       await this.avisos.error(mensajeDeError(error), 'No se pudieron cargar las denuncias');
     } finally {
