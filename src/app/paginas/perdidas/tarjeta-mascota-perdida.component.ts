@@ -1,8 +1,8 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { IonBadge, IonButton, IonCard, IonIcon } from '@ionic/angular';
 import { AccionesDeDuenioComponent } from '../../compartido/acciones-de-duenio/acciones-de-duenio.component';
 import { ChatRapidoComponent } from '../../compartido/chat/chat-rapido.component';
-import { MascotaPerdida } from '../../core/modelos';
+import { Avistamiento, MascotaPerdida } from '../../core/modelos';
 import { FechaPipe } from '../../core/pipes/fecha.pipe';
 
 @Component({
@@ -60,6 +60,27 @@ import { FechaPipe } from '../../core/pipes/fecha.pipe';
             La vi
           </ion-button>
         </div>
+        @if (avistamientos().length > 0) {
+          <details class="avistamientos">
+            <summary>
+              <ion-icon name="eye-outline" aria-hidden="true"></ion-icon>
+              {{ avistamientos().length === 1 ? '1 avistamiento' : avistamientos().length + ' avistamientos' }}
+            </summary>
+            <ul>
+              @for (avistamiento of avistamientos(); track $index) {
+                <li>
+                  <span class="lugar">{{ avistamiento.address || 'Sin dirección' }}</span>
+                  @if (avistamiento.note) {
+                    <span class="texto-secundario">{{ avistamiento.note }}</span>
+                  }
+                  @if (avistamiento.date) {
+                    <span class="texto-mini texto-secundario">{{ avistamiento.date | fecha: "d 'de' MMM, HH:mm" }}</span>
+                  }
+                </li>
+              }
+            </ul>
+          </details>
+        }
         @if (mascota().created_at) {
           <p class="texto-mini texto-secundario texto-centrado">
             Reportada {{ mascota().created_at | fecha: "d 'de' MMM, yyyy" }}
@@ -135,6 +156,42 @@ import { FechaPipe } from '../../core/pipes/fecha.pipe';
         margin: 0;
       }
     }
+
+    .avistamientos {
+      font-size: 0.85rem;
+
+      summary {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 36px;
+        font-weight: 600;
+        color: var(--ion-color-primary);
+        cursor: pointer;
+      }
+
+      ul {
+        margin: 4px 0 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      li {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(var(--ion-color-primary-rgb), 0.08);
+      }
+
+      .lugar {
+        font-weight: 600;
+      }
+    }
   `,
 })
 export class TarjetaMascotaPerdidaComponent {
@@ -142,4 +199,15 @@ export class TarjetaMascotaPerdidaComponent {
   readonly eliminar = input<(mascota: MascotaPerdida) => Promise<unknown>>();
   readonly avistamiento = output<void>();
   readonly editar = output<void>();
+
+  /**
+   * Todos los avistamientos, del más nuevo al más viejo. El mapa solo puede
+   * mostrar los que tienen coordenadas: los que se cargaron solo con la
+   * dirección no aparecían en ningún lado y quien publicó nunca los veía.
+   * sightings es JSONB sin validar, por eso el Array.isArray.
+   */
+  protected readonly avistamientos = computed<Avistamiento[]>(() => {
+    const cargados = this.mascota().sightings;
+    return Array.isArray(cargados) ? [...cargados].reverse() : [];
+  });
 }

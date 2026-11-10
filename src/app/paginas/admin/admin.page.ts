@@ -13,6 +13,15 @@ import { AdminVeterinariasComponent } from './admin-veterinarias.component';
 type Pestania = 'estadisticas' | 'veterinarias' | 'casos';
 
 /** Panel de administración: estadísticas, verificación de veterinarias y moderación. */
+/**
+ * El panel cuenta y lista todo lo cargado, no solo lo último. Con el límite por
+ * defecto (100) los totales quedaban mal y una veterinaria o una denuncia
+ * pendiente más vieja no se podía alcanzar. 1000 es el máximo de filas que
+ * devuelve la API de Supabase por consulta; si algún día se supera, hay que
+ * pasar a contar del lado del servidor y paginar.
+ */
+const LIMITE_DEL_PANEL = 1000;
+
 @Component({
   selector: 'app-admin',
   imports: [
@@ -55,11 +64,11 @@ export class AdminPage {
   async cargarTodo(): Promise<void> {
     try {
       const [veterinarias, perdidas, urgentes, adopciones, denuncias] = await Promise.all([
-        this.supabase.veterinarias.listar(),
-        this.supabase.mascotasPerdidas.listar(),
-        this.supabase.casosUrgentes.listar(),
-        this.supabase.mascotasEnAdopcion.listar(),
-        this.supabase.denuncias.listar(),
+        this.supabase.veterinarias.listar('-created_at', LIMITE_DEL_PANEL),
+        this.supabase.mascotasPerdidas.listar('-created_at', LIMITE_DEL_PANEL),
+        this.supabase.casosUrgentes.listar('-created_at', LIMITE_DEL_PANEL),
+        this.supabase.mascotasEnAdopcion.listar('-created_at', LIMITE_DEL_PANEL),
+        this.supabase.denuncias.listar('-created_at', LIMITE_DEL_PANEL),
       ]);
       this.veterinarias.set(veterinarias);
       this.mascotasPerdidas.set(perdidas);
@@ -76,28 +85,28 @@ export class AdminPage {
   protected async verificarVeterinaria(veterinaria: Veterinaria, verificada: boolean): Promise<void> {
     await this.actualizar(async () => {
       await this.supabase.veterinarias.actualizar(veterinaria.id, { is_verified: verificada });
-      this.veterinarias.set(await this.supabase.veterinarias.listar());
+      this.veterinarias.set(await this.supabase.veterinarias.listar('-created_at', LIMITE_DEL_PANEL));
     });
   }
 
   protected async cambiarEstadoDeCaso(id: string, status: CasoUrgente['status']): Promise<void> {
     await this.actualizar(async () => {
       await this.supabase.casosUrgentes.actualizar(id, { status });
-      this.casosUrgentes.set(await this.supabase.casosUrgentes.listar());
+      this.casosUrgentes.set(await this.supabase.casosUrgentes.listar('-created_at', LIMITE_DEL_PANEL));
     });
   }
 
   protected async cambiarEstadoDePerdida(id: string, status: MascotaPerdida['status']): Promise<void> {
     await this.actualizar(async () => {
       await this.supabase.mascotasPerdidas.actualizar(id, { status });
-      this.mascotasPerdidas.set(await this.supabase.mascotasPerdidas.listar());
+      this.mascotasPerdidas.set(await this.supabase.mascotasPerdidas.listar('-created_at', LIMITE_DEL_PANEL));
     });
   }
 
   protected async cambiarEstadoDeDenuncia(id: string, status: Denuncia['status']): Promise<void> {
     await this.actualizar(async () => {
       await this.supabase.denuncias.actualizar(id, { status });
-      this.denuncias.set(await this.supabase.denuncias.listar());
+      this.denuncias.set(await this.supabase.denuncias.listar('-created_at', LIMITE_DEL_PANEL));
     });
   }
 
