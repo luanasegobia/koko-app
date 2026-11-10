@@ -1,0 +1,70 @@
+@if (codigoDeSeguimiento(); as codigo) {
+  <div class="exito">
+    <ion-icon name="checkmark-circle" color="primary"></ion-icon>
+    <h3>Denuncia enviada</h3>
+    <p class="texto-chico texto-secundario">Tu código de seguimiento es:</p>
+    <div class="codigo">
+      <span class="monoespaciado">{{ codigo }}</span>
+      <ion-button fill="clear" size="small" (click)="copiarCodigo()" aria-label="Copiar código">
+        <ion-icon slot="icon-only" [name]="copiado() ? 'checkmark' : 'copy-outline'"></ion-icon>
+      </ion-button>
+    </div>
+    <p class="texto-mini texto-secundario">Guardá este código para consultar el estado de tu denuncia.</p>
+    <ion-button expand="block" (click)="enviado.emit()">Cerrar</ion-button>
+  </div>
+} @else {
+  <form class="formulario" [formGroup]="formulario" (ngSubmit)="enviar()">
+    <div class="pila-chica">
+      <p class="etiqueta-campo">Tipo de situación</p>
+      <ion-segment formControlName="type">
+        <ion-segment-button value="urgente">Urgente</ion-segment-button>
+        <ion-segment-button value="regular">Regular</ion-segment-button>
+        <ion-segment-button value="anonima">Anónima</ion-segment-button>
+      </ion-segment>
+      @if (tipo() === 'urgente') {
+        <p class="texto-mini" style="color: var(--ion-color-danger)">Se notifica a proteccionistas y municipio.</p>
+      }
+    </div>
+
+    <ion-textarea
+      label="Descripción"
+      labelPlacement="stacked"
+      fill="outline"
+      formControlName="description"
+      placeholder="Describí la situación..."
+      [rows]="4"
+      [autoGrow]="true"
+      errorText="La descripción es obligatoria"
+    ></ion-textarea>
+
+    <div class="pila-chica">
+      <ion-input label="Ubicación" labelPlacement="stacked" fill="outline" formControlName="address" placeholder="Ej: Av. San Martín, Orán"></ion-input>
+      <app-boton-ubicacion [(valor)]="ubicacion" />
+    </div>
+
+    @if (tipo() !== 'anonima') {
+      <div class="campos-en-fila">
+        <ion-input label="Tu nombre" labelPlacement="stacked" fill="outline" formControlName="reporter_name"></ion-input>
+        <ion-input label="Teléfono" labelPlacement="stacked" fill="outline" type="tel" formControlName="reporter_phone"></ion-input>
+      </div>
+    }
+
+    <div class="pila-chica">
+      <p class="etiqueta-campo">Evidencia (fotos/videos)</p>
+      <app-selector-foto [multiple]="true" aceptar="image/*,video/*" etiqueta="Adjuntar evidencia" (archivos)="alElegirArchivos($event)" />
+    </div>
+
+    @if (error()) {
+      <p class="error-formulario">{{ error() }}</p>
+    }
+
+    <ion-button type="submit" expand="block" color="danger" [disabled]="guardando()">
+      @if (guardando()) {
+        <ion-spinner slot="start" name="crescent"></ion-spinner>
+      } @else {
+        <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+      }
+      Enviar denuncia {{ tipo() === 'urgente' ? 'urgente' : '' }}
+    </ion-button>
+  </form>
+}

@@ -46,8 +46,8 @@ en minúsculas y separada por guiones:
 |---|---|---|
 | `feat/` | Funcionalidad nueva | `feat/donaciones-stripe` |
 | `fix/` | Corrección de un error | `fix/login-sin-perfil` |
-| `refactor/` | Reorganización sin cambiar comportamiento | `refactor/formularios-zod` |
-| `chore/` | Configuración, dependencias, tareas de mantenimiento | `chore/actualizar-vite` |
+| `refactor/` | Reorganización sin cambiar comportamiento | `refactor/formularios-reactivos` |
+| `chore/` | Configuración, dependencias, tareas de mantenimiento | `chore/actualizar-ionic` |
 | `docs/` | Solo documentación | `docs/readme-supabase` |
 
 ## Mensajes de commit

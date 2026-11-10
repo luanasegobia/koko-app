@@ -1,0 +1,122 @@
+<app-cabecera titulo="Adopción" />
+
+<ion-content class="ion-padding">
+  <div class="contenedor pila">
+    <div class="encabezado-pagina">
+      <div>
+        <h1>Adopción</h1>
+        <p class="subtitulo">Encontrá a tu nuevo compañero</p>
+      </div>
+      <ion-button (click)="abrirFormulario()">
+        <ion-icon slot="start" name="add"></ion-icon>
+        Publicar en adopción
+      </ion-button>
+    </div>
+
+    <div class="selectores">
+      <ion-icon name="filter-outline" class="texto-secundario"></ion-icon>
+      <ion-select [value]="filtroEspecie()" (ionChange)="filtroEspecie.set($any($event).detail.value)" interface="popover" fill="outline" aria-label="Especie">
+        <ion-select-option value="all">Todas</ion-select-option>
+        <ion-select-option value="perro">Perros</ion-select-option>
+        <ion-select-option value="gato">Gatos</ion-select-option>
+        <ion-select-option value="otro">Otros</ion-select-option>
+      </ion-select>
+      <ion-select [value]="filtroTamanio()" (ionChange)="filtroTamanio.set($any($event).detail.value)" interface="popover" fill="outline" aria-label="Tamaño">
+        <ion-select-option value="all">Todos</ion-select-option>
+        <ion-select-option value="pequeño">Pequeño</ion-select-option>
+        <ion-select-option value="mediano">Mediano</ion-select-option>
+        <ion-select-option value="grande">Grande</ion-select-option>
+      </ion-select>
+    </div>
+
+    @if (cargando()) {
+      <div class="cargando"><ion-spinner name="crescent" color="primary"></ion-spinner></div>
+    } @else if (filtradas().length === 0) {
+      <ion-card class="tarjeta-vacia">
+        <ion-icon name="heart-outline"></ion-icon>
+        <p>No hay mascotas en adopción por el momento.</p>
+      </ion-card>
+    } @else {
+      <div class="cuadricula-tarjetas">
+        @for (mascota of filtradas(); track mascota.id; let i = $index) {
+          <ion-card class="tarjeta aparece" [style.animation-delay]="i * 50 + 'ms'">
+            <div class="foto-tarjeta">
+              @if (mascota.photo_url) {
+                <img [src]="mascota.photo_url" [alt]="mascota.name" />
+              } @else {
+                <ion-icon name="paw" class="sin-foto"></ion-icon>
+              }
+              <ion-badge [color]="estado(mascota).color" class="estado">{{ estado(mascota).etiqueta }}</ion-badge>
+              @if (mascota.sex) {
+                <ion-badge color="light" class="sexo">{{ mascota.sex === 'macho' ? '♂ Macho' : '♀ Hembra' }}</ion-badge>
+              }
+            </div>
+            <div class="cuerpo">
+              <div class="titulo-fila">
+                <div>
+                  <h3>{{ mascota.name }}</h3>
+                  <p class="texto-chico texto-secundario">
+                    {{ mascota.breed || mascota.species }}
+                    @if (mascota.age_years) { · {{ mascota.age_years }} años }
+                    @if (mascota.size) { · {{ etiquetaTamanio(mascota.size) }} }
+                  </p>
+                </div>
+                <app-acciones-de-duenio
+                  [registro]="mascota"
+                  [etiqueta]="'la publicación de ' + mascota.name"
+                  [eliminar]="eliminarMascota"
+                  (editar)="abrirFormulario(mascota)"
+                />
+              </div>
+              @if (mascota.vaccinated || mascota.sterilized) {
+                <div class="fila">
+                  @if (mascota.vaccinated) {
+                    <ion-chip color="medium"><ion-icon name="fitness-outline"></ion-icon> Vacunado</ion-chip>
+                  }
+                  @if (mascota.sterilized) {
+                    <ion-chip color="medium"><ion-icon name="cut-outline"></ion-icon> Esterilizado</ion-chip>
+                  }
+                </div>
+              }
+              @if (mascota.description) {
+                <p class="texto-chico recortar-2">{{ mascota.description }}</p>
+              }
+              <div class="botones">
+                @if (mascota.contact_phone) {
+                  <ion-button fill="outline" size="small" [href]="'tel:' + mascota.contact_phone">
+                    <ion-icon slot="start" name="call-outline"></ion-icon>
+                    Contactar
+                  </ion-button>
+                }
+                <ion-button fill="outline" size="small" (click)="abrirChat(mascota)">
+                  <ion-icon slot="start" name="chatbubble-ellipses-outline"></ion-icon>
+                  Chat
+                </ion-button>
+              </div>
+            </div>
+          </ion-card>
+        }
+      </div>
+    }
+  </div>
+
+  <ion-modal [isOpen]="mostrarFormulario()" (didDismiss)="cerrarFormulario()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>
+            {{ enEdicion() ? 'Editar la publicación de ' + enEdicion()!.name : 'Publicar mascota en adopción' }}
+          </ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarFormulario()" aria-label="Cerrar">
+              <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <app-formulario-adopcion [registroInicial]="enEdicion()" (guardado)="alGuardar()" />
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

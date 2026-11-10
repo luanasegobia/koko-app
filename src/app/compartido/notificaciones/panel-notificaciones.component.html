@@ -1,0 +1,70 @@
+<div class="panel">
+  <div class="cabecera">
+    <div class="titulo-panel">
+      <ion-icon name="notifications" color="primary"></ion-icon>
+      <span>Notificaciones</span>
+      @if (notificaciones.noLeidas() > 0) {
+        <ion-badge color="danger">{{ notificaciones.noLeidas() }}</ion-badge>
+      }
+    </div>
+    <div class="acciones">
+      @if (notificaciones.noLeidas() > 0) {
+        <ion-button fill="clear" size="small" color="medium" (click)="notificaciones.marcarTodasLeidas()">
+          <ion-icon slot="start" name="checkmark-done"></ion-icon>
+          Todo leído
+        </ion-button>
+      }
+      <ion-button
+        [fill]="pestania() === 'configuracion' ? 'solid' : 'clear'"
+        size="small"
+        color="medium"
+        (click)="alternarPestania()"
+        aria-label="Configurar alertas"
+      >
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  @if (pestania() === 'configuracion') {
+    <app-panel-alertas />
+  } @else {
+    <div class="lista">
+      @if (notificaciones.notificaciones().length === 0) {
+        <div class="vacio">
+          <ion-icon name="notifications-off-outline"></ion-icon>
+          <p class="texto-chico texto-secundario">Sin notificaciones</p>
+          @if (!notificaciones.suscripcion()) {
+            <p class="texto-mini texto-secundario">
+              Activá las alertas desde
+              <ion-button fill="clear" size="small" (click)="pestania.set('configuracion')">
+                ⚙ Configuración
+              </ion-button>
+            </p>
+          }
+        </div>
+      } @else {
+        @for (n of notificaciones.notificaciones(); track n.id) {
+          <button
+            type="button"
+            class="notificacion"
+            [class.sin-leer]="!n.read"
+            (click)="notificaciones.marcarLeida(n.id)"
+          >
+            <ion-icon [name]="icono(n.type).nombre" [color]="icono(n.type).color"></ion-icon>
+            <span class="cuerpo">
+              <span class="titulo-notificacion" [class.negrita]="!n.read">{{ n.title }}</span>
+              <span class="texto-mini texto-secundario">{{ n.body }}</span>
+              @if (n.created_at) {
+                <span class="texto-mini fecha">{{ n.created_at | haceTiempo }}</span>
+              }
+            </span>
+            @if (!n.read) {
+              <span class="punto"></span>
+            }
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

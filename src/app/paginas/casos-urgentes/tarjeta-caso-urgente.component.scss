@@ -1,0 +1,105 @@
+:host {
+  display: block;
+}
+
+.tarjeta {
+  transition: box-shadow 0.3s;
+
+  &:hover {
+    box-shadow: 0 10px 25px -10px rgba(var(--koko-sombra-rgb), 0.3);
+  }
+}
+
+.cuerpo {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.encabezado {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  .titulos {
+    flex: 1;
+    min-width: 0;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  .miniatura {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+}
+
+.entre {
+  justify-content: space-between;
+}
+
+.recaudacion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  ion-progress-bar {
+    height: 8px;
+    border-radius: 999px;
+  }
+}
+
+.necesidades {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+ion-chip {
+  --background: transparent;
+  border: 1px solid var(--ion-border-color);
+  font-size: 0.75rem;
+  height: 26px;
+  margin: 0;
+
+  .icono-necesidad {
+    margin-right: 4px;
+    font-weight: 700;
+  }
+
+  &[data-estado='cubierto'] .icono-necesidad {
+    color: var(--ion-color-primary);
+  }
+
+  &[data-estado='parcial'] .icono-necesidad {
+    color: var(--ion-color-secondary);
+  }
+
+  &[data-estado='pendiente'] .icono-necesidad {
+    color: var(--ion-color-danger);
+  }
+}
+
+.alias {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(var(--ion-color-medium-rgb), 0.12);
+}
+
+.acciones {
+  ion-button,
+  app-boton-donar-stripe {
+    flex: 1;
+    margin: 0;
+  }
+}

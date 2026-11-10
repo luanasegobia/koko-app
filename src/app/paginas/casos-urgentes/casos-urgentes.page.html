@@ -1,0 +1,62 @@
+<app-cabecera titulo="Casos Urgentes" />
+
+<ion-content class="ion-padding">
+  <div class="contenedor pila">
+    <div class="encabezado-pagina">
+      <div class="fila">
+        <div>
+          <h1>Casos Urgentes</h1>
+          <p class="subtitulo">Ayudá a animales en emergencia</p>
+        </div>
+        @if (activos().length > 0) {
+          <ion-badge color="danger">{{ activos().length }} activos</ion-badge>
+        }
+      </div>
+      <ion-button (click)="abrirFormulario()">
+        <ion-icon slot="start" name="add"></ion-icon>
+        Publicar nuevo caso
+      </ion-button>
+    </div>
+
+    <app-panel-suscripcion-alertas />
+
+    @if (cargando()) {
+      <div class="cargando"><ion-spinner name="crescent" color="primary"></ion-spinner></div>
+    } @else if (casos().length === 0) {
+      <ion-card class="tarjeta-vacia">
+        <ion-icon name="hand-left-outline"></ion-icon>
+        <p>No hay casos urgentes por el momento.</p>
+      </ion-card>
+    } @else {
+      <div class="pila">
+        @for (caso of casos(); track caso.id; let i = $index) {
+          <app-tarjeta-caso-urgente
+            class="aparece"
+            [style.animation-delay]="i * 50 + 'ms'"
+            [caso]="caso"
+            [eliminar]="eliminarCaso"
+            (editar)="abrirFormulario(caso)"
+          />
+        }
+      </div>
+    }
+  </div>
+
+  <ion-modal [isOpen]="mostrarFormulario()" (didDismiss)="cerrarFormulario()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ enEdicion() ? 'Editar "' + enEdicion()!.title + '"' : 'Publicar caso urgente' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarFormulario()" aria-label="Cerrar">
+              <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <app-formulario-caso-urgente [registroInicial]="enEdicion()" (guardado)="alGuardar()" />
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

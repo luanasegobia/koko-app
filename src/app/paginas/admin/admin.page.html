@@ -1,0 +1,65 @@
+<app-cabecera titulo="Panel Admin" />
+
+<ion-content class="ion-padding">
+  <div class="contenedor pila">
+    @if (!auth.esAdmin()) {
+      <div class="restringido">
+        <ion-icon name="shield-half" color="danger"></ion-icon>
+        <h2>Acceso restringido</h2>
+        <p class="texto-secundario">Solo los administradores pueden ver esta sección.</p>
+      </div>
+    } @else {
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Panel de Administración</h1>
+          <p class="subtitulo">Estadísticas, verificaciones y moderación de contenido</p>
+        </div>
+      </div>
+
+      <ion-segment [value]="pestania()" (ionChange)="pestania.set($any($event).detail.value)" class="pestanias">
+        <ion-segment-button value="estadisticas">Estadísticas</ion-segment-button>
+        <ion-segment-button value="veterinarias">
+          Veterinarias
+          @if (veterinariasPendientes() > 0) {
+            <ion-badge color="warning">{{ veterinariasPendientes() }}</ion-badge>
+          }
+        </ion-segment-button>
+        <ion-segment-button value="casos">Casos &amp; Reportes</ion-segment-button>
+      </ion-segment>
+
+      @switch (pestania()) {
+        @case ('estadisticas') {
+          <app-admin-estadisticas
+            [veterinarias]="veterinarias()"
+            [mascotasPerdidas]="mascotasPerdidas()"
+            [casosUrgentes]="casosUrgentes()"
+            [adopciones]="adopciones()"
+            [denuncias]="denuncias()"
+            [cargando]="cargando()"
+          />
+        }
+        @case ('veterinarias') {
+          <app-admin-veterinarias
+            [veterinarias]="veterinarias()"
+            [cargando]="cargando()"
+            [actualizando]="actualizando()"
+            (aprobar)="verificarVeterinaria($event, true)"
+            (revocar)="verificarVeterinaria($event, false)"
+          />
+        }
+        @case ('casos') {
+          <app-admin-casos
+            [casosUrgentes]="casosUrgentes()"
+            [mascotasPerdidas]="mascotasPerdidas()"
+            [denuncias]="denuncias()"
+            [cargando]="cargando()"
+            [actualizando]="actualizando()"
+            (cambiarCaso)="cambiarEstadoDeCaso($event.id, $event.status)"
+            (cambiarPerdida)="cambiarEstadoDePerdida($event.id, $event.status)"
+            (cambiarDenuncia)="cambiarEstadoDeDenuncia($event.id, $event.status)"
+          />
+        }
+      }
+    }
+  </div>
+</ion-content>

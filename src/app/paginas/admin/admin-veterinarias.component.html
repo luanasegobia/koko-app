@@ -1,0 +1,73 @@
+<div class="pila">
+  <div class="contadores">
+    <div class="contador ambar">
+      <p class="numero">{{ pendientes().length }}</p>
+      <p class="texto-mini">Pendientes</p>
+    </div>
+    <div class="contador verde">
+      <p class="numero">{{ verificadas().length }}</p>
+      <p class="texto-mini">Verificadas</p>
+    </div>
+  </div>
+
+  <ion-segment [value]="pestania()" (ionChange)="pestania.set($any($event).detail.value)">
+    <ion-segment-button value="pendientes">
+      Pendientes
+      @if (pendientes().length > 0) {
+        <ion-badge color="warning">{{ pendientes().length }}</ion-badge>
+      }
+    </ion-segment-button>
+    <ion-segment-button value="verificadas">Verificadas</ion-segment-button>
+  </ion-segment>
+
+  @if (cargando()) {
+    <div class="cargando"><ion-spinner name="crescent" color="primary"></ion-spinner></div>
+  } @else if (mostradas().length === 0) {
+    <ion-card class="tarjeta-vacia">
+      <ion-icon name="medkit-outline"></ion-icon>
+      <p>{{ pestania() === 'pendientes' ? 'No hay veterinarias pendientes.' : 'No hay veterinarias verificadas aún.' }}</p>
+    </ion-card>
+  } @else {
+    <div class="lista">
+      @for (veterinaria of mostradas(); track veterinaria.id; let i = $index) {
+        <ion-card class="tarjeta aparece" [class.verificada]="veterinaria.is_verified" [style.animation-delay]="i * 50 + 'ms'">
+          <div class="info">
+            <div class="fila">
+              <h3>{{ veterinaria.name }}</h3>
+              <ion-badge [color]="veterinaria.is_verified ? 'primary' : 'warning'">
+                <ion-icon [name]="veterinaria.is_verified ? 'shield-checkmark' : 'time'"></ion-icon>
+                {{ veterinaria.is_verified ? 'Verificada' : 'Pendiente' }}
+              </ion-badge>
+            </div>
+            <div class="fila detalles texto-chico texto-secundario">
+              <span><ion-icon name="location-outline"></ion-icon> {{ veterinaria.address }}</span>
+              <span><ion-icon name="call-outline"></ion-icon> {{ veterinaria.phone }}</span>
+            </div>
+            @if (veterinaria.bio) {
+              <p class="texto-chico">{{ veterinaria.bio }}</p>
+            }
+            @if (veterinaria.services) {
+              <p class="texto-mini texto-secundario">Servicios: {{ veterinaria.services }}</p>
+            }
+            @if (veterinaria.created_at) {
+              <p class="texto-mini texto-secundario">Registrada el {{ veterinaria.created_at | fecha: "d 'de' MMMM 'de' yyyy" }}</p>
+            }
+          </div>
+          <div>
+            @if (!veterinaria.is_verified) {
+              <ion-button size="small" [disabled]="actualizando()" (click)="aprobar.emit(veterinaria)">
+                <ion-icon slot="start" name="checkmark-circle"></ion-icon>
+                Aprobar
+              </ion-button>
+            } @else {
+              <ion-button size="small" fill="outline" color="danger" [disabled]="actualizando()" (click)="revocar.emit(veterinaria)">
+                <ion-icon slot="start" name="close-circle"></ion-icon>
+                Revocar
+              </ion-button>
+            }
+          </div>
+        </ion-card>
+      }
+    </div>
+  }
+</div>

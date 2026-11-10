@@ -1,0 +1,77 @@
+<form class="panel" [formGroup]="formulario" (ngSubmit)="guardar()">
+  <p class="texto-mini texto-secundario">Recibí alertas cuando haya novedades cerca de tu zona.</p>
+
+  <div class="bloque">
+    <p class="etiqueta">Zona de alertas</p>
+    <div class="zona">
+      <ion-input
+        formControlName="location_label"
+        placeholder="Etiqueta (ej: Mi casa)"
+        aria-label="Etiqueta de la zona"
+        fill="outline"
+      ></ion-input>
+      <ion-button
+        type="button"
+        fill="outline"
+        size="small"
+        [disabled]="localizando()"
+        (click)="localizar()"
+        aria-label="Usar mi ubicación"
+      >
+        @if (localizando()) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          <ion-icon slot="icon-only" name="locate"></ion-icon>
+        }
+      </ion-button>
+    </div>
+    @if (tieneUbicacion) {
+      <p class="texto-mini texto-secundario">
+        📍 {{ formulario.controls.lat.value!.toFixed(4) }},
+        {{ formulario.controls.lng.value!.toFixed(4) }}
+      </p>
+    }
+  </div>
+
+  <div class="bloque">
+    <div class="entre">
+      <p class="etiqueta">Radio de alerta</p>
+      <strong class="texto-mini valor">{{ formulario.controls.radius_km.value }} km</strong>
+    </div>
+    <ion-range
+      formControlName="radius_km"
+      [min]="1"
+      [max]="30"
+      [step]="1"
+      aria-label="Radio de alerta en kilómetros"
+    ></ion-range>
+  </div>
+
+  <div class="bloque">
+    <p class="etiqueta">Tipos de alerta</p>
+    <ion-item lines="none">
+      <ion-label>🐾 Mascotas perdidas</ion-label>
+      <ion-toggle slot="end" formControlName="notify_lost_pets" aria-label="Alertas de mascotas perdidas"></ion-toggle>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label>🆘 Casos urgentes</ion-label>
+      <ion-toggle slot="end" formControlName="notify_urgent_cases" aria-label="Alertas de casos urgentes"></ion-toggle>
+    </ion-item>
+  </div>
+
+  <div class="acciones">
+    <ion-button type="submit" size="small" class="crecer" [disabled]="guardando() || !tieneUbicacion">
+      @if (guardando()) {
+        <ion-spinner slot="start" name="crescent"></ion-spinner>
+      } @else {
+        <ion-icon slot="start" name="save-outline"></ion-icon>
+      }
+      {{ guardado() ? '¡Guardado!' : 'Guardar alertas' }}
+    </ion-button>
+    @if (suscripcion()) {
+      <ion-button type="button" size="small" fill="outline" color="danger" (click)="eliminar()" aria-label="Quitar alertas">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    }
+  </div>
+</form>

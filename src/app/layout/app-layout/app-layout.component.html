@@ -1,0 +1,79 @@
+<ion-split-pane contentId="principal" when="lg">
+  <ion-menu contentId="principal" type="overlay" class="menu-lateral">
+    <ion-header>
+      <ion-toolbar>
+        <div class="marca">
+          <div class="logo">
+            <ion-icon name="paw"></ion-icon>
+          </div>
+          <div class="nombre">
+            <span>Conectando</span>
+            <span class="resaltado">Huellas</span>
+          </div>
+        </div>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+      <ion-list lines="none">
+        @for (elemento of navegacion; track elemento.ruta) {
+          <ion-menu-toggle [autoHide]="false">
+            <ion-item
+              button
+              [detail]="false"
+              [routerLink]="elemento.ruta"
+              routerLinkActive="activo"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              <ion-icon slot="start" [name]="elemento.icono"></ion-icon>
+              <ion-label>{{ elemento.etiqueta }}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        }
+      </ion-list>
+
+      <div class="separador"></div>
+
+      <ion-list lines="none">
+        <ion-item button [detail]="false" (click)="tema.alternar()">
+          <ion-icon slot="start" [name]="tema.tema() === 'oscuro' ? 'sunny-outline' : 'moon-outline'"></ion-icon>
+          <ion-label>{{ tema.tema() === 'oscuro' ? 'Modo claro' : 'Modo oscuro' }}</ion-label>
+        </ion-item>
+      </ion-list>
+
+      <div class="separador"></div>
+
+      <ion-list lines="none">
+        @if (auth.usuario(); as usuario) {
+          <p class="usuario">{{ usuario.full_name || usuario.email }}</p>
+          <ion-item button [detail]="false" (click)="auth.cerrarSesion()">
+            <ion-icon slot="start" name="log-out-outline"></ion-icon>
+            <ion-label>Cerrar sesión</ion-label>
+          </ion-item>
+        } @else {
+          <ion-item button [detail]="false" (click)="auth.irAlLogin()">
+            <ion-icon slot="start" name="log-in-outline"></ion-icon>
+            <ion-label>Iniciar sesión</ion-label>
+          </ion-item>
+        }
+      </ion-list>
+
+      @if (auth.esAdmin()) {
+        <div class="separador"></div>
+        <p class="seccion">Administración</p>
+        <ion-list lines="none">
+          <ion-menu-toggle [autoHide]="false">
+            <ion-item button [detail]="false" routerLink="/admin" routerLinkActive="activo">
+              <ion-icon slot="start" name="shield-checkmark-outline"></ion-icon>
+              <ion-label>Panel Admin</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
+      }
+    </ion-content>
+  </ion-menu>
+
+  <ion-router-outlet id="principal"></ion-router-outlet>
+</ion-split-pane>
+
+<app-ventanas-chat />

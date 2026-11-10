@@ -1,0 +1,84 @@
+ion-segment {
+  @media (min-width: 640px) {
+    width: auto;
+    align-self: flex-start;
+  }
+
+  ion-segment-button {
+    text-transform: none;
+    flex-direction: row;
+    gap: 6px;
+    min-height: 40px;
+  }
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.miniatura {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  p ion-icon {
+    vertical-align: -2px;
+    margin-right: 2px;
+  }
+}
+
+ion-select {
+  flex-shrink: 0;
+  min-width: 150px;
+  min-height: 38px;
+  font-size: 0.85rem;
+  --padding-start: 10px;
+  --padding-end: 6px;
+}
+
+.capitalizar {
+  text-transform: capitalize;
+}
+
+.evidencias {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+
+  img {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--ion-border-color);
+  }
+}
