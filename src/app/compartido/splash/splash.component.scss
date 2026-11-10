@@ -4,9 +4,9 @@
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: var(--ion-color-primary);
+  overflow: hidden;
+  background: var(--ion-background-color);
+  color: var(--ion-text-color);
   transition: opacity 0.5s ease-in-out;
 
   &.saliendo {
@@ -15,113 +15,156 @@
   }
 }
 
-.circulo {
+// La columna se mide en alto de pantalla para que las siete patitas entren
+// siempre, sea un teléfono o un monitor.
+.patitas {
   position: absolute;
-  border-radius: 50%;
-  background: rgba(var(--koko-texto-sobre-color-rgb), 0.05);
-  animation: crecer 0.8s ease-out both;
+  top: 0;
+  right: -7vh;
+  z-index: 1;
+  width: min(28.3vh, 62vw);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px 0;
+}
 
-  &.circulo-grande {
-    width: 384px;
-    height: 384px;
-  }
+.patita {
+  width: 100%;
+  height: 14%;
+  opacity: 0;
+  transform: translateX(140px) rotate(-6deg);
+  animation: entrar-patita 0.7s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
 
-  &.circulo-chico {
-    width: 256px;
-    height: 256px;
-    animation-delay: 0.1s;
+  @for $i from 1 through 7 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{0.05 + ($i - 1) * 0.1}s;
+    }
   }
 }
 
-.logo {
+.marca {
   position: relative;
+  z-index: 2;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  animation: entrar 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  align-items: flex-start;
+  justify-content: center;
+  width: 60%;
+  padding-left: 42px;
 
-  .caja {
-    width: 112px;
-    height: 112px;
-    border-radius: 28px;
-    background: var(--koko-texto-sobre-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 25px 50px -12px rgba(var(--koko-sombra-rgb), 0.35);
-
-    ion-icon {
-      font-size: 56px;
-      color: var(--ion-color-primary);
-    }
+  @media (min-width: 768px) {
+    padding-left: 12vw;
   }
 
   h1 {
-    font-size: 3.5rem;
-    font-weight: 800;
-    color: var(--koko-texto-sobre-color);
-    text-align: center;
-  }
-
-  p {
-    color: rgba(var(--koko-texto-sobre-color-rgb), 0.7);
-    font-size: 0.8rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    text-align: center;
-  }
-}
-
-.puntos {
-  position: absolute;
-  bottom: 64px;
-  display: flex;
-  gap: 8px;
-
-  span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(var(--koko-texto-sobre-color-rgb), 0.5);
-    animation: latir 1s infinite;
-
-    &:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    &:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-  }
-}
-
-@keyframes crecer {
-  from {
-    transform: scale(0);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-@keyframes entrar {
-  from {
-    transform: scale(0.4);
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.4em;
     opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
+    transform: scale(0.6) translateY(14px);
+    animation: aparecer-titulo 1.1s cubic-bezier(0.2, 0.9, 0.25, 1) 0.15s forwards;
+
+    @media (min-width: 768px) {
+      font-size: 96px;
+    }
   }
 }
 
-@keyframes latir {
-  0%,
-  100% {
-    opacity: 0.3;
-  }
-  50% {
+.lema {
+  margin: 14px 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: aparecer-texto 0.7s ease 0.95s forwards;
+}
+
+.barra {
+  width: 46px;
+  height: 5px;
+  margin: 22px 0 0 4px;
+  border-radius: 4px;
+  background: var(--ion-text-color);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: crecer-barra 0.5s ease 1.25s forwards;
+}
+
+.pie {
+  position: relative;
+  z-index: 2;
+  padding-bottom: 38px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: aparecer-texto 0.6s ease 1.5s forwards;
+}
+
+@keyframes entrar-patita {
+  to {
     opacity: 1;
+    transform: translateX(0) rotate(-6deg);
+  }
+}
+
+@keyframes aparecer-titulo {
+  0% {
+    opacity: 0;
+    letter-spacing: 0.5em;
+    transform: scale(0.6) translateY(14px);
+  }
+  55% {
+    opacity: 1;
+    letter-spacing: 0.02em;
+    transform: scale(1.08) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    letter-spacing: 0.06em;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes aparecer-texto {
+  to {
+    opacity: 0.85;
+    transform: translateY(0);
+  }
+}
+
+@keyframes crecer-barra {
+  to {
+    opacity: 0.55;
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .patita,
+  .marca h1,
+  .lema,
+  .barra,
+  .pie {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .patita {
+    transform: rotate(-6deg);
+  }
+
+  .marca h1 {
+    letter-spacing: 0.06em;
   }
 }

@@ -4,12 +4,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonButton,
   IonContent,
-  IonIcon,
   IonInput,
   IonInputPasswordToggle,
   IonSpinner,
 } from '@ionic/angular';
 import { IconoGoogleComponent } from '../../compartido/icono-google/icono-google.component';
+import { PatitaComponent } from '../../compartido/patita/patita.component';
 import { SplashComponent } from '../../compartido/splash/splash.component';
 import { mensajeDeError } from '../../core/mensaje-de-error';
 import { AuthService } from '../../core/servicios/auth.service';
@@ -21,12 +21,12 @@ import { AuthService } from '../../core/servicios/auth.service';
     RouterLink,
     IonContent,
     IonButton,
-    IonIcon,
     IonInput,
     IonInputPasswordToggle,
     IonSpinner,
     SplashComponent,
     IconoGoogleComponent,
+    PatitaComponent,
   ],
   templateUrl: './login.page.html',
   styleUrl: './login.page.scss',

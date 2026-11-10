@@ -1,16 +1,25 @@
 ion-content {
-  --background: linear-gradient(
-    135deg,
-    rgba(var(--ion-color-primary-rgb), 0.1),
-    var(--ion-background-color) 50%,
-    rgba(var(--ion-color-secondary-rgb), 0.1)
-  );
+  --background: var(--ion-background-color);
+}
+
+// La patita que asoma desde la esquina inferior. Va en el slot fijo para que
+// no se mueva al hacer scroll ni empuje el contenido.
+.patita-esquina {
+  right: -40px;
+  bottom: -30px;
+  width: 190px;
+  opacity: 0.9;
+  transform: rotate(8deg);
+  pointer-events: none;
 }
 
 .login {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
   max-width: 440px;
   margin: 0 auto;
-  padding: 32px 0 40px;
   opacity: 0;
   transform: translateY(24px);
   transition:
@@ -23,62 +32,136 @@ ion-content {
   }
 }
 
-.marca {
-  text-align: center;
-  margin-bottom: 28px;
+.encabezado {
+  padding: 74px 34px 10px;
 
-  .logo {
-    width: 80px;
-    height: 80px;
-    border-radius: 24px;
-    background: var(--ion-color-primary);
-    color: var(--koko-texto-sobre-color);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 25px -5px rgba(var(--ion-color-primary-rgb), 0.4);
-    margin-bottom: 16px;
-
-    ion-icon {
-      font-size: 40px;
-    }
+  .antetitulo {
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ion-color-primary);
   }
 
   h1 {
-    font-size: 2.25rem;
-    font-weight: 800;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+  }
+
+  .bajada {
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    opacity: 0.75;
   }
 }
 
-.tarjeta {
-  background: var(--ion-card-background);
-  border: 1px solid var(--ion-border-color);
-  border-radius: 24px;
-  padding: 28px;
-  box-shadow: var(--koko-sombra);
-
-  h2 {
-    font-size: 1.4rem;
-  }
-
-  .subtitulo {
-    margin: 4px 0 20px;
-  }
+.cuerpo {
+  flex: 1;
+  padding: 26px 34px 0;
 }
 
-.campo-contrasena {
+.formulario-login {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 16px;
+}
 
-  .enlace {
-    align-self: flex-end;
+.etiqueta {
+  margin: 0 0 7px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+// Campo relleno del diseño: fondo de color y texto crema, sin borde visible.
+ion-input.campo-relleno {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+  --placeholder-color: var(--ion-color-primary-contrast);
+  --placeholder-opacity: 0.75;
+  --border-color: var(--ion-color-primary);
+  --border-radius: 16px;
+  --padding-start: 18px;
+  --padding-end: 18px;
+  --highlight-color-focused: var(--ion-text-color);
+  --highlight-color-valid: var(--ion-color-primary);
+  min-height: 52px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.olvide {
+  align-self: flex-end;
+  margin-top: -6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ion-text-color);
+  opacity: 0.7;
+  text-decoration: none;
+
+  &:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+}
+
+.boton-ingresar {
+  --border-radius: 16px;
+  --box-shadow: 0 10px 20px rgba(var(--ion-color-celeste-rgb), 0.55);
+  min-height: 54px;
+  text-transform: none;
+  margin: 8px 0 0;
+  font-family: var(--koko-fuente-titulos);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.separador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(var(--ion-text-color-rgb), 0.5);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(var(--ion-text-color-rgb), 0.18);
+  }
+}
+
+.boton-social {
+  --border-radius: 16px;
+  --border-width: 1.6px;
+  --border-color: var(--ion-color-primary);
+  --color: var(--ion-text-color);
+  --background-hover: var(--ion-color-primary);
+  min-height: 50px;
+  letter-spacing: 0;
+  text-transform: none;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+
+  app-icono-google {
+    margin-right: 8px;
   }
 }
 
 .enlace {
   color: var(--ion-color-primary);
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
 
   &:hover {
@@ -86,9 +169,17 @@ ion-content {
   }
 }
 
+// En teléfono el pie queda por encima de la patita de la esquina; en pantallas
+// anchas la patita está lejos y alcanza con el margen del diseño.
 .pie {
+  padding: 20px 24px 92px;
   text-align: center;
-  margin-top: 20px;
+  font-size: 13px;
+  font-weight: 600;
+
+  @media (min-width: 768px) {
+    padding-bottom: 34px;
+  }
 }
 
 ion-spinner {

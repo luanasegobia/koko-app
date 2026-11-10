@@ -1,17 +1,23 @@
 import { Component, input } from '@angular/core';
 import { IonContent, IonIcon } from '@ionic/angular';
+import { PatitaComponent } from '../patita/patita.component';
 
 /** Marco común de las pantallas de registro, recuperación y cambio de contraseña. */
 @Component({
   selector: 'app-layout-auth',
-  imports: [IonContent, IonIcon],
+  imports: [IonContent, IonIcon, PatitaComponent],
   template: `
     <ion-content class="ion-padding">
+      <div slot="fixed" class="patita-esquina">
+        <app-patita [garras]="true" />
+      </div>
+
       <div class="envoltorio">
         <div class="cabecera">
-          <div class="icono">
+          <p class="antetitulo">
             <ion-icon [name]="icono()" aria-hidden="true"></ion-icon>
-          </div>
+            Koko · Comunidad Mascotera
+          </p>
           <h1>{{ titulo() }}</h1>
           @if (subtitulo()) {
             <p class="subtitulo">{{ subtitulo() }}</p>
@@ -31,54 +37,75 @@ import { IonContent, IonIcon } from '@ionic/angular';
       display: contents;
     }
 
+    ion-content {
+      --background: var(--ion-background-color);
+    }
+
+    .patita-esquina {
+      right: -40px;
+      bottom: -30px;
+      width: 190px;
+      opacity: 0.9;
+      transform: rotate(8deg);
+      pointer-events: none;
+    }
+
     .envoltorio {
+      position: relative;
       max-width: 440px;
       margin: 0 auto;
       padding: 40px 0;
     }
 
     .cabecera {
-      text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
+      padding: 0 8px;
     }
 
-    .icono {
-      display: inline-flex;
+    .antetitulo {
+      display: flex;
       align-items: center;
-      justify-content: center;
-      width: 56px;
-      height: 56px;
-      border-radius: 18px;
-      background: var(--ion-color-primary);
-      color: var(--ion-color-primary-contrast);
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--ion-color-primary);
 
       ion-icon {
-        font-size: 28px;
+        flex-shrink: 0;
+        font-size: 16px;
       }
     }
 
     h1 {
-      font-size: 1.75rem;
+      font-size: 30px;
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: 0.01em;
     }
 
     .subtitulo {
-      color: var(--koko-texto-secundario);
-      margin-top: 8px;
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+      opacity: 0.75;
     }
 
     .tarjeta {
       background: var(--ion-card-background);
       border: 1px solid var(--ion-border-color);
-      border-radius: 20px;
+      border-radius: 24px;
       padding: 28px;
       box-shadow: 0 1px 3px rgba(var(--koko-sombra-rgb), 0.06);
     }
 
     .pie {
       text-align: center;
-      font-size: 0.9rem;
-      color: var(--koko-texto-secundario);
+      font-size: 13px;
+      font-weight: 600;
       margin-top: 24px;
 
       &:empty {

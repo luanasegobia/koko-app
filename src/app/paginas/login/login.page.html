@@ -2,49 +2,45 @@
   <app-splash (terminado)="splashTerminado.set(true)" />
 }
 
-<ion-content class="ion-padding">
+<ion-content>
+  <div slot="fixed" class="patita-esquina">
+    <app-patita [garras]="true" />
+  </div>
+
   <div class="login" [class.visible]="splashTerminado()">
-    <div class="marca">
-      <div class="logo">
-        <ion-icon name="paw"></ion-icon>
-      </div>
-      <h1>Koko</h1>
-      <p class="texto-secundario texto-chico">Comunidad mascoteril</p>
+    <div class="encabezado">
+      <p class="antetitulo">Koko · Comunidad Mascotera</p>
+      <h1>Bienvenidos a KOKO</h1>
+      <p class="bajada">
+        Iniciá sesión para compartir fotos, encontrar hogares y conectar con otros amantes de las mascotas.
+      </p>
     </div>
 
-    <div class="tarjeta">
-      <h2>Bienvenido de vuelta</h2>
-      <p class="texto-secundario texto-chico subtitulo">Iniciá sesión para continuar</p>
-
-      <ion-button expand="block" fill="outline" color="medium" class="boton-google" (click)="continuarConGoogle()">
-        <app-icono-google />
-        Continuar con Google
-      </ion-button>
-
-      <div class="divisor"><span>o con email</span></div>
-
+    <div class="cuerpo">
       @if (error()) {
         <p class="error-formulario">{{ error() }}</p>
       }
 
-      <form class="formulario" [formGroup]="formulario" (ngSubmit)="ingresar()">
-        <ion-input
-          label="Email"
-          labelPlacement="stacked"
-          fill="outline"
-          type="email"
-          formControlName="email"
-          placeholder="tu@email.com"
-          autocomplete="email"
-          errorText="Ingresá un email válido"
-        >
-          <ion-icon slot="start" name="mail-outline" aria-hidden="true"></ion-icon>
-        </ion-input>
-
-        <div class="campo-contrasena">
+      <form class="formulario-login" [formGroup]="formulario" (ngSubmit)="ingresar()">
+        <div>
+          <p class="etiqueta" aria-hidden="true">Correo electrónico</p>
           <ion-input
-            label="Contraseña"
-            labelPlacement="stacked"
+            class="campo-relleno"
+            aria-label="Correo electrónico"
+            fill="outline"
+            type="email"
+            formControlName="email"
+            placeholder="tunombre@correo.com"
+            autocomplete="email"
+            errorText="Ingresá un email válido"
+          ></ion-input>
+        </div>
+
+        <div>
+          <p class="etiqueta" aria-hidden="true">Contraseña</p>
+          <ion-input
+            class="campo-relleno"
+            aria-label="Contraseña"
             fill="outline"
             type="password"
             formControlName="password"
@@ -52,25 +48,30 @@
             autocomplete="current-password"
             errorText="Ingresá tu contraseña"
           >
-            <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
-            <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+            <ion-input-password-toggle slot="end" color="light"></ion-input-password-toggle>
           </ion-input>
-          <a routerLink="/forgot-password" class="enlace texto-mini">¿Olvidaste tu contraseña?</a>
         </div>
 
-        <ion-button type="submit" expand="block" [disabled]="cargando()">
+        <a routerLink="/forgot-password" class="olvide">¿Olvidaste tu contraseña?</a>
+
+        <ion-button type="submit" expand="block" color="celeste" class="boton-ingresar" [disabled]="cargando()">
           @if (cargando()) {
             <ion-spinner slot="start" name="crescent"></ion-spinner>
             Ingresando...
           } @else {
-            Ingresar
+            Iniciar sesión
           }
         </ion-button>
       </form>
+
+      <div class="separador">o continuá con</div>
+
+      <ion-button expand="block" fill="outline" class="boton-social" (click)="continuarConGoogle()">
+        <app-icono-google />
+        Continuar con Google
+      </ion-button>
     </div>
 
-    <p class="pie texto-chico texto-secundario">
-      ¿No tenés cuenta? <a routerLink="/register" class="enlace">Registrate</a>
-    </p>
+    <p class="pie">¿Todavía no tenés cuenta? <a routerLink="/register" class="enlace">Registrate</a></p>
   </div>
 </ion-content>
