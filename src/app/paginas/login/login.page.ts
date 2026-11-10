@@ -8,6 +8,7 @@ import {
   IonInputPasswordToggle,
   IonSpinner,
 } from '@ionic/angular';
+import { BotonVolverComponent } from '../../compartido/boton-volver/boton-volver.component';
 import { IconoGoogleComponent } from '../../compartido/icono-google/icono-google.component';
 import { PatitaComponent } from '../../compartido/patita/patita.component';
 import { SplashComponent } from '../../compartido/splash/splash.component';
@@ -27,6 +28,7 @@ import { AuthService } from '../../core/servicios/auth.service';
     SplashComponent,
     IconoGoogleComponent,
     PatitaComponent,
+    BotonVolverComponent,
   ],
   templateUrl: './login.page.html',
   styleUrl: './login.page.scss',

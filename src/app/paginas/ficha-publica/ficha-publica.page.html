@@ -1,5 +1,6 @@
 <ion-content class="ion-padding">
   <div class="contenedor-angosto pila">
+    <app-boton-volver porDefecto="/perdidas" />
     @if (cargando()) {
       <div class="cargando"><ion-spinner name="crescent" color="primary"></ion-spinner></div>
     } @else if (!mascota()) {

@@ -133,5 +133,11 @@
         }
       </ion-card-content>
     </ion-card>
+
+    <!-- Esta pantalla es obligatoria para entrar: la única salida es cerrar la sesión. -->
+    <p class="salir texto-chico texto-secundario">
+      ¿Querés seguir más tarde?
+      <button type="button" class="enlace" (click)="cerrarSesion()">Cerrar sesión</button>
+    </p>
   </div>
 </ion-content>
