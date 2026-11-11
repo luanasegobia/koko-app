@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonButton,
   IonIcon,
@@ -12,6 +12,7 @@ import {
 import { IconoGoogleComponent } from '../../compartido/icono-google/icono-google.component';
 import { LayoutAuthComponent } from '../../compartido/layout-auth/layout-auth.component';
 import { mensajeDeError } from '../../core/mensaje-de-error';
+import { rutaDeRetorno } from '../../core/utilidades';
 import { camposCoinciden } from '../../core/validadores';
 import { AuthService } from '../../core/servicios/auth.service';
 import { AvisosService } from '../../core/servicios/avisos.service';
@@ -37,6 +38,7 @@ export class RegistroPage {
   private readonly auth = inject(AuthService);
   private readonly avisos = inject(AvisosService);
   private readonly router = inject(Router);
+  private readonly rutaActiva = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
 
   protected readonly cargando = signal(false);
@@ -85,7 +87,9 @@ export class RegistroPage {
     try {
       await this.auth.verificarCodigo(this.formulario.controls.email.value, this.codigo());
       await this.auth.recargarUsuario();
-      await this.router.navigateByUrl('/');
+      // Vuelve a la página desde la que la persona llegó, igual que el login.
+      // Si todavía falta completar el perfil, la guardia la lleva ahí primero.
+      await this.router.navigateByUrl(this.destino());
     } catch (error) {
       this.error.set(mensajeDeError(error));
     } finally {
@@ -104,7 +108,13 @@ export class RegistroPage {
   }
 
   continuarConGoogle(): void {
-    void this.auth.iniciarConProveedor('google').catch((error) => this.error.set(mensajeDeError(error)));
+    void this.auth
+      .iniciarConProveedor('google', this.destino())
+      .catch((error) => this.error.set(mensajeDeError(error)));
+  }
+
+  private destino(): string {
+    return rutaDeRetorno(this.rutaActiva.snapshot.queryParamMap.get('redirect'));
   }
 
   protected alCambiarCodigo(evento: CustomEvent<{ value?: string | number | null }>): void {

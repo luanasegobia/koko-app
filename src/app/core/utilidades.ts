@@ -84,3 +84,15 @@ export function enlaceDeWhatsApp(telefono: string): string {
   }
   return `https://wa.me/${digitos}`;
 }
+
+/**
+ * A dónde volver después de entrar o registrarse: lo que pidió ?redirect=, pero
+ * solo si es una ruta de esta app. Cualquier otra cosa (otro sitio, "//sitio")
+ * se descarta y se va al inicio.
+ */
+export function rutaDeRetorno(redirect: string | null | undefined): string {
+  const pedido = redirect || '/';
+  const origen = window.location.origin;
+  const ruta = pedido.startsWith(origen) ? pedido.slice(origen.length) || '/' : pedido;
+  return ruta.startsWith('/') && !ruta.startsWith('//') ? ruta : '/';
+}

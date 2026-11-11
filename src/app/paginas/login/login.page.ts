@@ -14,6 +14,7 @@ import { PatitaComponent } from '../../compartido/patita/patita.component';
 import { SplashComponent } from '../../compartido/splash/splash.component';
 import { mensajeDeError } from '../../core/mensaje-de-error';
 import { AuthService } from '../../core/servicios/auth.service';
+import { rutaDeRetorno } from '../../core/utilidades';
 
 @Component({
   selector: 'app-login',
@@ -77,10 +78,6 @@ export class LoginPage {
 
   /** A dónde volver después de entrar: lo que pidió ?redirect=, si es una ruta de la app. */
   private destino(): string {
-    const redirect = this.rutaActiva.snapshot.queryParamMap.get('redirect') || '/';
-    if (redirect.startsWith(window.location.origin)) {
-      return redirect.slice(window.location.origin.length) || '/';
-    }
-    return redirect.startsWith('/') ? redirect : '/';
+    return rutaDeRetorno(this.rutaActiva.snapshot.queryParamMap.get('redirect'));
   }
 }
