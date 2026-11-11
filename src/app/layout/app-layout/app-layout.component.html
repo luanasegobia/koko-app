@@ -16,7 +16,7 @@
 
     <ion-content>
       <ion-list lines="none">
-        @for (elemento of navegacion; track elemento.ruta) {
+        @for (elemento of navegacion(); track elemento.ruta) {
           <ion-menu-toggle [autoHide]="false">
             <ion-item
               button

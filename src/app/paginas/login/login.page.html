@@ -8,8 +8,12 @@
   </div>
 
   <div class="login" [class.visible]="splashTerminado()">
-    <!-- Sin sesión se puede seguir usando las pantallas públicas: perdidas es la entrada. -->
-    <app-boton-volver class="volver" porDefecto="/perdidas" />
+    <!-- Sin sesión se pueden usar las pantallas públicas: perdidas es la entrada.
+         El texto dice a dónde lleva; "Volver" hacía pensar que se entraba a la app. -->
+    <a routerLink="/perdidas" class="sin-cuenta">
+      Seguir sin cuenta
+      <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
+    </a>
     <div class="encabezado">
       <p class="antetitulo">Koko · Comunidad Mascotera</p>
       <h1>Bienvenidos a KOKO</h1>
