@@ -5,6 +5,20 @@
 //   celeste            --ion-color-celeste (y su contraste para el texto encima)
 //   azul acero         --ion-color-primary
 //   naranja            --ion-color-secondary
+//
+// Los dos que el tema no tiene se definen acá, con su versión para modo oscuro.
+
+:host {
+  // Arena tostado del cartel de bienvenida.
+  --inicio-cartel: #ead3a8;
+  // Marrón del texto sobre fondos anaranjados claros.
+  --inicio-marron: #8a4a18;
+}
+
+:host-context(.ion-palette-dark) {
+  --inicio-cartel: #2b3050;
+  --inicio-marron: #f2b680;
+}
 
 ion-content {
   --background: var(--ion-background-color);
@@ -13,15 +27,15 @@ ion-content {
 .inicio {
   max-width: 560px;
   margin: 0 auto;
-  padding: 12px 24px 28px;
+  padding: 10px 24px 28px;
 
   > * {
     animation: aparecer 0.55s both;
   }
 
-  @for $i from 1 through 8 {
+  @for $i from 1 through 5 {
     > *:nth-child(#{$i}) {
-      animation-delay: #{($i - 1) * 0.06}s;
+      animation-delay: #{($i - 1) * 0.08}s;
     }
   }
 }
@@ -31,55 +45,56 @@ a {
   text-decoration: none;
 }
 
-// ─── Portada ─────────────────────────────────────────────────────────────
+// ─── Cartel de bienvenida ────────────────────────────────────────────────
 .portada {
+  position: relative;
   display: flex;
   align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  padding: 16px 10px 10px 18px;
+  border-radius: 26px;
+  background: var(--inicio-cartel);
+  box-shadow: 0 4px 12px rgba(var(--koko-sombra-rgb), 0.06);
 }
 
 .texto-portada {
   flex: 1 1 52%;
-
-  .saludo {
-    margin-bottom: 6px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ion-color-primary);
-  }
+  padding-bottom: 6px;
 
   h1 {
-    font-size: 33px;
+    font-size: 29px;
     font-weight: 700;
-    line-height: 1.02;
+    line-height: 1.04;
     letter-spacing: 0;
   }
 
   .bajada {
-    margin-top: 12px;
-    font-size: 13.5px;
+    margin-top: 10px;
+    font-size: 12.5px;
     font-weight: 600;
-    line-height: 1.4;
-    opacity: 0.82;
+    line-height: 1.38;
   }
 }
 
 .dibujo {
-  flex: 0 0 49%;
-  max-width: 220px;
-  margin-right: -10px;
+  flex: 0 0 48%;
+  align-self: flex-end;
+  max-width: 210px;
+  margin-right: -4px;
 
   svg {
     display: block;
     width: 100%;
     height: auto;
+    overflow: visible;
     animation: flotar 4s ease-in-out infinite;
   }
 }
 
-// ─── Secciones ───────────────────────────────────────────────────────────
-h2 {
-  margin: 22px 0 10px 2px;
-  font-family: var(--ion-font-family);
+// ─── Títulos de sección ──────────────────────────────────────────────────
+.rotulo {
+  margin: 18px 0 10px 2px;
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.22em;
@@ -87,80 +102,51 @@ h2 {
   color: var(--ion-color-primary);
 }
 
-// Fila que se desliza de costado y sangra hasta el borde de la pantalla.
-.fila {
+.encabezado {
   display: flex;
-  gap: 12px;
-  margin: 0 -24px;
-  padding: 0 24px 4px;
-  // global.scss tiene una clase .fila que envuelve: acá va todo en una línea.
-  flex-wrap: nowrap;
-  align-items: stretch;
-  overflow-x: auto;
-  scroll-snap-type: x proximity;
-  scrollbar-width: none;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  margin: 20px 2px 4px;
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  > * {
-    flex: none;
-    scroll-snap-align: start;
+  h2 {
+    font-size: 19px;
+    font-weight: 600;
   }
 }
 
-.mascota {
-  width: 64px;
-  text-align: center;
-  font-size: 12px;
+.ver-todas {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-left: 12px;
+  font-size: 12.5px;
   font-weight: 700;
-
-  app-avatar-mascota,
-  .agregar {
-    width: 60px;
-    height: 60px;
-    margin: 0 auto 4px;
-  }
-
-  span:last-child {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .agregar {
-    display: grid;
-    place-items: center;
-    border: 2px dashed var(--ion-color-primary);
-    border-radius: 50%;
-    color: var(--ion-color-primary);
-    font-family: var(--koko-fuente-titulos);
-    font-size: 24px;
-    font-weight: 600;
-  }
+  color: var(--ion-color-primary);
 }
 
 // ─── Módulos ─────────────────────────────────────────────────────────────
 .modulos {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 96px;
   gap: 12px;
 }
 
 .modulo {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 98px;
+  overflow: hidden;
   padding: 14px 16px;
   border-radius: 20px;
   background: var(--ion-card-background);
   box-shadow: 0 2px 0 rgba(var(--koko-sombra-rgb), 0.08);
   font-family: var(--koko-fuente-titulos);
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 600;
+  line-height: 1.15;
   transition:
     background 0.18s,
     transform 0.18s,
@@ -179,6 +165,18 @@ h2 {
     transform: translateY(-3px);
     box-shadow: 0 10px 18px rgba(var(--ion-color-celeste-rgb), 0.6);
     outline: 0;
+
+    .huellas {
+      color: currentColor;
+      opacity: 0.18;
+      transform: scale(1.06) rotate(-4deg);
+    }
+  }
+
+  .arriba,
+  .nombre {
+    position: relative;
+    z-index: 1;
   }
 
   .arriba {
@@ -190,6 +188,21 @@ h2 {
   ion-icon {
     font-size: 30px;
   }
+}
+
+// Huellitas de adorno en la esquina de cada módulo.
+.huellas {
+  position: absolute;
+  right: -4px;
+  bottom: -6px;
+  width: 76px;
+  height: 76px;
+  color: var(--ion-color-primary);
+  opacity: 0.11;
+  pointer-events: none;
+  transition:
+    opacity 0.18s,
+    transform 0.2s;
 }
 
 .insignia {
@@ -218,124 +231,40 @@ h2 {
   }
 }
 
-// ─── Tarjetas ────────────────────────────────────────────────────────────
-.tarjeta {
+// ─── Carruseles ──────────────────────────────────────────────────────────
+// Fila que se desliza de costado y sangra hasta el borde de la pantalla.
+.carrusel {
   display: flex;
-  align-items: center;
   gap: 12px;
-  margin-bottom: 10px;
-  padding: 12px 14px;
-  border-radius: 18px;
-  background: var(--ion-card-background);
-
-  .avatar {
-    flex: none;
-    width: 48px;
-  }
-
-  b {
-    display: block;
-    font-family: var(--koko-fuente-titulos);
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  small {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.35;
-    opacity: 0.78;
-  }
-}
-
-.ir {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  margin-left: auto;
-  border-radius: 12px;
-  background: var(--ion-color-celeste);
-  color: var(--ion-color-celeste-contrast);
-
-  ion-icon {
-    font-size: 20px;
-  }
-}
-
-.perdida {
-  width: 142px;
-  padding: 12px;
-  border-radius: 20px;
-  background: var(--ion-card-background);
-  text-align: center;
-
-  app-avatar-mascota {
-    width: 64px;
-    margin: 0 auto 6px;
-  }
-
-  b {
-    display: block;
-    font-family: var(--koko-fuente-titulos);
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  small {
-    display: block;
-    overflow: hidden;
-    font-size: 11.5px;
-    font-weight: 600;
-    line-height: 1.35;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    opacity: 0.78;
-  }
-
-  .etiqueta {
-    margin-top: 6px;
-  }
-}
-
-.etiqueta {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 99px;
-  background: rgba(var(--ion-color-secondary-rgb), 0.2);
-  color: var(--ion-text-color);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-
-  &.celeste {
-    background: var(--ion-color-celeste);
-    color: var(--ion-color-celeste-contrast);
-  }
-}
-
-// ─── Consejos ────────────────────────────────────────────────────────────
-.pista {
-  display: flex;
+  margin: 0 -24px;
+  padding: 2px 24px 8px;
   overflow-x: auto;
-  border-radius: 24px;
+  scroll-padding-left: 24px;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
     display: none;
   }
+
+  > * {
+    flex: none;
+    scroll-snap-align: start;
+  }
 }
 
+// ─── Consejos de temporada ───────────────────────────────────────────────
 .consejo {
   position: relative;
-  flex: 0 0 100%;
-  padding: 16px 16px 16px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(286px, 88%);
+  overflow: hidden;
+  padding: 16px 16px 6px 20px;
+  border-radius: 22px;
   background: var(--ion-card-background);
-  scroll-snap-align: start;
+  box-shadow: 0 2px 0 rgba(var(--koko-sombra-rgb), 0.08);
 
   &::before {
     content: '';
@@ -345,68 +274,80 @@ h2 {
     background: var(--ion-color-secondary);
   }
 
+  &.frio::before {
+    background: var(--ion-color-primary);
+  }
+
   h3 {
-    margin: 8px 0 4px;
-    font-size: 19px;
+    margin-top: 2px;
+    font-size: 17.5px;
     font-weight: 600;
+    line-height: 1.15;
   }
 
   p {
-    margin-bottom: 10px;
     font-size: 12.5px;
     font-weight: 600;
-    line-height: 1.4;
-    opacity: 0.8;
+    line-height: 1.42;
   }
+}
 
-  ol {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    counter-reset: paso;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.4;
+.consejo-arriba {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.consejo-icono {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: var(--ion-color-celeste);
+  color: var(--ion-color-celeste-contrast);
+
+  ion-icon {
+    font-size: 25px;
   }
+}
 
-  li {
-    display: flex;
-    gap: 10px;
-    counter-increment: paso;
+.consejo-etiqueta,
+.etiqueta {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(var(--ion-color-secondary-rgb), 0.18);
+  color: var(--inicio-marron);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
 
-    &::before {
-      content: counter(paso);
-      flex: none;
-      display: grid;
-      place-items: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--ion-color-celeste);
-      color: var(--ion-color-celeste-contrast);
-      font-family: var(--koko-fuente-titulos);
-      font-size: 12.5px;
-      font-weight: 600;
-    }
-  }
+.consejo.frio .consejo-etiqueta,
+.etiqueta.encontrada {
+  background: rgba(var(--ion-color-primary-rgb), 0.16);
+  color: var(--ion-color-primary);
+}
 
-  .nota {
-    margin: 10px 0 0;
-    padding: 9px 11px;
-    border-radius: 12px;
-    background: rgba(var(--ion-color-secondary-rgb), 0.16);
-    font-weight: 700;
-    opacity: 1;
-  }
+.leer {
+  align-self: flex-start;
+  min-height: 44px;
+  margin-top: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ion-color-primary);
+  font-family: var(--koko-fuente-titulos);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .puntos {
   display: flex;
   justify-content: center;
-  gap: 2px;
 
   // El botón es la zona de toque (44 px de alto); el punto visible va adentro.
   button {
@@ -424,26 +365,80 @@ h2 {
       width: 7px;
       height: 7px;
       border-radius: 99px;
-      background: var(--ion-color-primary);
-      opacity: 0.45;
+      background: var(--ion-text-color);
+      opacity: 0.4;
       transition:
-        width 0.25s,
-        opacity 0.25s;
+        width 0.2s,
+        opacity 0.2s;
     }
 
     &.actual::before {
       width: 20px;
-      opacity: 1;
+      opacity: 0.85;
     }
   }
 }
 
-.aclaracion {
-  margin: 8px 4px 0;
-  font-size: 11px;
-  font-weight: 600;
+// ─── Perdidas recientes ──────────────────────────────────────────────────
+.perdida {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 152px;
+  padding: 12px 12px 14px;
+  border-radius: 20px;
+  background: var(--ion-card-background);
+  box-shadow: 0 2px 0 rgba(var(--koko-sombra-rgb), 0.08);
   text-align: center;
-  opacity: 0.85;
+  transition:
+    background 0.18s,
+    transform 0.18s,
+    color 0.18s;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--ion-color-celeste);
+    color: var(--ion-color-celeste-contrast);
+    transform: translateY(-3px);
+    outline: 0;
+
+    .etiqueta {
+      background: var(--ion-card-background);
+    }
+  }
+
+  app-avatar-mascota {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 4px;
+  }
+
+  .etiqueta {
+    padding: 3px 9px;
+    letter-spacing: 0.1em;
+  }
+
+  b {
+    margin-top: 4px;
+    font-family: var(--koko-fuente-titulos);
+    font-size: 15.5px;
+    font-weight: 600;
+  }
+
+  b,
+  small {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
 }
 
 // ─── Acciones fijas al pie ───────────────────────────────────────────────
@@ -456,7 +451,7 @@ ion-footer {
   gap: 12px;
   max-width: 560px;
   margin: 0 auto;
-  padding: 10px 20px calc(14px + env(safe-area-inset-bottom));
+  padding: 8px 24px calc(14px + env(safe-area-inset-bottom));
 }
 
 .accion {
@@ -465,20 +460,34 @@ ion-footer {
   align-items: center;
   justify-content: center;
   gap: 9px;
-  min-height: 58px;
-  padding: 0 10px;
+  min-height: 60px;
+  padding: 12px;
   border-radius: 18px;
   background: var(--ion-color-celeste);
   color: var(--ion-color-celeste-contrast);
   box-shadow: 0 8px 16px rgba(var(--ion-color-celeste-rgb), 0.55);
   font-family: var(--koko-fuente-titulos);
   font-size: 14.5px;
-  font-weight: 600;
-  line-height: 1.15;
-  transition: transform 0.15s;
+  font-weight: 700;
+  line-height: 1.12;
+  transition:
+    transform 0.15s,
+    filter 0.15s;
+
+  // La acción de urgencia: publicar una mascota perdida.
+  &.urgente {
+    background: var(--ion-color-secondary);
+    color: var(--ion-color-secondary-contrast);
+    box-shadow: 0 8px 16px rgba(var(--ion-color-secondary-rgb), 0.35);
+  }
 
   &:hover {
     transform: translateY(-2px);
+    filter: brightness(0.97);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 
   ion-icon {
@@ -495,7 +504,7 @@ button:focus-visible {
 
 @keyframes flotar {
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
   }
 }
 

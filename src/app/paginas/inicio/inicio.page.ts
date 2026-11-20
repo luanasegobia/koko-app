@@ -1,14 +1,13 @@
-import { Component, computed, ElementRef, inject, OnDestroy, signal, viewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonFooter, IonIcon } from '@ionic/angular';
 import { CabeceraComponent } from '../../compartido/cabecera/cabecera.component';
-import { CasoUrgente, Mascota, MascotaPerdida, Veterinaria } from '../../core/modelos';
+import { CasoUrgente, MascotaPerdida } from '../../core/modelos';
 import { HaceTiempoPipe } from '../../core/pipes/fecha.pipe';
-import { AuthService } from '../../core/servicios/auth.service';
 import { SupabaseService } from '../../core/servicios/supabase.service';
-import { estadoDeVeterinaria } from '../veterinarias/estado-veterinaria';
 import { AvatarMascotaComponent } from './avatar-mascota.component';
-import { consejosDelMes } from './consejos';
+import { Consejo, consejosDelMes } from './consejos';
+import { GuiaConsejoComponent } from './guia-consejo.component';
 
 interface Modulo {
   ruta: string;
@@ -19,16 +18,13 @@ interface Modulo {
 const MODULOS: Modulo[] = [
   { ruta: '/adopcion', icono: 'heart-outline', titulo: 'Adopción' },
   { ruta: '/veterinarias', icono: 'medkit-outline', titulo: 'Veterinario' },
-  { ruta: '/identificacion', icono: 'qr-code-outline', titulo: 'ID' },
+  { ruta: '/identificacion', icono: 'id-card-outline', titulo: 'Mis mascotas' },
   { ruta: '/perdidas', icono: 'search-outline', titulo: 'Mascotas perdidas' },
   { ruta: '/casos-urgentes', icono: 'warning-outline', titulo: 'Casos urgentes' },
   { ruta: '/denuncias', icono: 'shield-half-outline', titulo: 'Denuncias' },
 ];
 
-const SEGUNDOS_ENTRE_CONSEJOS = 7;
-const PAUSA_TRAS_TOCAR_MS = 9000;
-
-/** Portada de la app: accesos a los módulos y un resumen de lo que está pasando. */
+/** Portada de la app: accesos a los módulos, consejos de la época y las últimas mascotas perdidas. */
 @Component({
   selector: 'app-inicio',
   imports: [
@@ -36,6 +32,7 @@ const PAUSA_TRAS_TOCAR_MS = 9000;
     IonContent,
     IonFooter,
     IonIcon,
+    GuiaConsejoComponent,
     CabeceraComponent,
     AvatarMascotaComponent,
     HaceTiempoPipe,
@@ -43,28 +40,21 @@ const PAUSA_TRAS_TOCAR_MS = 9000;
   templateUrl: './inicio.page.html',
   styleUrl: './inicio.page.scss',
 })
-export class InicioPage implements OnDestroy {
-  private readonly auth = inject(AuthService);
+export class InicioPage {
   private readonly supabase = inject(SupabaseService);
+  private readonly router = inject(Router);
 
   protected readonly modulos = MODULOS;
   protected readonly consejos = consejosDelMes(new Date().getMonth() + 1);
   protected readonly consejoActual = signal(0);
+  /** El consejo cuya guía completa está abierta, si hay alguna. */
+  protected readonly guiaAbierta = signal<Consejo | null>(null);
 
-  protected readonly misMascotas = signal<Mascota[]>([]);
   private readonly perdidas = signal<MascotaPerdida[]>([]);
   private readonly casosUrgentes = signal<CasoUrgente[]>([]);
-  private readonly veterinarias = signal<Veterinaria[]>([]);
-
-  protected readonly nombre = computed(() => this.auth.usuario()?.full_name?.trim().split(' ')[0] ?? '');
 
   /** Las publicaciones más nuevas, sin importar el estado: la etiqueta dice si ya apareció. */
   protected readonly perdidasRecientes = computed(() => this.perdidas().slice(0, 8));
-  protected readonly reencuentros = computed(() =>
-    this.perdidas()
-      .filter((mascota) => mascota.status === 'encontrada')
-      .slice(0, 3),
-  );
   private readonly cantidadPerdidas = computed(
     () => this.perdidas().filter((mascota) => mascota.status === 'perdida').length,
   );
@@ -72,31 +62,14 @@ export class InicioPage implements OnDestroy {
     () => this.casosUrgentes().filter((caso) => caso.status === 'activo').length,
   );
 
-  /** Las verificadas que atienden ahora mismo, con las de emergencia primero. */
-  protected readonly veterinariasDeGuardia = computed(() =>
-    this.veterinarias()
-      .filter((veterinaria) => veterinaria.is_verified)
-      .map((veterinaria) => ({ veterinaria, estado: estadoDeVeterinaria(veterinaria) }))
-      .filter(({ estado }) => estado.abierta)
-      .sort((a, b) => Number(b.veterinaria.is_emergency ?? false) - Number(a.veterinaria.is_emergency ?? false))
-      .slice(0, 3),
-  );
-
   private readonly pista = viewChild<ElementRef<HTMLDivElement>>('pista');
-  private ultimoToque = 0;
-  private temporizador: ReturnType<typeof setInterval> | null = null;
 
   ionViewWillEnter(): void {
     void this.cargar();
-    this.iniciarRotacion();
   }
 
   ionViewWillLeave(): void {
-    this.detenerRotacion();
-  }
-
-  ngOnDestroy(): void {
-    this.detenerRotacion();
+    this.cerrarGuia();
   }
 
   /**
@@ -104,20 +77,16 @@ export class InicioPage implements OnDestroy {
    * consulta falla esa sección queda vacía y el resto se muestra igual.
    */
   private async cargar(): Promise<void> {
-    const idDeUsuario = this.auth.usuario()?.id;
-    const [mascotas, perdidas, casos, veterinarias] = await Promise.allSettled([
-      idDeUsuario ? this.supabase.mascotas.filtrar({ created_by_id: idDeUsuario }, '-created_at', 12) : [],
+    const [perdidas, casos] = await Promise.allSettled([
       this.supabase.mascotasPerdidas.listar('-created_at', 100),
       this.supabase.casosUrgentes.listar('-created_at', 100),
-      this.supabase.veterinarias.listar(),
     ]);
-    if (mascotas.status === 'fulfilled') this.misMascotas.set(mascotas.value);
     if (perdidas.status === 'fulfilled') this.perdidas.set(perdidas.value);
     if (casos.status === 'fulfilled') this.casosUrgentes.set(casos.value);
-    if (veterinarias.status === 'fulfilled') this.veterinarias.set(veterinarias.value);
 
-    for (const resultado of [mascotas, perdidas, casos, veterinarias]) {
-      if (resultado.status === 'rejected') console.error('No se pudo cargar parte del inicio:', resultado.reason);
+    for (const resultado of [perdidas, casos]) {
+      if (resultado.status === 'rejected')
+        console.error('No se pudo cargar parte del inicio:', resultado.reason);
     }
   }
 
@@ -133,46 +102,53 @@ export class InicioPage implements OnDestroy {
     return null;
   }
 
-  protected detalleDeGuardia(estado: { etiqueta: string; horario?: string }): string {
-    return estado.horario ? `${estado.etiqueta} · ${estado.horario}` : estado.etiqueta;
+  protected descripcion(mascota: MascotaPerdida): string {
+    const especie = { perro: 'Perro', gato: 'Gato', otro: 'Mascota' }[mascota.species] ?? 'Mascota';
+    return mascota.breed ? `${especie} · ${mascota.breed}` : especie;
   }
 
-  protected especieEnPalabras(mascota: MascotaPerdida): string {
-    const especie = { perro: 'Perro', gato: 'Gato', otro: 'Mascota' }[mascota.species] ?? 'Mascota';
-    return mascota.last_seen_address ? `${especie} · ${mascota.last_seen_address}` : especie;
+  /** "Barrio · hace 2 horas", o solo el tiempo si la publicación no dice dónde. */
+  protected lugarYTiempo(mascota: MascotaPerdida, hace: string): string {
+    return mascota.last_seen_address ? `${mascota.last_seen_address} · ${hace}` : hace;
   }
 
   // ─── Carrusel de consejos ────────────────────────────────────────────────
-  protected irAlConsejo(indice: number, porLaPersona = true): void {
+  /** Lo que avanza la pista para pasar de una tarjeta a la siguiente. */
+  private pasoDeLaPista(pista: HTMLDivElement): number {
+    const [primera, segunda] = Array.from(pista.children) as HTMLElement[];
+    if (!primera) return 0;
+    return segunda ? segunda.offsetLeft - primera.offsetLeft : primera.offsetWidth;
+  }
+
+  protected irAlConsejo(indice: number): void {
     const pista = this.pista()?.nativeElement;
     if (!pista) return;
-    if (porLaPersona) this.ultimoToque = Date.now();
-    pista.scrollTo({ left: indice * pista.clientWidth, behavior: 'smooth' });
+    pista.scrollTo({ left: indice * this.pasoDeLaPista(pista), behavior: 'smooth' });
   }
 
   protected alDesplazar(): void {
     const pista = this.pista()?.nativeElement;
-    if (!pista || pista.clientWidth === 0) return;
-    this.consejoActual.set(Math.round(pista.scrollLeft / pista.clientWidth));
+    if (!pista) return;
+    const paso = this.pasoDeLaPista(pista);
+    if (paso === 0) return;
+    // La última tarjeta no llega a alinearse a la izquierda: al tocar el final cuenta como actual.
+    const alFinal = pista.scrollLeft + pista.clientWidth >= pista.scrollWidth - 2;
+    const indice = alFinal ? this.consejos.length - 1 : Math.round(pista.scrollLeft / paso);
+    this.consejoActual.set(Math.min(indice, this.consejos.length - 1));
   }
 
-  protected anotarToque(): void {
-    this.ultimoToque = Date.now();
+  // ─── Guía completa ───────────────────────────────────────────────────────
+  protected abrirGuia(consejo: Consejo): void {
+    this.guiaAbierta.set(consejo);
   }
 
-  private iniciarRotacion(): void {
-    this.detenerRotacion();
-    // Con "reducir movimiento" los consejos no pasan solos.
-    if (this.consejos.length < 2 || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    this.temporizador = setInterval(() => {
-      // Si la persona tocó el carrusel hace poco, no se le mueve mientras lee.
-      if (Date.now() - this.ultimoToque < PAUSA_TRAS_TOCAR_MS) return;
-      this.irAlConsejo((this.consejoActual() + 1) % this.consejos.length, false);
-    }, SEGUNDOS_ENTRE_CONSEJOS * 1000);
+  protected cerrarGuia(): void {
+    this.guiaAbierta.set(null);
   }
 
-  private detenerRotacion(): void {
-    if (this.temporizador) clearInterval(this.temporizador);
-    this.temporizador = null;
+  /** El botón al pie de la guía: la cierra y, si el consejo apunta a un módulo, va ahí. */
+  protected seguirDesdeLaGuia(consejo: Consejo): void {
+    this.cerrarGuia();
+    if (consejo.boton.ruta) void this.router.navigateByUrl(consejo.boton.ruta);
   }
 }

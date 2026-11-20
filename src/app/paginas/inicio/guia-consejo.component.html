@@ -1,0 +1,48 @@
+<ion-modal
+  class="guia"
+  [isOpen]="consejo() !== null"
+  [initialBreakpoint]="0.85"
+  [breakpoints]="[0, 0.85, 1]"
+  (didDismiss)="cerrar.emit()"
+>
+  <ng-template>
+    @if (consejo(); as consejo) {
+      <ion-content class="guia-contenido">
+        <button type="button" class="guia-cerrar" aria-label="Cerrar" (click)="cerrar.emit()">
+          <ion-icon name="close" aria-hidden="true"></ion-icon>
+        </button>
+        <div class="guia-cuerpo">
+          <h2>{{ consejo.titulo }}</h2>
+          <p class="guia-bajada">{{ consejo.bajada }}</p>
+          @for (seccion of consejo.secciones; track $index) {
+            @if (seccion.tipo === 'nota') {
+              <p class="guia-nota">{{ seccion.texto }}</p>
+            } @else {
+              <h3>{{ seccion.titulo }}</h3>
+              @if (seccion.tipo === 'pasos') {
+                <ol class="pasos">
+                  @for (item of seccion.items; track item) {
+                    <li>{{ item }}</li>
+                  }
+                </ol>
+              } @else {
+                <ul
+                  [class.evitar]="seccion.tipo === 'evitar'"
+                  [class.senales]="seccion.tipo === 'lista'"
+                >
+                  @for (item of seccion.items; track item) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+              }
+            }
+          }
+          <button type="button" class="guia-boton" (click)="seguir.emit(consejo)">
+            {{ consejo.boton.texto }}
+          </button>
+          <p class="guia-aclaracion">{{ aclaracion }}</p>
+        </div>
+      </ion-content>
+    }
+  </ng-template>
+</ion-modal>
