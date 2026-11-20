@@ -50,11 +50,13 @@
   <div class="bloque">
     <p class="etiqueta">Tipos de alerta</p>
     <ion-item lines="none">
-      <ion-label>🐾 Mascotas perdidas</ion-label>
+      <ion-icon slot="start" name="paw-outline" aria-hidden="true"></ion-icon>
+      <ion-label>Mascotas perdidas</ion-label>
       <ion-toggle slot="end" formControlName="notify_lost_pets" aria-label="Alertas de mascotas perdidas"></ion-toggle>
     </ion-item>
     <ion-item lines="none">
-      <ion-label>🆘 Casos urgentes</ion-label>
+      <ion-icon slot="start" name="warning-outline" aria-hidden="true"></ion-icon>
+      <ion-label>Casos urgentes</ion-label>
       <ion-toggle slot="end" formControlName="notify_urgent_cases" aria-label="Alertas de casos urgentes"></ion-toggle>
     </ion-item>
   </div>
