@@ -1,115 +1,186 @@
-<app-cabecera titulo="Inicio" />
+<app-cabecera titulo="KOKO" />
 
-<ion-content class="ion-padding">
-  <div class="contenedor pila-grande">
-    <!-- Portada -->
-    <section class="portada aparece sobre-noche">
-      @for (huella of huellas; track $index) {
-        <ion-icon
-          name="paw"
-          class="huella"
-          [style.left]="huella.x"
-          [style.top]="huella.y"
-          [style.font-size.px]="huella.tamanio"
-          [style.opacity]="huella.opacidad"
-          [style.--rotacion]="huella.rotacion + 'deg'"
-          [style.animation-delay]="huella.retraso + 's'"
-          aria-hidden="true"
-        ></ion-icon>
-      }
-      <div class="mancha mancha-verde"></div>
-      <div class="mancha mancha-ambar"></div>
-
-      <div class="contenido-portada">
-        <div class="insignia">
-          <ion-icon name="sparkles" class="gira"></ion-icon>
-          <span>Conectando Huellas · Orán</span>
-        </div>
-
-        <h1>Bienvenidos a <span class="resaltado">Koko</span></h1>
-        <p class="bajada">
-          La red solidaria para proteger, identificar y rescatar a los animales que más lo
-          necesitan.
-        </p>
-
-        <form class="buscador" (submit)="$event.preventDefault(); buscar()">
-          <ion-searchbar
-            [value]="busqueda()"
-            (ionInput)="busqueda.set($any($event).detail.value || '')"
-            placeholder="Buscar por raza, zona o nombre..."
-            [debounce]="0"
-            mode="ios"
-          ></ion-searchbar>
-          <ion-button type="submit">Buscar</ion-button>
-        </form>
-
-        <div class="llamados">
-          <ion-button color="danger" class="llamado" (click)="irAReportar()">
-            <ion-icon slot="start" name="megaphone"></ion-icon>
-            Perdí mi mascota
-          </ion-button>
-          <ion-button fill="outline" color="light" class="llamado" (click)="irAAvistamiento()">
-            <ion-icon slot="start" name="eye"></ion-icon>
-            Encontré un animal
-          </ion-button>
-        </div>
+<ion-content>
+  <div class="inicio">
+    <section class="portada">
+      <div class="texto-portada">
+        @if (nombre()) {
+          <p class="saludo">Hola, {{ nombre() }}</p>
+        }
+        <h1>Conectando Huellas</h1>
+        <p class="bajada">Bienvenidos a Koko, tu comunidad mascotera de confianza</p>
+      </div>
+      <div class="dibujo">
+        <svg viewBox="0 0 200 190" role="img" aria-label="Un perro y un gato juntos">
+          <circle cx="100" cy="102" r="88" fill="#A0C2D5" opacity=".55" />
+          <g stroke="#313857" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M110 82l2-36 26 22zM150 66l24-22 4 40z" fill="#E38B3D" />
+            <ellipse cx="144" cy="100" rx="40" ry="36" fill="#E38B3D" />
+            <path d="M144 70v10M133 72l2 8M155 72l-2 8" fill="none" stroke="#8A4A18" />
+            <circle cx="131" cy="98" r="4.5" fill="#313857" stroke="none" />
+            <circle cx="158" cy="98" r="4.5" fill="#313857" stroke="none" />
+            <path d="M140 107h8l-4 5zM144 112v4q-5 5-10 1M144 116q5 5 10 1" fill="#F4B8B0" stroke-width="2.2" />
+            <ellipse cx="78" cy="178" rx="52" ry="30" fill="#D9A066" />
+            <ellipse cx="42" cy="122" rx="14" ry="29" fill="#9A6B3E" transform="rotate(14 42 122)" />
+            <ellipse cx="114" cy="122" rx="14" ry="29" fill="#9A6B3E" transform="rotate(-14 114 122)" />
+            <ellipse cx="78" cy="122" rx="38" ry="36" fill="#E8B67A" />
+            <ellipse cx="78" cy="138" rx="21" ry="16" fill="#FFF1DC" />
+            <ellipse cx="78" cy="129" rx="8.5" ry="6" fill="#313857" />
+            <path d="M78 135v6M78 141q-8 6-16 0M78 141q8 6 16 0" fill="none" stroke-width="2.4" />
+            <path d="M73 145q5 13 10 0z" fill="#F28DA0" stroke-width="2.2" />
+            <circle cx="63" cy="112" r="4.8" fill="#313857" stroke="none" />
+            <circle cx="93" cy="112" r="4.8" fill="#313857" stroke="none" />
+            <path d="M50 156q28 14 56 0" fill="none" stroke="#598099" stroke-width="8" />
+            <circle cx="78" cy="168" r="6.5" fill="#FAEDCD" stroke-width="2.4" />
+          </g>
+        </svg>
       </div>
     </section>
 
-    <!-- Estadísticas -->
-    <section class="estadisticas">
-      @for (dato of estadisticas; track dato.etiqueta; let i = $index) {
-        <div class="dato aparece" [style.animation-delay]="0.1 + i * 0.07 + 's'">
-          <ion-icon [name]="dato.icono" [color]="dato.color"></ion-icon>
-          <span class="valor" [style.color]="'var(--ion-color-' + dato.color + ')'">{{ dato.valor }}</span>
-          <span class="texto-mini texto-secundario">{{ dato.etiqueta }}</span>
-        </div>
-      }
+    <section>
+      <h2>Mis mascotas</h2>
+      <div class="fila">
+        @for (mascota of misMascotas(); track mascota.id) {
+          <a class="mascota" routerLink="/identificacion">
+            <app-avatar-mascota [especie]="mascota.species" [foto]="mascota.photo_url" [nombre]="mascota.name" />
+            <span>{{ mascota.name }}</span>
+          </a>
+        }
+        <a class="mascota" routerLink="/identificacion">
+          <span class="agregar" aria-hidden="true">+</span>
+          <span>Agregar</span>
+        </a>
+      </div>
     </section>
 
-    <!-- Módulos -->
-    <section class="modulos">
-      <div class="titulo-seccion">
-        <h2>Explorar Servicios</h2>
-        <span class="linea"></span>
-        <span class="contador">6 módulos</span>
-      </div>
-
-      <div class="cuadricula-tarjetas">
-        @for (modulo of modulos; track modulo.ruta; let i = $index) {
-          <a
-            class="modulo aparece"
-            [routerLink]="modulo.ruta"
-            [style.animation-delay]="0.08 + i * 0.08 + 's'"
-            [style.--color-modulo]="'var(--ion-color-' + modulo.color + ')'"
-            [style.--color-modulo-rgb]="'var(--ion-color-' + modulo.color + '-rgb)'"
-          >
-            <div class="fila-superior">
-              <div class="icono"><ion-icon [name]="modulo.icono"></ion-icon></div>
-              <span class="etiqueta">{{ modulo.etiqueta }}</span>
-              <span class="flecha"><ion-icon name="arrow-forward"></ion-icon></span>
-            </div>
-            <h3>{{ modulo.titulo }}</h3>
-            <p class="texto-chico texto-secundario">{{ modulo.descripcion }}</p>
-            <span class="ir">Ir al módulo <ion-icon name="arrow-forward"></ion-icon></span>
+    <section>
+      <h2>¿Qué necesitás hoy?</h2>
+      <div class="modulos">
+        @for (modulo of modulos; track modulo.ruta) {
+          <a class="modulo" [routerLink]="modulo.ruta" [class.urgente]="insignia(modulo.ruta)?.urgente">
+            <span class="arriba">
+              <ion-icon [name]="modulo.icono" aria-hidden="true"></ion-icon>
+              @if (insignia(modulo.ruta); as insignia) {
+                <span class="insignia" [class.celeste]="!insignia.urgente">
+                  @if (insignia.urgente) {
+                    <i></i>
+                  }
+                  {{ insignia.texto }}
+                </span>
+              }
+            </span>
+            {{ modulo.titulo }}
           </a>
         }
       </div>
     </section>
 
-    <!-- Llamado a alertas -->
-    <section class="alertas aparece">
-      <div class="mancha mancha-blanca"></div>
-      <div class="texto-alertas">
-        <p class="sobre-titulo"><ion-icon name="notifications"></ion-icon> Alertas de zona</p>
-        <h3>Activá alertas cerca tuyo</h3>
-        <p>Recibí notificaciones cuando aparezca una mascota perdida en tu barrio.</p>
-      </div>
-      <ion-button color="light" routerLink="/perdidas">
-        <ion-icon slot="start" name="notifications"></ion-icon>
-        Configurar alertas
-        <ion-icon slot="end" name="arrow-forward"></ion-icon>
-      </ion-button>
+    <section>
+      <h2>Veterinarias de guardia</h2>
+      @for (item of veterinariasDeGuardia(); track item.veterinaria.id) {
+        <div class="tarjeta">
+          <div>
+            <b>{{ item.veterinaria.name }}</b>
+            <small>{{ detalleDeGuardia(item.estado) }}</small>
+          </div>
+          <a class="ir" [href]="'tel:' + item.veterinaria.phone" [attr.aria-label]="'Llamar a ' + item.veterinaria.name">
+            <ion-icon name="call-outline" aria-hidden="true"></ion-icon>
+          </a>
+        </div>
+      } @empty {
+        <a class="tarjeta" routerLink="/veterinarias">
+          <div>
+            <b>Ninguna de turno ahora</b>
+            <small>Mirá el listado completo y sus horarios.</small>
+          </div>
+          <span class="ir"><ion-icon name="arrow-forward" aria-hidden="true"></ion-icon></span>
+        </a>
+      }
     </section>
+
+    @if (perdidasRecientes().length > 0) {
+      <section>
+        <h2>Perdidas recientes</h2>
+        <div class="fila">
+          @for (mascota of perdidasRecientes(); track mascota.id) {
+            <a class="perdida" routerLink="/perdidas">
+              <app-avatar-mascota [especie]="mascota.species" [foto]="mascota.photo_url" [nombre]="mascota.pet_name" />
+              <b>{{ mascota.pet_name }}</b>
+              <small>{{ especieEnPalabras(mascota) }}</small>
+              <small>{{ mascota.created_at | haceTiempo }}</small>
+              <span class="etiqueta" [class.celeste]="mascota.status === 'encontrada'">
+                {{ mascota.status === 'encontrada' ? 'Encontrada' : 'Perdida' }}
+              </span>
+            </a>
+          }
+        </div>
+      </section>
+    }
+
+    <section>
+      <h2>Consejo de temporada</h2>
+      <div
+        #pista
+        class="pista"
+        (scroll)="alDesplazar()"
+        (pointerdown)="anotarToque()"
+        (wheel)="anotarToque()"
+      >
+        @for (consejo of consejos; track consejo.titulo) {
+          <article class="consejo">
+            <span class="etiqueta">{{ consejo.etiqueta }}</span>
+            <h3>{{ consejo.titulo }}</h3>
+            <p>{{ consejo.bajada }}</p>
+            <ol>
+              @for (paso of consejo.pasos; track paso) {
+                <li>{{ paso }}</li>
+              }
+            </ol>
+            <p class="nota">{{ consejo.nota }}</p>
+          </article>
+        }
+      </div>
+      @if (consejos.length > 1) {
+        <div class="puntos">
+          @for (consejo of consejos; track consejo.titulo; let i = $index) {
+            <button
+              type="button"
+              [class.actual]="i === consejoActual()"
+              [attr.aria-label]="'Ver el consejo: ' + consejo.titulo"
+              (click)="irAlConsejo(i)"
+            ></button>
+          }
+        </div>
+      }
+      <p class="aclaracion">Información orientativa. No reemplaza la consulta veterinaria.</p>
+    </section>
+
+    @if (reencuentros().length > 0) {
+      <section>
+        <h2>Reencuentros felices</h2>
+        @for (mascota of reencuentros(); track mascota.id) {
+          <div class="tarjeta">
+            <app-avatar-mascota class="avatar" [especie]="mascota.species" [foto]="mascota.photo_url" [nombre]="mascota.pet_name" />
+            <div>
+              <b>{{ mascota.pet_name }} volvió a casa</b>
+              <small>La comunidad ayudó a encontrarla. Publicada {{ mascota.created_at | haceTiempo }}.</small>
+            </div>
+          </div>
+        }
+      </section>
+    }
   </div>
 </ion-content>
+
+<ion-footer class="ion-no-border">
+  <div class="acciones">
+    <a class="accion" routerLink="/perdidas" [queryParams]="{ action: 'report' }">
+      <ion-icon name="megaphone-outline" aria-hidden="true"></ion-icon>
+      <span>Perdí mi mascota</span>
+    </a>
+    <a class="accion" routerLink="/denuncias">
+      <ion-icon name="shield-half-outline" aria-hidden="true"></ion-icon>
+      <span>Entrar a denuncias</span>
+    </a>
+  </div>
+</ion-footer>

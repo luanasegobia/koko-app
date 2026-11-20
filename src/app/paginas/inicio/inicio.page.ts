@@ -1,109 +1,178 @@
-import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { IonButton, IonContent, IonIcon, IonSearchbar } from '@ionic/angular';
+import { Component, computed, ElementRef, inject, OnDestroy, signal, viewChild } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { IonContent, IonFooter, IonIcon } from '@ionic/angular';
 import { CabeceraComponent } from '../../compartido/cabecera/cabecera.component';
+import { CasoUrgente, Mascota, MascotaPerdida, Veterinaria } from '../../core/modelos';
+import { HaceTiempoPipe } from '../../core/pipes/fecha.pipe';
+import { AuthService } from '../../core/servicios/auth.service';
+import { SupabaseService } from '../../core/servicios/supabase.service';
+import { estadoDeVeterinaria } from '../veterinarias/estado-veterinaria';
+import { AvatarMascotaComponent } from './avatar-mascota.component';
+import { consejosDelMes } from './consejos';
 
 interface Modulo {
   ruta: string;
   icono: string;
   titulo: string;
-  descripcion: string;
-  color: string;
-  etiqueta: string;
 }
 
 const MODULOS: Modulo[] = [
-  {
-    ruta: '/perdidas',
-    icono: 'search',
-    titulo: 'Mascotas Perdidas',
-    descripcion: 'Reportá y buscá mascotas perdidas con fotos, mapa y alertas por zona.',
-    color: 'danger',
-    etiqueta: 'Urgente',
-  },
-  {
-    ruta: '/adopcion',
-    icono: 'heart',
-    titulo: 'Adopción',
-    descripcion: 'Encontrá tu compañero ideal. Perfiles, filtros y solicitudes en línea.',
-    color: 'primary',
-    etiqueta: 'Popular',
-  },
-  {
-    ruta: '/veterinarias',
-    icono: 'medkit',
-    titulo: 'Veterinarias de Turno',
-    descripcion: 'Consultá qué veterinaria está de turno ahora, con mapa y llamada directa.',
-    color: 'tertiary',
-    etiqueta: '24h',
-  },
-  {
-    ruta: '/identificacion',
-    icono: 'qr-code',
-    titulo: 'ID Digital (QR / NFC)',
-    descripcion: 'Creá la ficha digital de tu mascota. Generá un QR para el collar.',
-    color: 'purpura',
-    etiqueta: 'Nuevo',
-  },
-  {
-    ruta: '/denuncias',
-    icono: 'shield-half',
-    titulo: 'Denuncias de Maltrato',
-    descripcion: 'Denunciá situaciones de maltrato animal con evidencia y geolocalización.',
-    color: 'secondary',
-    etiqueta: 'Anónimo',
-  },
-  {
-    ruta: '/casos-urgentes',
-    icono: 'hand-left',
-    titulo: 'Casos Urgentes',
-    descripcion: 'Ayudá a animales en emergencia. Donaciones, traslados y más.',
-    color: 'rosa',
-    etiqueta: 'Solidario',
-  },
+  { ruta: '/adopcion', icono: 'heart-outline', titulo: 'Adopción' },
+  { ruta: '/veterinarias', icono: 'medkit-outline', titulo: 'Veterinario' },
+  { ruta: '/identificacion', icono: 'qr-code-outline', titulo: 'ID' },
+  { ruta: '/perdidas', icono: 'search-outline', titulo: 'Mascotas perdidas' },
+  { ruta: '/casos-urgentes', icono: 'warning-outline', titulo: 'Casos urgentes' },
+  { ruta: '/denuncias', icono: 'shield-half-outline', titulo: 'Denuncias' },
 ];
 
-const ESTADISTICAS = [
-  { icono: 'paw', etiqueta: 'Mascotas reunidas', valor: '124+', color: 'primary' },
-  { icono: 'heart', etiqueta: 'Adopciones exitosas', valor: '42', color: 'rosa' },
-  { icono: 'location', etiqueta: 'Veterinarias activas', valor: '18', color: 'tertiary' },
-  { icono: 'flash', etiqueta: 'Casos resueltos', valor: '67', color: 'secondary' },
-];
+const SEGUNDOS_ENTRE_CONSEJOS = 7;
+const PAUSA_TRAS_TOCAR_MS = 9000;
 
-const HUELLAS_FLOTANTES = [
-  { x: '8%', y: '18%', tamanio: 26, retraso: 0, opacidad: 0.08, rotacion: -15 },
-  { x: '78%', y: '8%', tamanio: 34, retraso: 0.6, opacidad: 0.06, rotacion: 20 },
-  { x: '62%', y: '65%', tamanio: 22, retraso: 1.1, opacidad: 0.08, rotacion: -5 },
-  { x: '22%', y: '72%', tamanio: 30, retraso: 0.9, opacidad: 0.06, rotacion: 30 },
-  { x: '88%', y: '45%', tamanio: 18, retraso: 0.4, opacidad: 0.09, rotacion: -25 },
-  { x: '45%', y: '85%', tamanio: 20, retraso: 1.5, opacidad: 0.05, rotacion: 10 },
-];
-
+/** Portada de la app: accesos a los módulos y un resumen de lo que está pasando. */
 @Component({
   selector: 'app-inicio',
-  imports: [RouterLink, IonContent, IonButton, IonIcon, IonSearchbar, CabeceraComponent],
+  imports: [
+    RouterLink,
+    IonContent,
+    IonFooter,
+    IonIcon,
+    CabeceraComponent,
+    AvatarMascotaComponent,
+    HaceTiempoPipe,
+  ],
   templateUrl: './inicio.page.html',
   styleUrl: './inicio.page.scss',
 })
-export class InicioPage {
-  private readonly router = inject(Router);
+export class InicioPage implements OnDestroy {
+  private readonly auth = inject(AuthService);
+  private readonly supabase = inject(SupabaseService);
 
   protected readonly modulos = MODULOS;
-  protected readonly estadisticas = ESTADISTICAS;
-  protected readonly huellas = HUELLAS_FLOTANTES;
-  protected readonly busqueda = signal('');
+  protected readonly consejos = consejosDelMes(new Date().getMonth() + 1);
+  protected readonly consejoActual = signal(0);
 
-  protected buscar(): void {
-    const texto = this.busqueda().trim();
-    if (!texto) return;
-    void this.router.navigate(['/perdidas'], { queryParams: { search: texto } });
+  protected readonly misMascotas = signal<Mascota[]>([]);
+  private readonly perdidas = signal<MascotaPerdida[]>([]);
+  private readonly casosUrgentes = signal<CasoUrgente[]>([]);
+  private readonly veterinarias = signal<Veterinaria[]>([]);
+
+  protected readonly nombre = computed(() => this.auth.usuario()?.full_name?.trim().split(' ')[0] ?? '');
+
+  /** Las publicaciones más nuevas, sin importar el estado: la etiqueta dice si ya apareció. */
+  protected readonly perdidasRecientes = computed(() => this.perdidas().slice(0, 8));
+  protected readonly reencuentros = computed(() =>
+    this.perdidas()
+      .filter((mascota) => mascota.status === 'encontrada')
+      .slice(0, 3),
+  );
+  private readonly cantidadPerdidas = computed(
+    () => this.perdidas().filter((mascota) => mascota.status === 'perdida').length,
+  );
+  private readonly cantidadCasosActivos = computed(
+    () => this.casosUrgentes().filter((caso) => caso.status === 'activo').length,
+  );
+
+  /** Las verificadas que atienden ahora mismo, con las de emergencia primero. */
+  protected readonly veterinariasDeGuardia = computed(() =>
+    this.veterinarias()
+      .filter((veterinaria) => veterinaria.is_verified)
+      .map((veterinaria) => ({ veterinaria, estado: estadoDeVeterinaria(veterinaria) }))
+      .filter(({ estado }) => estado.abierta)
+      .sort((a, b) => Number(b.veterinaria.is_emergency ?? false) - Number(a.veterinaria.is_emergency ?? false))
+      .slice(0, 3),
+  );
+
+  private readonly pista = viewChild<ElementRef<HTMLDivElement>>('pista');
+  private ultimoToque = 0;
+  private temporizador: ReturnType<typeof setInterval> | null = null;
+
+  ionViewWillEnter(): void {
+    void this.cargar();
+    this.iniciarRotacion();
   }
 
-  protected irAReportar(): void {
-    void this.router.navigate(['/perdidas'], { queryParams: { action: 'report' } });
+  ionViewWillLeave(): void {
+    this.detenerRotacion();
   }
 
-  protected irAAvistamiento(): void {
-    void this.router.navigate(['/perdidas'], { queryParams: { action: 'sighting' } });
+  ngOnDestroy(): void {
+    this.detenerRotacion();
+  }
+
+  /**
+   * Cada bloque se carga por separado: la portada es un resumen, así que si una
+   * consulta falla esa sección queda vacía y el resto se muestra igual.
+   */
+  private async cargar(): Promise<void> {
+    const idDeUsuario = this.auth.usuario()?.id;
+    const [mascotas, perdidas, casos, veterinarias] = await Promise.allSettled([
+      idDeUsuario ? this.supabase.mascotas.filtrar({ created_by_id: idDeUsuario }, '-created_at', 12) : [],
+      this.supabase.mascotasPerdidas.listar('-created_at', 100),
+      this.supabase.casosUrgentes.listar('-created_at', 100),
+      this.supabase.veterinarias.listar(),
+    ]);
+    if (mascotas.status === 'fulfilled') this.misMascotas.set(mascotas.value);
+    if (perdidas.status === 'fulfilled') this.perdidas.set(perdidas.value);
+    if (casos.status === 'fulfilled') this.casosUrgentes.set(casos.value);
+    if (veterinarias.status === 'fulfilled') this.veterinarias.set(veterinarias.value);
+
+    for (const resultado of [mascotas, perdidas, casos, veterinarias]) {
+      if (resultado.status === 'rejected') console.error('No se pudo cargar parte del inicio:', resultado.reason);
+    }
+  }
+
+  /** El número que acompaña a un módulo, si hay algo para contar. */
+  protected insignia(ruta: string): { texto: string; urgente: boolean } | null {
+    if (ruta === '/perdidas' && this.cantidadPerdidas() > 0) {
+      return { texto: `${this.cantidadPerdidas()} sin aparecer`, urgente: false };
+    }
+    if (ruta === '/casos-urgentes' && this.cantidadCasosActivos() > 0) {
+      const cantidad = this.cantidadCasosActivos();
+      return { texto: cantidad === 1 ? '1 activo' : `${cantidad} activos`, urgente: true };
+    }
+    return null;
+  }
+
+  protected detalleDeGuardia(estado: { etiqueta: string; horario?: string }): string {
+    return estado.horario ? `${estado.etiqueta} · ${estado.horario}` : estado.etiqueta;
+  }
+
+  protected especieEnPalabras(mascota: MascotaPerdida): string {
+    const especie = { perro: 'Perro', gato: 'Gato', otro: 'Mascota' }[mascota.species] ?? 'Mascota';
+    return mascota.last_seen_address ? `${especie} · ${mascota.last_seen_address}` : especie;
+  }
+
+  // ─── Carrusel de consejos ────────────────────────────────────────────────
+  protected irAlConsejo(indice: number, porLaPersona = true): void {
+    const pista = this.pista()?.nativeElement;
+    if (!pista) return;
+    if (porLaPersona) this.ultimoToque = Date.now();
+    pista.scrollTo({ left: indice * pista.clientWidth, behavior: 'smooth' });
+  }
+
+  protected alDesplazar(): void {
+    const pista = this.pista()?.nativeElement;
+    if (!pista || pista.clientWidth === 0) return;
+    this.consejoActual.set(Math.round(pista.scrollLeft / pista.clientWidth));
+  }
+
+  protected anotarToque(): void {
+    this.ultimoToque = Date.now();
+  }
+
+  private iniciarRotacion(): void {
+    this.detenerRotacion();
+    // Con "reducir movimiento" los consejos no pasan solos.
+    if (this.consejos.length < 2 || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    this.temporizador = setInterval(() => {
+      // Si la persona tocó el carrusel hace poco, no se le mueve mientras lee.
+      if (Date.now() - this.ultimoToque < PAUSA_TRAS_TOCAR_MS) return;
+      this.irAlConsejo((this.consejoActual() + 1) % this.consejos.length, false);
+    }, SEGUNDOS_ENTRE_CONSEJOS * 1000);
+  }
+
+  private detenerRotacion(): void {
+    if (this.temporizador) clearInterval(this.temporizador);
+    this.temporizador = null;
   }
 }
