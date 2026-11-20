@@ -24,33 +24,45 @@
   &.pildora-roja {
     background: rgba(var(--ion-color-danger-rgb), 0.08);
     border-color: rgba(var(--ion-color-danger-rgb), 0.3);
-    color: var(--ion-color-danger);
+    color: var(--ion-text-color);
 
     .punto,
     .contador {
       background: var(--ion-color-danger);
+    }
+
+    .contador {
+      color: var(--ion-color-danger-contrast);
     }
   }
 
   &.pildora-verde {
     background: rgba(var(--ion-color-success-rgb), 0.08);
     border-color: rgba(var(--ion-color-success-rgb), 0.3);
-    color: var(--ion-color-success-shade);
+    color: var(--ion-text-color);
 
     .punto,
     .contador {
       background: var(--ion-color-success);
+    }
+
+    .contador {
+      color: var(--ion-color-success-contrast);
     }
   }
 
   &.pildora-gris {
     background: rgba(var(--ion-color-medium-rgb), 0.1);
     border-color: rgba(var(--ion-color-medium-rgb), 0.3);
-    color: var(--ion-color-medium);
+    color: var(--ion-text-color);
 
     .punto,
     .contador {
       background: var(--ion-color-medium);
+    }
+
+    .contador {
+      color: var(--ion-color-medium-contrast);
     }
   }
 }
@@ -147,13 +159,13 @@
   &[data-color='danger'] {
     background: var(--ion-color-danger);
     border-color: var(--ion-color-danger-shade);
-    color: var(--koko-texto-sobre-color);
+    color: var(--ion-color-danger-contrast);
   }
 
   &[data-color='success'] {
     background: var(--ion-color-success);
     border-color: var(--ion-color-success-shade);
-    color: var(--koko-texto-sobre-color);
+    color: var(--ion-color-success-contrast);
   }
 }
 

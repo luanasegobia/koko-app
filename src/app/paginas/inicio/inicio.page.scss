@@ -406,23 +406,32 @@ h2 {
 .puntos {
   display: flex;
   justify-content: center;
-  gap: 6px;
-  margin-top: 10px;
+  gap: 2px;
 
+  // El botón es la zona de toque (44 px de alto); el punto visible va adentro.
   button {
-    width: 7px;
-    height: 7px;
+    display: grid;
+    place-items: center;
+    min-width: 24px;
+    height: 44px;
     padding: 0;
     border: 0;
-    border-radius: 99px;
-    background: var(--ion-color-primary);
-    opacity: 0.3;
+    background: none;
     cursor: pointer;
-    transition:
-      width 0.25s,
-      opacity 0.25s;
 
-    &.actual {
+    &::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 99px;
+      background: var(--ion-color-primary);
+      opacity: 0.45;
+      transition:
+        width 0.25s,
+        opacity 0.25s;
+    }
+
+    &.actual::before {
       width: 20px;
       opacity: 1;
     }
@@ -434,7 +443,7 @@ h2 {
   font-size: 11px;
   font-weight: 600;
   text-align: center;
-  opacity: 0.65;
+  opacity: 0.85;
 }
 
 // ─── Acciones fijas al pie ───────────────────────────────────────────────

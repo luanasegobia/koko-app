@@ -417,3 +417,47 @@ ion-modal::part(content) {
     color: var(--koko-texto-secundario);
   }
 }
+
+// ─── Botones ─────────────────────────────────────────────────────────────
+// Un solo estilo para toda la app, el mismo del login y el inicio: bordes
+// redondeados y texto en minúsculas. El modo Material de Ionic los trae rectos
+// y en MAYÚSCULAS, y convivían los dos.
+ion-button {
+  --border-radius: 14px;
+  // 44 px es el mínimo cómodo para tocar con el dedo; los botones chicos de
+  // Ionic miden 27 a 36.
+  min-height: 44px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+
+  &.button-has-icon-only {
+    min-width: 44px;
+  }
+
+  // Ionic los deja al 50% de opacidad y el texto no se leía. Se ven apagados
+  // por el color y el borde punteado, no por transparencia.
+  &.button-disabled {
+    opacity: 1;
+    color: var(--koko-texto-secundario);
+
+    &::part(native) {
+      background: transparent;
+      border: 1.5px dashed rgba(var(--ion-text-color-rgb), 0.45);
+      box-shadow: none;
+      color: var(--koko-texto-secundario);
+    }
+  }
+}
+
+// La pestaña sin seleccionar usaba un gris que no contrastaba.
+ion-segment-button {
+  --color: var(--ion-text-color);
+  --color-checked: var(--ion-color-primary);
+}
+
+// Ionic le pone a las tarjetas un gris propio para el texto, que sobre el fondo
+// crema quedaba justo por debajo del contraste mínimo.
+ion-card {
+  --color: var(--ion-text-color);
+}
