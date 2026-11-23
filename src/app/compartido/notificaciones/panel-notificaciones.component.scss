@@ -111,3 +111,10 @@
   background: var(--ion-color-primary);
   margin-top: 6px;
 }
+
+// En la campana el espacio es chico: la configuración de alertas se desplaza adentro.
+app-panel-alertas {
+  display: block;
+  max-height: 380px;
+  overflow-y: auto;
+}

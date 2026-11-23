@@ -50,8 +50,16 @@
                 <p class="nombre">{{ item.veterinaria.name }}</p>
                 <p class="texto-mini texto-secundario recortar">{{ item.veterinaria.address }}</p>
               </div>
-              <ion-button fill="clear" size="small" [href]="'tel:' + item.veterinaria.phone" aria-label="Llamar">
-                <ion-icon slot="icon-only" name="call-outline"></ion-icon>
+              <ion-button
+                fill="clear"
+                size="small"
+                class="boton-whatsapp"
+                [href]="whatsapp(item.veterinaria)"
+                target="_blank"
+                rel="noopener"
+                [attr.aria-label]="'Escribirle por WhatsApp a ' + item.veterinaria.name"
+              >
+                <ion-icon slot="icon-only" name="logo-whatsapp"></ion-icon>
               </ion-button>
             </ion-card>
           }
@@ -113,12 +121,16 @@
             <div class="llamar">
               <ion-button
                 size="small"
-                [color]="item.estado.abierta ? (item.veterinaria.is_emergency ? 'danger' : 'success') : 'medium'"
+                class="boton-whatsapp"
+                [class.cerrada]="!item.estado.abierta"
                 [fill]="item.estado.abierta ? 'solid' : 'outline'"
-                [href]="'tel:' + item.veterinaria.phone"
+                [href]="whatsapp(item.veterinaria)"
+                target="_blank"
+                rel="noopener"
+                [attr.aria-label]="'Escribirle por WhatsApp a ' + item.veterinaria.name"
               >
-                <ion-icon slot="start" name="call-outline"></ion-icon>
-                Llamar
+                <ion-icon slot="start" name="logo-whatsapp"></ion-icon>
+                WhatsApp
               </ion-button>
             </div>
           </ion-card>

@@ -17,6 +17,7 @@ import { AccionesDeDuenioComponent } from '../../compartido/acciones-de-duenio/a
 import { CabeceraComponent } from '../../compartido/cabecera/cabecera.component';
 import { MapaComponent, Marcador } from '../../compartido/mapa/mapa.component';
 import { mensajeDeError } from '../../core/mensaje-de-error';
+import { enlaceDeWhatsApp } from '../../core/utilidades';
 import { Veterinaria } from '../../core/modelos';
 import { AuthService } from '../../core/servicios/auth.service';
 import { AvisosService } from '../../core/servicios/avisos.service';
@@ -28,7 +29,6 @@ interface VeterinariaConEstado {
   veterinaria: Veterinaria;
   estado: EstadoDeVeterinaria;
 }
-
 
 @Component({
   selector: 'app-veterinarias',
@@ -62,6 +62,12 @@ export class VeterinariasPage {
   protected readonly veterinarias = signal<Veterinaria[]>([]);
   protected readonly vista = signal<'lista' | 'mapa'>('lista');
   protected readonly enEdicion = signal<Veterinaria | null>(null);
+
+  /** El chat de WhatsApp de la veterinaria, con un saludo ya escrito. */
+  protected whatsapp(veterinaria: Veterinaria): string {
+    const saludo = encodeURIComponent('Hola, les escribo desde Koko.');
+    return `${enlaceDeWhatsApp(veterinaria.phone)}?text=${saludo}`;
+  }
 
   /**
    * Las verificadas, más la propia aunque siga pendiente: quien la registró

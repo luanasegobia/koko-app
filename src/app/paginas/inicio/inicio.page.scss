@@ -147,11 +147,7 @@ a {
   font-size: 15.5px;
   font-weight: 600;
   line-height: 1.15;
-  transition:
-    background 0.18s,
-    transform 0.18s,
-    box-shadow 0.18s,
-    color 0.18s;
+  transition: 0.18s;
 
   &.urgente {
     box-shadow: inset 0 0 0 2px rgba(var(--ion-color-secondary-rgb), 0.55);
@@ -391,10 +387,7 @@ a {
   background: var(--ion-card-background);
   box-shadow: 0 2px 0 rgba(var(--koko-sombra-rgb), 0.08);
   text-align: center;
-  transition:
-    background 0.18s,
-    transform 0.18s,
-    color 0.18s;
+  transition: 0.18s;
 
   &:hover,
   &:focus-visible {
@@ -493,6 +486,72 @@ ion-footer {
   ion-icon {
     flex: none;
     font-size: 25px;
+  }
+}
+
+// En el teléfono las acciones van fijas al pie; esta copia es para escritorio.
+.acciones-portada {
+  display: none;
+}
+
+// ─── Escritorio ──────────────────────────────────────────────────────────
+// Desde el ancho en que aparece el menú lateral (992 px), la portada deja de
+// ser una columna de teléfono: el cartel crece, los módulos van de a tres,
+// se ven varios consejos a la vez y las acciones pasan al cartel.
+@media (min-width: 992px) {
+  .inicio {
+    max-width: 1040px;
+    padding: 24px 32px 48px;
+  }
+
+  .portada {
+    padding: 36px 24px 0 44px;
+  }
+
+  .texto-portada {
+    padding-bottom: 36px;
+
+    h1 {
+      font-size: 46px;
+    }
+
+    .bajada {
+      font-size: 16px;
+    }
+  }
+
+  .dibujo {
+    flex-basis: 40%;
+    max-width: 300px;
+  }
+
+  .acciones-portada {
+    display: flex;
+    margin: 24px 0 0;
+    padding: 0;
+
+    .accion {
+      flex: 0 1 210px;
+    }
+  }
+
+  ion-footer {
+    display: none;
+  }
+
+  .modulos {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 108px;
+  }
+
+  .carrusel {
+    margin: 0;
+    padding: 2px 0 8px;
+    scroll-padding-left: 0;
+  }
+
+  .consejo {
+    width: max(250px, calc((100% - 24px) / 3));
   }
 }
 

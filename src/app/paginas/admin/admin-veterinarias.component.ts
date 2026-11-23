@@ -1,17 +1,53 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import { IonBadge, IonButton, IonCard, IonIcon, IonSegment, IonSegmentButton, IonSpinner } from '@ionic/angular';
+import {
+  IonBadge,
+  IonButton,
+  IonCard,
+  IonIcon,
+  IonSegment,
+  IonSegmentButton,
+  IonSpinner,
+} from '@ionic/angular';
 import { Veterinaria } from '../../core/modelos';
 import { FechaPipe } from '../../core/pipes/fecha.pipe';
 
 @Component({
   selector: 'app-admin-veterinarias',
-  imports: [IonCard, IonBadge, IonButton, IonIcon, IonSegment, IonSegmentButton, IonSpinner, FechaPipe],
+  imports: [
+    IonCard,
+    IonBadge,
+    IonButton,
+    IonIcon,
+    IonSegment,
+    IonSegmentButton,
+    IonSpinner,
+    FechaPipe,
+  ],
   templateUrl: './admin-veterinarias.component.html',
   styles: `
+    .arriba {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
     .contadores {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
+    }
+
+    .acciones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      @media (min-width: 640px) {
+        flex-direction: column;
+        align-items: stretch;
+      }
     }
 
     .contador {
@@ -106,6 +142,9 @@ export class AdminVeterinariasComponent {
   readonly actualizando = input(false);
   readonly aprobar = output<Veterinaria>();
   readonly revocar = output<Veterinaria>();
+  readonly agregar = output<void>();
+  readonly editar = output<Veterinaria>();
+  readonly eliminar = output<Veterinaria>();
 
   protected readonly pestania = signal<'pendientes' | 'verificadas'>('pendientes');
   protected readonly pendientes = computed(() => this.veterinarias().filter((v) => !v.is_verified));

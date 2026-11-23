@@ -1,13 +1,19 @@
 <div class="pila">
-  <div class="contadores">
-    <div class="contador ambar">
-      <p class="numero">{{ pendientes().length }}</p>
-      <p class="texto-mini">Pendientes</p>
+  <div class="arriba">
+    <div class="contadores">
+      <div class="contador ambar">
+        <p class="numero">{{ pendientes().length }}</p>
+        <p class="texto-mini">Pendientes</p>
+      </div>
+      <div class="contador verde">
+        <p class="numero">{{ verificadas().length }}</p>
+        <p class="texto-mini">Verificadas</p>
+      </div>
     </div>
-    <div class="contador verde">
-      <p class="numero">{{ verificadas().length }}</p>
-      <p class="texto-mini">Verificadas</p>
-    </div>
+    <ion-button (click)="agregar.emit()">
+      <ion-icon slot="start" name="add"></ion-icon>
+      Agregar veterinaria
+    </ion-button>
   </div>
 
   <ion-segment [value]="pestania()" (ionChange)="pestania.set($any($event).detail.value)">
@@ -25,12 +31,22 @@
   } @else if (mostradas().length === 0) {
     <ion-card class="tarjeta-vacia">
       <ion-icon name="medkit-outline"></ion-icon>
-      <p>{{ pestania() === 'pendientes' ? 'No hay veterinarias pendientes.' : 'No hay veterinarias verificadas aún.' }}</p>
+      <p>
+        {{
+          pestania() === 'pendientes'
+            ? 'No hay veterinarias pendientes.'
+            : 'No hay veterinarias verificadas aún.'
+        }}
+      </p>
     </ion-card>
   } @else {
     <div class="lista">
       @for (veterinaria of mostradas(); track veterinaria.id; let i = $index) {
-        <ion-card class="tarjeta aparece" [class.verificada]="veterinaria.is_verified" [style.animation-delay]="i * 50 + 'ms'">
+        <ion-card
+          class="tarjeta aparece"
+          [class.verificada]="veterinaria.is_verified"
+          [style.animation-delay]="i * 50 + 'ms'"
+        >
           <div class="info">
             <div class="fila">
               <h3>{{ veterinaria.name }}</h3>
@@ -50,21 +66,53 @@
               <p class="texto-mini texto-secundario">Servicios: {{ veterinaria.services }}</p>
             }
             @if (veterinaria.created_at) {
-              <p class="texto-mini texto-secundario">Registrada el {{ veterinaria.created_at | fecha: "d 'de' MMMM 'de' yyyy" }}</p>
+              <p class="texto-mini texto-secundario">
+                Registrada el {{ veterinaria.created_at | fecha: "d 'de' MMMM 'de' yyyy" }}
+              </p>
             }
           </div>
-          <div>
+          <div class="acciones">
             @if (!veterinaria.is_verified) {
-              <ion-button size="small" [disabled]="actualizando()" (click)="aprobar.emit(veterinaria)">
+              <ion-button
+                size="small"
+                [disabled]="actualizando()"
+                (click)="aprobar.emit(veterinaria)"
+              >
                 <ion-icon slot="start" name="checkmark-circle"></ion-icon>
                 Aprobar
               </ion-button>
             } @else {
-              <ion-button size="small" fill="outline" color="danger" [disabled]="actualizando()" (click)="revocar.emit(veterinaria)">
+              <ion-button
+                size="small"
+                fill="outline"
+                color="danger"
+                [disabled]="actualizando()"
+                (click)="revocar.emit(veterinaria)"
+              >
                 <ion-icon slot="start" name="close-circle"></ion-icon>
                 Revocar
               </ion-button>
             }
+            <ion-button
+              size="small"
+              fill="outline"
+              [disabled]="actualizando()"
+              (click)="editar.emit(veterinaria)"
+            >
+              <ion-icon slot="start" name="create-outline"></ion-icon>
+              Editar
+            </ion-button>
+            <ion-button
+              size="small"
+              fill="clear"
+              color="danger"
+              [disabled]="actualizando()"
+              (click)="eliminar.emit(veterinaria)"
+              [attr.aria-label]="'Eliminar ' + veterinaria.name"
+            >
+              <ion-icon slot="start" name="trash-outline"></ion-icon>
+              Eliminar
+            </ion-button>
           </div>
         </ion-card>
       }

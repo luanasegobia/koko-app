@@ -1,10 +1,20 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationStart, Router } from '@angular/router';
 import { IonBadge, IonButton, IonIcon, IonPopover } from '@ionic/angular';
 import { AuthService } from '../../core/servicios/auth.service';
 import { NotificacionesService } from '../../core/servicios/notificaciones.service';
 import { PanelNotificacionesComponent } from './panel-notificaciones.component';
 
-/** Campana con el contador de no leídas. Abre el panel en un popover. */
+/**
+ * Campana con el contador de no leídas. Abre el panel en un popover.
+ *
+ * Cada página tiene su propia cabecera con su campana. Al tocar una
+ * notificación se navega a otra página, y en el teléfono Ionic deja la
+ * anterior en la pila sin redibujarla: bajar `isOpen` no alcanzaba para que el
+ * popover se fuera. Por eso se cierra llamando a dismiss() y, por las dudas,
+ * también en cuanto empieza cualquier navegación.
+ */
 @Component({
   selector: 'app-campana-notificaciones',
   imports: [IonButton, IonIcon, IonBadge, IonPopover, PanelNotificacionesComponent],
@@ -28,7 +38,7 @@ import { PanelNotificacionesComponent } from './panel-notificaciones.component';
         [showBackdrop]="false"
       >
         <ng-template>
-          <app-panel-notificaciones (cerrar)="abierto.set(false)" />
+          <app-panel-notificaciones (cerrar)="cerrar()" />
         </ng-template>
       </ion-popover>
     }
@@ -59,9 +69,23 @@ export class CampanaNotificacionesComponent {
   protected readonly notificaciones = inject(NotificacionesService);
   protected readonly abierto = signal(false);
   protected readonly evento = signal<Event | undefined>(undefined);
+  private readonly popover = viewChild(IonPopover);
+
+  constructor() {
+    inject(Router)
+      .events.pipe(takeUntilDestroyed(inject(DestroyRef)))
+      .subscribe((evento) => {
+        if (evento instanceof NavigationStart && this.abierto()) this.cerrar();
+      });
+  }
 
   abrir(evento: Event): void {
     this.evento.set(evento);
     this.abierto.set(true);
+  }
+
+  protected cerrar(): void {
+    this.abierto.set(false);
+    void this.popover()?.dismiss();
   }
 }

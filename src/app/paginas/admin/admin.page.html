@@ -16,7 +16,11 @@
         </div>
       </div>
 
-      <ion-segment [value]="pestania()" (ionChange)="pestania.set($any($event).detail.value)" class="pestanias">
+      <ion-segment
+        [value]="pestania()"
+        (ionChange)="pestania.set($any($event).detail.value)"
+        class="pestanias"
+      >
         <ion-segment-button value="estadisticas">Estadísticas</ion-segment-button>
         <ion-segment-button value="veterinarias">
           Veterinarias
@@ -45,6 +49,9 @@
             [actualizando]="actualizando()"
             (aprobar)="verificarVeterinaria($event, true)"
             (revocar)="verificarVeterinaria($event, false)"
+            (agregar)="fichaAbierta.set('nueva')"
+            (editar)="fichaAbierta.set($event)"
+            (eliminar)="eliminarVeterinaria($event)"
           />
         }
         @case ('casos') {
@@ -62,4 +69,25 @@
       }
     }
   </div>
+
+  <ion-modal [isOpen]="fichaAbierta() !== null" (didDismiss)="fichaAbierta.set(null)">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ tituloDeFicha() }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fichaAbierta.set(null)" aria-label="Cerrar">
+              <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <app-formulario-veterinaria
+          [registroInicial]="fichaEnEdicion()"
+          (guardado)="alGuardarVeterinaria($event)"
+        />
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
