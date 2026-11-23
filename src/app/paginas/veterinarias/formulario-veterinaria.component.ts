@@ -25,8 +25,10 @@ interface HorarioEditable extends HorarioVeterinaria {
 const DIAS_DE_ATENCION = [...DIAS.slice(1), DIAS[0]];
 
 /**
- * Edición de la propia ficha de veterinaria. El alta ocurre en el onboarding
- * de tipo de cuenta "veterinario"; acá se corrigen horario, teléfono o servicios.
+ * Ficha de una veterinaria. Con `registroInicial` edita una existente (la
+ * propia, o cualquiera si es administración). Sin él da de alta una nueva: lo
+ * usa el panel de administración, porque una cuenta de veterinario se da de
+ * alta en el onboarding.
  */
 @Component({
   selector: 'app-formulario-veterinaria',
@@ -99,7 +101,11 @@ const DIAS_DE_ATENCION = [...DIAS.slice(1), DIAS[0]];
           <h3>Atiende urgencias</h3>
           <p>Se muestra destacada para casos urgentes.</p>
         </ion-label>
-        <ion-toggle slot="end" formControlName="is_emergency" aria-label="Atiende urgencias"></ion-toggle>
+        <ion-toggle
+          slot="end"
+          formControlName="is_emergency"
+          aria-label="Atiende urgencias"
+        ></ion-toggle>
       </ion-item>
 
       <fieldset class="horarios">
@@ -150,7 +156,7 @@ const DIAS_DE_ATENCION = [...DIAS.slice(1), DIAS[0]];
         } @else {
           <ion-icon slot="start" name="save-outline"></ion-icon>
         }
-        Guardar cambios
+        {{ registroInicial() ? 'Guardar cambios' : 'Agregar veterinaria' }}
       </ion-button>
     </form>
   `,
@@ -224,8 +230,9 @@ export class FormularioVeterinariaComponent implements OnInit {
   private readonly supabase = inject(SupabaseService);
   private readonly fb = inject(FormBuilder);
 
-  readonly registroInicial = input.required<Veterinaria>();
-  readonly guardado = output<void>();
+  readonly registroInicial = input<Veterinaria | null>(null);
+  /** Avisa con la ficha como quedó en la base (la nueva, al dar de alta). */
+  readonly guardado = output<Veterinaria>();
 
   protected readonly guardando = signal(false);
   protected readonly error = signal<string | null>(null);
@@ -245,18 +252,21 @@ export class FormularioVeterinariaComponent implements OnInit {
     // Angular asigna los inputs antes de ngOnInit (y antes del primer
     // renderizado): recién acá se puede leer registroInicial al editar.
     const registro = this.registroInicial();
-    this.formulario.patchValue({
-      name: registro.name,
-      address: registro.address,
-      phone: registro.phone,
-      is_emergency: registro.is_emergency ?? false,
-      services: registro.services ?? '',
-      bio: registro.bio ?? '',
-    });
-    this.ubicacion.set({ lat: registro.lat ?? undefined, lng: registro.lng ?? undefined });
+    if (registro) {
+      this.formulario.patchValue({
+        name: registro.name,
+        address: registro.address,
+        phone: registro.phone,
+        is_emergency: registro.is_emergency ?? false,
+        services: registro.services ?? '',
+        bio: registro.bio ?? '',
+      });
+      this.ubicacion.set({ lat: registro.lat ?? undefined, lng: registro.lng ?? undefined });
+    }
 
     // schedule es JSONB sin validar: solo se usa si de verdad es una lista.
-    const cargados = Array.isArray(registro.schedule) ? registro.schedule : [];
+    const guardados = registro?.schedule;
+    const cargados = Array.isArray(guardados) ? guardados : [];
     this.horarios.set(
       DIAS_DE_ATENCION.map((day) => {
         const cargado = cargados.find((h) => h.day === day);
@@ -295,15 +305,19 @@ export class FormularioVeterinariaComponent implements OnInit {
     this.error.set(null);
     try {
       // is_verified queda deliberadamente afuera: lo decide administración.
-      await this.supabase.veterinarias.actualizar(this.registroInicial().id, {
+      const ficha = {
         ...this.formulario.getRawValue(),
         // null y no undefined: al serializar, undefined desaparece y "Quitar"
         // dejaba las coordenadas viejas en la base.
         lat: this.ubicacion().lat ?? null,
         lng: this.ubicacion().lng ?? null,
         schedule: atencion.map(({ day, open, close }) => ({ day, open, close })),
-      });
-      this.guardado.emit();
+      };
+      const registro = this.registroInicial();
+      const guardada = registro
+        ? await this.supabase.veterinarias.actualizar(registro.id, ficha)
+        : await this.supabase.veterinarias.crear(ficha);
+      this.guardado.emit(guardada);
     } catch (error) {
       this.error.set(mensajeDeError(error));
     } finally {
