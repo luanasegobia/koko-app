@@ -114,12 +114,20 @@
 
   &[data-estado='danger'] {
     border-left-color: var(--ion-color-danger);
-    background: linear-gradient(to right, rgba(var(--ion-color-danger-rgb), 0.06), var(--ion-card-background) 50%);
+    background: linear-gradient(
+      to right,
+      rgba(var(--ion-color-danger-rgb), 0.06),
+      var(--ion-card-background) 50%
+    );
   }
 
   &[data-estado='success'] {
     border-left-color: var(--ion-color-success);
-    background: linear-gradient(to right, rgba(var(--ion-color-success-rgb), 0.06), var(--ion-card-background) 50%);
+    background: linear-gradient(
+      to right,
+      rgba(var(--ion-color-success-rgb), 0.06),
+      var(--ion-card-background) 50%
+    );
   }
 }
 
@@ -200,6 +208,35 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+// Verde de WhatsApp oscurecido para que el texto blanco llegue a 4,5 a 1.
+.boton-whatsapp {
+  --background: #0f7a40;
+  --background-hover: #0c6635;
+  --background-activated: #0c6635;
+  --color: #ffffff;
+
+  &[fill='clear'] {
+    --color: #0f7a40;
+  }
+
+  // Cerrada: se puede escribir igual, pero el botón no compite con las abiertas.
+  &.cerrada {
+    --background: transparent;
+    --background-hover: rgba(15, 122, 64, 0.08);
+    --border-color: #0f7a40;
+    --color: #0f7a40;
+  }
+}
+
+// En modo oscuro el verde de texto se aclara para seguir leyéndose sobre azul noche.
+:host-context(.ion-palette-dark) .boton-whatsapp {
+  &[fill='clear'],
+  &.cerrada {
+    --border-color: #4ade80;
+    --color: #4ade80;
+  }
 }
 
 .llamar {
