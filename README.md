@@ -242,6 +242,11 @@ npx cap open android
 
 Cada vez que cambie el código web: `npm run build && npx cap sync`.
 
+La carpeta `android/` se genera en cada máquina y no se sube al repositorio. En Android Studio hay que
+abrir **`android`**, no la raíz del proyecto: abierta la raíz, no aparece nada para ejecutar. Si la ruta
+de la carpeta tiene espacios, `npx cap run android` no encuentra `gradlew`; en ese caso se compila e
+instala con el botón Run de Android Studio.
+
 ---
 
 ## Estado del proyecto
