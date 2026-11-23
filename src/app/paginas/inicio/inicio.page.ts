@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonFooter, IonIcon } from '@ionic/angular';
@@ -28,6 +29,7 @@ const MODULOS: Modulo[] = [
 @Component({
   selector: 'app-inicio',
   imports: [
+    NgTemplateOutlet,
     RouterLink,
     IonContent,
     IonFooter,

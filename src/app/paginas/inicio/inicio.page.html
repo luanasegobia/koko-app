@@ -6,6 +6,10 @@
       <div class="texto-portada">
         <h1>Conectando Huellas</h1>
         <p class="bajada">Bienvenidos a Koko, tu comunidad mascotera de confianza</p>
+        <!-- En escritorio las acciones van acá; en el teléfono, fijas al pie. -->
+        <div class="acciones acciones-portada">
+          <ng-container [ngTemplateOutlet]="acciones" />
+        </div>
       </div>
       <div class="dibujo">
         <svg
@@ -211,13 +215,17 @@
 
 <ion-footer class="ion-no-border">
   <div class="acciones">
-    <a class="accion urgente" routerLink="/perdidas" [queryParams]="{ action: 'report' }">
-      <ion-icon name="megaphone-outline" aria-hidden="true"></ion-icon>
-      <span>Publicar perdida</span>
-    </a>
-    <a class="accion" routerLink="/perdidas" [queryParams]="{ action: 'sighting' }">
-      <ion-icon name="camera-outline" aria-hidden="true"></ion-icon>
-      <span>Reportar hallazgo</span>
-    </a>
+    <ng-container [ngTemplateOutlet]="acciones" />
   </div>
 </ion-footer>
+
+<ng-template #acciones>
+  <a class="accion urgente" routerLink="/perdidas" [queryParams]="{ action: 'report' }">
+    <ion-icon name="megaphone-outline" aria-hidden="true"></ion-icon>
+    <span>Publicar perdida</span>
+  </a>
+  <a class="accion" routerLink="/perdidas" [queryParams]="{ action: 'sighting' }">
+    <ion-icon name="camera-outline" aria-hidden="true"></ion-icon>
+    <span>Reportar hallazgo</span>
+  </a>
+</ng-template>
