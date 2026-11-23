@@ -11,7 +11,8 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'ar.com.koko.app',
   appName: 'Koko',
-  webDir: 'www',
+  // El build de Angular deja la app en www/browser (www tiene además las licencias y las rutas prerenderizadas).
+  webDir: 'www/browser',
   server: {
     androidScheme: 'https',
   },
