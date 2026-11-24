@@ -19,6 +19,7 @@ const CLAVES = [
   'STRIPE_PUBLISHABLE_KEY',
   'HABILITAR_TIEMPO_REAL',
   'HABILITAR_ALERTAS',
+  'URL_PUBLICA',
 ];
 
 /** Lee un archivo .env sencillo (CLAVE=valor, comentarios con #). */

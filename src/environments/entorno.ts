@@ -18,6 +18,8 @@ export interface VariablesDeEntorno {
   STRIPE_PUBLISHABLE_KEY: string;
   HABILITAR_TIEMPO_REAL: string;
   HABILITAR_ALERTAS: string;
+  /** Dirección del sitio publicado, para los links que salen de la app (el QR de cada mascota). */
+  URL_PUBLICA?: string;
 }
 
 const PASOS_HABITUALES = [
@@ -126,4 +128,17 @@ export function tiempoRealHabilitado(entorno: VariablesDeEntorno = ENTORNO_LOCAL
 /** Sondeo de alertas por cercanía. Apagado por defecto. */
 export function alertasHabilitadas(entorno: VariablesDeEntorno = ENTORNO_LOCAL): boolean {
   return entorno.HABILITAR_ALERTAS === 'true';
+}
+
+/**
+ * La dirección para armar links que otra persona va a abrir, como el QR de la
+ * ficha. Sale de URL_PUBLICA; si está vacía se usa la dirección actual, que en
+ * desarrollo y dentro de la app de Android es localhost y no sirve afuera.
+ */
+export function urlPublica(
+  entorno: VariablesDeEntorno = ENTORNO_LOCAL,
+  origenActual: string = window.location.origin,
+): string {
+  const configurada = entorno.URL_PUBLICA?.trim().replace(/\/+$/, '');
+  return configurada || origenActual;
 }
