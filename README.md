@@ -162,8 +162,6 @@ blanco: muestra una pantalla que dice qué falta y cómo resolverlo.
 | `npm run build` | Compila para producción en `www/` |
 | `npm run preview` | Sirve lo compilado, para probarlo |
 | `npm run docs:pdf` | Exporta cada documento de `docs/` a PDF |
-| `npm run docs:completo` | Arma un único PDF con portada, índice y número de página |
-| `npm run docs:word` | Arma la documentación completa en Word |
 
 ---
 
@@ -365,8 +363,7 @@ un Markdown por etapa:
 | [Presentación](docs/08-presentacion.md) | Guion de la defensa |
 | [Glosario](docs/09-glosario.md) | Términos, siglas y abreviaturas |
 
-Los PDF, el documento completo en Word y la presentación se generan con los comandos
-`docs:*` y los scripts de `scripts/` (ver [`docs/README.md`](docs/README.md)).
+Los PDF se generan con `npm run docs:pdf` (ver [`docs/README.md`](docs/README.md)).
 
 ---
 
