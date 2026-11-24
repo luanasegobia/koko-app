@@ -62,6 +62,12 @@ ion-select {
   font-size: 0.85rem;
   --padding-start: 10px;
   --padding-end: 6px;
+
+  // En fila, ion-select ocupa el 100% por defecto y aplasta la columna de datos.
+  @media (min-width: 640px) {
+    flex: 0 0 170px;
+    width: 170px;
+  }
 }
 
 .capitalizar {
