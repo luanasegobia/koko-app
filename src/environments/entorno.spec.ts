@@ -5,8 +5,21 @@ import {
   hayStripeConfigurado,
   leerConfiguracion,
   tiempoRealHabilitado,
+  urlPublica,
   VariablesDeEntorno,
 } from './entorno';
+
+describe('urlPublica', () => {
+  it('usa URL_PUBLICA sin la barra final', () => {
+    expect(urlPublica(entorno({ URL_PUBLICA: ' https://koko.ar/ ' }), 'https://localhost')).toBe(
+      'https://koko.ar',
+    );
+  });
+
+  it('sin URL_PUBLICA usa la dirección actual', () => {
+    expect(urlPublica(entorno(), 'http://localhost:4200')).toBe('http://localhost:4200');
+  });
+});
 
 /** Arma un JWT con el payload pedido. La firma no importa: nunca se valida acá. */
 const jwtCon = (payload: object) =>

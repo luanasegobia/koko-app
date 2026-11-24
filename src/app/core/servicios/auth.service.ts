@@ -1,4 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { urlPublica } from '../../../environments/entorno';
 import { ErrorDeConfiguracion } from '../errores';
 import { Perfil } from '../modelos';
 import { SupabaseService } from './supabase.service';
@@ -95,7 +96,8 @@ export class AuthService {
 
   async pedirRestablecerContrasena(email: string): Promise<void> {
     const { error } = await this.supabase.cliente.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      // El enlace se abre desde el mail, fuera de la app: tiene que ir al sitio publicado, no a localhost.
+      redirectTo: `${urlPublica()}/reset-password`,
     });
     if (error) throw error;
   }

@@ -1,6 +1,7 @@
 import { Component, computed, effect, input, signal, untracked } from '@angular/core';
 import { IonBadge, IonButton, IonCard, IonIcon } from '@ionic/angular';
 import QRCode from 'qrcode';
+import { urlPublica } from '../../../environments/entorno';
 import { Mascota } from '../../core/modelos';
 
 /**
@@ -184,7 +185,7 @@ export class TarjetaQrComponent {
   readonly mascota = input.required<Mascota>();
   protected readonly imagenQr = signal<string | null>(null);
   protected readonly urlPublica = computed(
-    () => `${window.location.origin}/ficha/${this.mascota().qr_id || this.mascota().id}`,
+    () => `${urlPublica()}/ficha/${this.mascota().qr_id || this.mascota().id}`,
   );
 
   constructor() {
